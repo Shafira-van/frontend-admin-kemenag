@@ -1,0 +1,28 @@
+.layout-navbar {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+}
+
+.layout-body {
+  display: flex;
+  flex: 1;
+}
+
+.layout-content {
+  margin-left: 230px;
+  padding: 20px;
+  flex: 1;
+  background-color: #f9fafb;
+  min-height: calc(100vh - 60px);
+  overflow-y: auto;
+    background: #f5f6fa;
+}
+
+/* Responsif */
+@media (max-width: 992px) {
+  .layout-content {
+    margin-left: 0;
+  }
+}

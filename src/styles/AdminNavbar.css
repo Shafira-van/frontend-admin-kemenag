@@ -1,0 +1,93 @@
+.admin-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-logo {
+  height: 45px;
+}
+
+.navbar-text h1 {
+  font-size: 16px;
+  margin: 0;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.navbar-text p {
+  font-size: 12px;
+  color: #555;
+  margin: 0;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  cursor: pointer;
+  color: #00695c;
+}
+
+.logout:hover {
+  color: #c62828;
+}
+
+.admin-name {
+  font-size: 14px;
+  color: #333;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.clickable:hover {
+  color: #007bff;
+  /* biru saat di-hover */
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .admin-navbar .navbar-left{
+    margin-left: 40px;
+  }
+  .navbar-text h1 {
+    font-size: 12px;
+  }
+  .navbar-logo {
+    height: 30px;
+    display: none;
+  }
+
+  .navbar-right .logout{
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .admin-navbar .navbar-left {
+      margin-left: 40px;
+    }
+    
+    .navbar-logo {
+        display: none;
+      }
+}

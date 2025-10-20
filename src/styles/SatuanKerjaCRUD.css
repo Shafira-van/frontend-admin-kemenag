@@ -1,0 +1,289 @@
+/* ====== WRAPPER UTAMA ====== */
+.satker-crud-container {
+  display: flex;
+  flex-direction: column;
+  background: #f4f6f8;
+  min-height: 100vh;
+  padding: 30px;
+}
+
+/* ====== HEADER ====== */
+.crud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.crud-header h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-add:hover {
+  background: #16a085;
+}
+
+/* ====== TABEL DATA ====== */
+.table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+.satker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.satker-table th,
+.satker-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.satker-table th {
+  background: #f9fafb;
+  color: #34495e;
+  font-weight: 700;
+}
+
+.satker-table td {
+  color: #555;
+  vertical-align: top;
+}
+
+/* ====== AKSI TOMBOL ====== */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-view,
+.btn-edit,
+.btn-delete {
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-view {
+  background: #3498db;
+  color: white;
+}
+
+.btn-edit {
+  background: #f1c40f;
+  color: white;
+}
+
+.btn-delete {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #2980b9;
+}
+
+.btn-edit:hover {
+  background: #d4ac0d;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+}
+
+/* ====== MODAL ====== */
+.modal-overlay {
+  padding-bottom: 0 !important;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  height: fit-content;
+  padding: 30px;
+  width: 95%;
+  max-width: 850px;
+  margin: 30px ;
+  margin-bottom: 0;
+  /* biar gak nempel atas-bawah */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content form {
+  max-height: 70vh;
+  /* batasi tinggi isi form agar scroll muncul di dalam modal */
+  overflow-y: auto;
+  padding-right: 5px;
+  /* biar scrollbar gak nutup teks */
+}
+
+/* tambahkan ini untuk editor agar tidak bikin layout melebar */
+.jodit-wysiwyg {
+  min-height: 160px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.modal-large {
+  max-width: 850px;
+}
+
+.modal-content h3 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 15px;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.modal-content input:focus {
+  border-color: #1abc9c;
+  box-shadow: 0 0 6px rgba(26, 188, 156, 0.3);
+  outline: none;
+}
+
+/* ====== JODIT EDITOR ====== */
+.jodit-wysiwyg {
+  min-height: 160px;
+}
+
+/* ====== FORM BUTTONS ====== */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-save {
+  background: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background: #16a085;
+}
+
+.btn-cancel {
+  background: #bdc3c7;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #95a5a6;
+}
+
+/* ====== PREVIEW ====== */
+.about-section {
+  margin-top: 18px;
+}
+
+.about-section h4 {
+  font-size: 16px;
+  color: #2c3e50;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.about-section div {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  line-height: 1.6;
+}
+
+/* ====== ANIMASI ====== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 20px;
+  }
+
+  .crud-header h2 {
+    font-size: 20px;
+  }
+
+  .btn-add {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .satker-table th,
+  .satker-table td {
+    font-size: 13px;
+    padding: 10px;
+  }
+}

@@ -1,0 +1,14 @@
+.admin-layanan .section-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0b8043;
+}
+
+.admin-layanan table th,
+.admin-layanan table td {
+  vertical-align: middle;
+}
+
+.admin-layanan .btn {
+  border-radius: 8px;
+}

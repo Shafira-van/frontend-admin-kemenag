@@ -1,0 +1,384 @@
+/* ==== SIDEBAR UTAMA ==== */
+.admin-sidebar {
+  position: fixed;
+  top: 0px;
+  /* mulai di bawah navbar */
+  margin-top: 6px;
+  left: 0;
+  width: 230px;
+  height: calc(100vh - 60px);
+  /* tinggi dikurangi navbar */
+  background-color: #00695c;
+  /* hijau tosca tua */
+  color: white;
+  padding-top: 20px;
+  transition: left 0.3s ease;
+  z-index: 900;
+  /* di bawah navbar (1000) tapi di atas konten */
+  overflow-y: auto;
+}
+
+/* Sidebar terbuka di perangkat kecil */
+.admin-sidebar.open {
+  left: 0;
+}
+
+/* ==== MENU ==== */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin-bottom: 8px;
+}
+
+.sidebar-menu a,
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  background: none;
+}
+
+/* Hover dan aktif */
+.sidebar-menu a:hover,
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.sidebar-menu a.active {
+  background: #004d40;
+  /* hijau lebih gelap */
+  border-left: 4px solid #00e676;
+  /* hijau neon */
+  color: #fff;
+}
+
+/* ==== LOGOUT BUTTON ==== */
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+/* ==== TOGGLE BUTTON (BURGER MENU) ==== */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  background: #004d40;
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 2001;
+  /* di atas navbar (1000) */
+  transition: background 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background: #00796b;
+}
+
+/* ==== OVERLAY ==== */
+.overlay {
+  position: fixed;
+  top: 60px;
+  /* mulai di bawah navbar */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 800;
+  /* di bawah sidebar */
+  display: none;
+}
+
+/* ==== RESPONSIVE ==== */
+
+/* 📱 HP */
+@media (max-width: 700px) {
+
+  /* Tombol burger muncul */
+  .sidebar-toggle {
+    display: block;
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Sidebar tertutup awal */
+  .admin-sidebar {
+    left: -250px;
+    height: calc(100vh - 60px);
+    top: 60px;
+    z-index: 900;
+  }
+
+  /* Sidebar terbuka */
+  .admin-sidebar.open {
+    left: 0;
+    z-index: 1000;
+  }
+
+  /* Overlay aktif hanya saat sidebar terbuka */
+  .overlay {
+    display: block;
+  }
+}
+
+/* 💻 Tablet */
+@media (max-width: 1000px) {
+  .sidebar-toggle {
+    display: block;
+    /* burger muncul juga di tablet */
+  }
+
+  .admin-sidebar {
+    left: -250px;
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  .overlay {
+    display: block;
+  }
+}
+
+/* 💻 Desktop */
+@media (min-width: 1001px) {
+  .sidebar-toggle {
+    display: none;
+    /* burger disembunyikan */
+  }
+
+  .overlay {
+    display: none;
+  }
+/* ==== SIDEBAR UTAMA ==== */
+.admin-sidebar {
+  position: fixed;
+  top: 60px;
+  /* mulai di bawah navbar */
+  left: 0;
+  width: 230px;
+  height: calc(100vh - 60px);
+  background-color: #00695c;
+  /* hijau tosca tua */
+  color: white;
+  padding-top: 20px;
+  transition: all 0.3s ease;
+  z-index: 900;
+  /* di bawah navbar (1000) tapi di atas konten */
+  overflow-y: auto;
+}
+
+/* Sidebar terbuka */
+.admin-sidebar.open {
+  left: 0;
+}
+
+/* ==== MENU ==== */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin-bottom: 8px;
+}
+
+.sidebar-menu a,
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  background: none;
+}
+
+.sidebar-menu a:hover,
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.sidebar-menu a.active {
+  background: #004d40;
+  border-left: 4px solid #00e676;
+  color: #fff;
+}
+
+/* ==== LOGOUT BUTTON ==== */
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+/* ==== TOGGLE BUTTON (BURGER) ==== */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  background: #004d40;
+  border: none;
+  color: white;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 2001;
+  transition: background 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  background: #00796b;
+}
+
+/* ==== TOMBOL CLOSE DI DALAM SIDEBAR ==== */
+.sidebar-close {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 22px;
+  z-index: 2002;
+}
+
+/* ==== OVERLAY ==== */
+.overlay {
+  position: fixed;
+  top: 0;
+  /* full screen */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 800;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* ==== RESPONSIVE ==== */
+
+/* 📱 HP */
+@media (max-width: 700px) {
+  .sidebar-toggle {
+    display: block;
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Sidebar menutupi seluruh layar */
+  .admin-sidebar {
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    width: 230px;
+    z-index: 1001;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  /* Tombol close muncul di pojok kanan atas sidebar */
+  .sidebar-close {
+    display: block;
+  }
+
+  /* Overlay aktif */
+  .overlay.active {
+    display: block;
+    opacity: 1;
+  }
+}
+
+/* 💻 Tablet */
+@media (max-width: 1000px) {
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .admin-sidebar {
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    z-index: 1001;
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-close {
+    display: block;
+  }
+
+  .overlay.active {
+    display: block;
+    opacity: 1;
+  }
+}
+
+/* 💻 Desktop */
+@media (min-width: 1001px) {
+  .sidebar-toggle {
+    display: none;
+  }
+
+  .sidebar-close {
+    display: none;
+  }
+
+  .overlay {
+    display: none;
+  }
+
+  .admin-sidebar {
+    top: 60px;
+    height: calc(100vh - 60px);
+    left: 0;
+  }
+}
+  .admin-sidebar {
+    left: 0;
+  }
+}
