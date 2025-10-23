@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios"; // install dulu: npm install axios
 import "../styles/Login.css";
 import { ClockFading } from "lucide-react";
+import { API_URL } from "../config";
 
 function Login() {
   const [user, setUser] = useState("");
@@ -11,27 +12,23 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/profilAdmin/login",
-        {
-          username: user,
-          password: pass,
-        }
-      );
+      const res = await axios.post(`${API_URL}/profilAdmin/login`, {
+        username: user,
+        password: pass,
+      });
 
-      console.log(user)
+      console.log("Login berhasil untuk:", user);
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
-        localStorage.setItem("username", user); 
+        localStorage.setItem("username", user);
         navigate("/login/dashboard");
       } else {
         alert("Login gagal: token tidak diterima");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       alert("Username atau Password salah!");
     }
   };

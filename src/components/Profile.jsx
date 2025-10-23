@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Profile.css";
 import { Edit, KeyRound } from "lucide-react";
+import { API_URL} from "../config";
 
-const API_URL = "http://localhost:3000/api/profilAdmin";
+// const API_URL = "http://localhost:3000/api/profilAdmin";
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -22,7 +23,7 @@ const Profile = () => {
     const username = localStorage.getItem("username");
     if (!username) return;
 
-    fetch(`${API_URL}?username=${username}`)
+    fetch(`${API_URL}/profilAdmin?username=${username}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -52,7 +53,7 @@ const Profile = () => {
     if (!profile?.id) return alert("Data admin tidak ditemukan.");
 
     try {
-      const res = await fetch(`${API_URL}/${profile.id}`, {
+      const res = await fetch(`${API_URL}/profilAdmin/${profile.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -81,7 +82,7 @@ const Profile = () => {
     }
 
     try {
-      const res = await fetch(`${API_URL}/${profile.id}`, {
+      const res = await fetch(`${API_URL}/profilAdmin/${profile.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

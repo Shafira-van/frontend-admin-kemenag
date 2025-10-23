@@ -1,2 +1,2 @@
-export const API_URL = "http://localhost:3000/api";
-export const API_UPLOAD = "http://localhost:3000/uploads";
+export const API_URL = "https://api.kemenag-pematangsiantar.com/api";
+export const API_UPLOAD = "https://api.kemenag-pematangsiantar.com/uploads";
