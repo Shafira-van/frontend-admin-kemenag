@@ -43,7 +43,7 @@ const Dashboard = () => {
 
         // Set summary
         setDataSummary({
-          berita: berita.length,
+          berita: berita.total,
           layanan: layanan.length,
           pengaduan: pengaduan.length,
           admin: admin.length,

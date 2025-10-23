@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import "../styles/InformasiCRUD.css";
 import { format, parseISO } from "date-fns";
-
-const API_URL = "http://localhost:3000/api/informasi";
-const API_UPLOADS = "http://localhost:3000";
+import { API_URL, API_UPLOADS } from "../config";
 
 const InformasiCRUD = () => {
   const [informasiList, setInformasiList] = useState([]);
@@ -16,11 +14,9 @@ const InformasiCRUD = () => {
     file: "",
   });
   const [filePreview, setFilePreview] = useState(null);
-
-  console.log(formData)
   // Fetch data informasi
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/informasi`)
       .then((res) => res.json())
       .then((data) => setInformasiList(data))
       .catch((err) => console.error("Error fetching informasi:", err));
@@ -30,13 +26,17 @@ const InformasiCRUD = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id
+      ? `${API_URL}/informasi/${formData.id}`
+      : `${API_URL}/informasi`;
 
     const body = new FormData();
     Object.entries(formData).forEach(([key, val]) => body.append(key, val));
 
     await fetch(url, { method, body });
-    const updated = await fetch(API_URL).then((res) => res.json());
+    const updated = await fetch(`${API_URL}/informasi`).then((res) =>
+      res.json()
+    );
     setInformasiList(updated);
 
     closeModal();
@@ -55,20 +55,21 @@ const InformasiCRUD = () => {
   // Preview informasi
   const handlePreview = (info) => {
     setFormData(info);
-    setFilePreview(
-      info.file_path
-        ? typeof info.file_path === "string"
-          ? `${API_UPLOADS}/${info.file_path}`
-          : URL.createObjectURL(info.file_path)
-        : null
-    );
+    if (info.file_path && typeof info.file_path === "string") {
+      setFilePreview(`${API_UPLOADS}/${info.file_path}`);
+    } else if (info.file_path instanceof File) {
+      setFilePreview(URL.createObjectURL(info.file_path));
+    } else {
+      setFilePreview(null);
+    }
+
     setModalMode("preview");
   };
 
   // Hapus informasi
   const handleDelete = async (id) => {
     if (window.confirm("Hapus data informasi ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/informasi/${id}`, { method: "DELETE" });
       setInformasiList(informasiList.filter((n) => n.id !== id));
     }
   };

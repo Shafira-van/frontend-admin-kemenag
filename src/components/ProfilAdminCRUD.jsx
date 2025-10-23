@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import "../styles/ProfilAdminCRUD.css";
+import { API_URL, API_UPLOADS } from "../config";
 
-const API_URL = "http://localhost:3000/api/profilAdmin"; // Ganti sesuai endpoint kamu
+// const API_URL = "http://localhost:3000/api/profilAdmin"; // Ganti sesuai endpoint kamu
 
 const ProfilAdminCRUD = () => {
   const [adminList, setAdminList] = useState([]);
@@ -18,7 +19,7 @@ const ProfilAdminCRUD = () => {
 
   // Fetch data admin dari API
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/profilAdmin`)
       .then((res) => res.json())
       .then((data) => setAdminList(data))
       .catch((err) => console.error("Error fetching:", err));
@@ -29,7 +30,9 @@ const ProfilAdminCRUD = () => {
     e.preventDefault();
 
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id
+      ? `${API_URL}/profilAdmin/${formData.id}`
+      : `${API_URL}/profilAdmin`;
 
     // Jika tambah admin baru, gunakan password default
     const payload = {
@@ -43,7 +46,9 @@ const ProfilAdminCRUD = () => {
       body: JSON.stringify(payload),
     });
 
-    const updated = await fetch(API_URL).then((res) => res.json());
+    const updated = await fetch(`${API_URL}/profilAdmin`).then((res) =>
+      res.json()
+    );
     setAdminList(updated);
     closeModal();
   };
@@ -66,7 +71,7 @@ const ProfilAdminCRUD = () => {
   // Hapus admin
   const handleDelete = async (id) => {
     if (window.confirm("Yakin ingin menghapus admin ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/profilAdmin/${id}`, { method: "DELETE" });
       setAdminList(adminList.filter((a) => a.id !== id));
     }
   };

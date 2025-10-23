@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import "../styles/KuaCRUD.css";
+import { API_URL, API_UPLOADS } from "../config";
 
-const API_URL = "http://localhost:3000/api/kua";
-const API_UPLOADS = "http://localhost:3000";
+// const API_URL = "http://localhost:3000/api/kua";
+// const API_UPLOADS = "http://localhost:3000";
 
 const KuaCRUD = () => {
   const [kuaList, setKuaList] = useState([]);
@@ -21,7 +22,7 @@ const KuaCRUD = () => {
 
   // Ambil data KUA
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/kua`)
       .then((res) => res.json())
       .then((data) =>
         setKuaList(
@@ -43,7 +44,9 @@ const KuaCRUD = () => {
     e.preventDefault();
 
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id
+      ? `${API_URL}/kua/${formData.id}`
+      : `${API_URL}/kua`;
 
     const body = new FormData();
     body.append("name", formData.name);
@@ -56,7 +59,7 @@ const KuaCRUD = () => {
     }
 
     await fetch(url, { method, body });
-    const updated = await fetch(API_URL).then((res) => res.json());
+    const updated = await fetch(`${API_URL}/kua`).then((res) => res.json());
     setKuaList(updated);
     closeModal();
   };
@@ -92,7 +95,7 @@ const KuaCRUD = () => {
   // Hapus data
   const handleDelete = async (id) => {
     if (window.confirm("Yakin ingin menghapus data ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/kua/${id}`, { method: "DELETE" });
       setKuaList(kuaList.filter((n) => n.id !== id));
     }
   };

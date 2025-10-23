@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/PengaduanCRUD.css";
 import { Eye, Trash2 } from "lucide-react";
+import { API_URL, API_UPLOADS } from "../config";
 
-const API_URL = "http://localhost:3000/api/pengaduan";
 
 const PengaduanCRUD = () => {
   const [pengaduanList, setPengaduanList] = useState([]);
@@ -10,7 +10,7 @@ const PengaduanCRUD = () => {
 
   // Ambil data pengaduan dari API
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/pengaduan`)
       .then((res) => res.json())
       .then((data) => setPengaduanList(data))
       .catch((err) => console.error("Error fetching pengaduan:", err));
@@ -19,7 +19,7 @@ const PengaduanCRUD = () => {
   // Hapus pengaduan
   const handleDelete = async (id) => {
     if (window.confirm("Apakah Anda yakin ingin menghapus pengaduan ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/pengaduan/${id}`, { method: "DELETE" });
       setPengaduanList(pengaduanList.filter((n) => n.id !== id));
     }
   };
@@ -34,7 +34,7 @@ const PengaduanCRUD = () => {
   // 🔄 Ganti status dari dropdown
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await fetch(`${API_URL}/${id}`, {
+      await fetch(`${API_URL}/pengaduan/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -84,14 +84,17 @@ const PengaduanCRUD = () => {
                 </td>
                 <td>
                   <select
-                    value={p.status}
+                    value={p.status || "MENUNGGU"}
                     onChange={(e) => handleStatusChange(p.id, e.target.value)}
-                    className={`status-select ${p.status.toLowerCase()}`}>
+                    className={`status-select ${
+                      p.status ? p.status.toLowerCase() : "menunggu"
+                    }`}>
                     <option value="MENUNGGU">Menunggu</option>
                     <option value="PROSES">Proses</option>
                     <option value="SELESAI">Selesai</option>
                   </select>
                 </td>
+
                 <td className="action-buttons">
                   <button
                     className="btn-view"
@@ -137,8 +140,10 @@ const PengaduanCRUD = () => {
             <p>
               <strong>Status:</strong>{" "}
               <span
-                className={`status-badge ${modalData.status.toLowerCase()}`}>
-                {modalData.status}
+                className={`status-badge ${(
+                  modalData.status || "MENUNGGU"
+                ).toLowerCase()}`}>
+                {modalData.status || "MENUNGGU"}
               </span>
             </p>
             <div style={{ marginTop: "15px", textAlign: "right" }}>

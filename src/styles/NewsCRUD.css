@@ -1,8 +1,11 @@
+/* ==========================
+   🎯 WRAPPER & HEADER
+========================== */
 .news-crud-container {
-  background: white;
+  background: #fff;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .crud-header {
@@ -13,9 +16,10 @@
 }
 
 .crud-header h2 {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   color: #004d40;
+  margin: 0;
 }
 
 .btn-add {
@@ -23,15 +27,116 @@
   align-items: center;
   gap: 6px;
   background: #00695c;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background 0.3s;
+  font-weight: 500;
 }
 
 .btn-add:hover {
   background: #004d40;
+}
+
+/* ==========================
+   🔍 FILTER SECTION
+========================== */
+.filter-bar {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 🔸 Search box */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+  border-color: #00695c;
+  box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  flex: 1;
+  background: transparent;
+  font-size: 14px;
+  color: #333;
+}
+
+/* 🔸 Inline filter row */
+.filter-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.filter-item label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #004d40;
+}
+
+.filter-item select,
+.filter-item input[type="date"] {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.filter-item select:focus,
+.filter-item input[type="date"]:focus {
+  border-color: #00695c;
+}
+
+/* 🔸 Date range */
+.date-range .date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range span {
+  font-weight: 600;
+  color: #777;
+}
+
+/* ==========================
+   📋 TABLE
+========================== */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #eee;
 }
 
 .news-table {
@@ -40,13 +145,10 @@
   font-size: 14px;
 }
 
-.news-table td {
-  height: 120px;
-}
 .news-table th,
 .news-table td {
+  padding: 12px;
   border-bottom: 1px solid #e0e0e0;
-  padding: 10px;
   text-align: left;
   vertical-align: middle;
 }
@@ -57,75 +159,46 @@
   color: #333;
 }
 
-.table-img {
-  width: 600px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 4px;
+.news-table tr:hover td {
+  background: #f9f9f9;
+}
+
+.news-table td {
+  color: #444;
 }
 
 .preview-img {
   width: 100%;
-  max-height: 200px;
   max-width: 250px;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  margin-top: 8px;
-  border-radius: 6px;
-}
-
-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  background-color: #fff;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-select:focus {
-  border-color: #007bff;
-}
-
-.jodit-container {
-  height: 400px !important;
+  max-height: 200px;
+  object-fit: cover;
   border-radius: 8px;
-  overflow: hidden;
 }
 
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-}
-
-.status-badge.published {
-  background: #c8e6c9;
-  color: #2e7d32;
-}
-
-.status-badge.draft {
-  background: #ffe0b2;
-  color: #ef6c00;
-}
-
+/* ==========================
+   ⚙️ ACTION BUTTONS
+========================== */
 .action-buttons {
   display: flex;
   align-items: center;
-  gap:8px;
-  color: blue;
+  gap: 10px;
 }
 
 .action-buttons button {
   border: none;
   background: none;
   cursor: pointer;
-  padding: 0;
   display: flex;
   align-items: center;
+  transition: transform 0.2s;
+}
+
+.action-buttons button:hover {
+  transform: scale(1.15);
+}
+
+.btn-view {
+  color: #2e7d32;
 }
 
 .btn-edit {
@@ -136,45 +209,33 @@ select:focus {
   color: #d32f2f;
 }
 
-.btn-view {
-  color: #388e3c;
-  
-}
-
-/* Modal */
-/* Modal Overlay */
+/* ==========================
+   🧩 MODAL
+========================== */
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  overflow-y: auto;
-  /* ✅ Tambahkan ini supaya bisa scroll saat konten panjang */
-  padding: 40px 0;
-  /* Supaya ada jarak atas bawah */
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.45)!important;
+  display: flex!important;
+  justify-content: center!important;
+  align-items: center!important;
+  z-index: 999!important;
+  overflow-y: auto!important;
+  padding: 30px!important;
 }
 
-/* Modal Content */
 .modal-content {
-  background: white;
-  padding: 25px;
-  margin-top: 100px;
-  margin-bottom: 10px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 1000px;
-  /* ✅ Lebar maksimal */
-  max-height: 90vh;
-  /* ✅ Biar gak keluar layar */
-  overflow-y: auto;
-  /* ✅ Scroll dalam modal */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  background: #ffffff!important;
+  border-radius: 16px!important;
+  width: 100% !important;
+  max-width: 1400px!important;
+  /* ✅ modal penuh di desktop */
+  overflow-y: auto!important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3)!important;
+  padding: 32px!important;
+  position: relative!important;
+  transition: all 0.3s ease!important;
+  animation: fadeIn 0.25s ease!important;
 }
 
 .modal-content h3 {
@@ -184,93 +245,33 @@ select:focus {
 
 .modal-content label {
   font-size: 14px;
+  font-weight: 600;
+  color: #333;
   display: block;
   margin-top: 10px;
-  color: #333;
 }
 
 .modal-content input,
 .modal-content select {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  margin-top: 4px;
-}
-
-/* 🔹 Paksa modal jadi lebih besar */
-.modal-overlay .modal-content.modal-large {
-  width: 90% !important;
-  max-width: 1200px !important;
-  height: auto !important;
-}
-
-/* 🔹 Perlebar semua elemen input di dalam form */
-.modal-content form input[type="text"],
-.modal-content form input[type="date"],
-.modal-content form select,
-.modal-content form textarea,
-.modal-content form .jodit-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  font-size: 16px !important;
-  padding: 10px 14px !important;
-  box-sizing: border-box !important;
-}
-
-/* 🔹 Tinggikan area editor */
-.modal-content form .jodit-container {
-  min-height: 350px !important;
-}
-
-/* 🔹 Tambahkan jarak antar elemen */
-.modal-content form>div {
-  margin-bottom: 18px !important;
-}
-
-/* 🔹 Perbesar teks label */
-.modal-content form label {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  display: block !important;
-  margin-bottom: 5px !important;
-}
-
-/* 🔹 Tombol di bagian bawah */
-.form-actions {
-  display: flex !important;
-  justify-content: flex-end !important;
-  gap: 12px !important;
-  margin-top: 15px !important;
-}
-
-/* 🔹 Tombol lebih besar */
-.btn-save,
-.btn-cancel {
-  padding: 10px 22px !important;
-  font-size: 15px !important;
-  border-radius: 8px !important;
-}
-
-.modal-large {
-  width: 90%;
-  height: 90vh;
+  margin-top: 6px;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
-  margin-bottom: 15px;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
   gap: 10px;
+  margin-top: 20px;
   position: sticky;
-  /* ✅ Agar tombol tetap terlihat */
   bottom: 0;
   background: white;
   padding-top: 10px;
@@ -280,9 +281,10 @@ select:focus {
   background: #00695c;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .btn-save:hover {
@@ -292,7 +294,7 @@ select:focus {
 .btn-cancel {
   background: #ccc;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -301,34 +303,101 @@ select:focus {
   background: #b0b0b0;
 }
 
-/* Responsif */
-@media (max-width: 600px) {
+/* ==========================
+   ✏️ JODIT EDITOR AREA
+========================== */
+.jodit-container {
+  /* min-height: 400px !important; */
+  /* ✅ tinggi default */
+  /* max-height: 100px; */
+  /* ✅ biar tidak terlalu panjang */
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Jika kamu ingin textarea-nya lebih besar lagi */
+.modal-content form .jodit-container {
+  min-height: 340px !important;
+  /* ✅ lebar penuh modal */
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 15px;
+}
+
+/* Tambahkan padding biar isi editor nggak terlalu mepet */
+.jodit-wysiwyg {
+  padding: 12px !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ==========================
+   📱 RESPONSIVE
+========================== */
+@media (max-width: 768px) {
   .modal-content {
-    width: 90%;
-  }
-  .table-wrapper {
-
-          overflow-y: hidden;
-          /* scroll vertikal */
-          overflow-x: auto;
-          /* sembunyikan scroll horizontal */
-          border: 1px solid #e0e0e0;
-          /* opsional agar terlihat batas */
-          border-radius: 8px;
+      width: 95%;
+      height: 90vh;
+      padding: 24px;
+    }
+    .filter-inline {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .news-crud-container h2{
+  .filter-item {
+    width: 100%;
+  }
+
+  .news-crud-container {
+    padding: 15px;
+  }
+
+  .crud-header h2 {
     font-size: 18px;
   }
-  .btn-add{
-    font-size: 0px;
-    
+
+  .btn-add {
+    padding: 8px 10px;
   }
-    .news-table td {
-      height: 220px;
-    }
+
   .news-table th,
   .news-table td {
     font-size: 12px;
+    padding: 8px;
   }
+}
+
+@media (max-width: 1024px) {
+  .modal-content {
+      max-width: 95%!important;
+      height: 90vh!important;
+      padding: 28px!important;
+    }
+}
+
+/* Smartphone (bawah 600px) */
+@media (max-width: 600px) {
+  .modal-overlay {
+      padding: 10px;
+    }
+  
+    .modal-content {
+      width: 100%!important;
+      height: 95vh!important;
+      max-width: none!important;
+      border-radius: 10px!important;
+      padding: 180px!important;
+    }
 }

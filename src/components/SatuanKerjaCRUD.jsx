@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import JoditEditor from "jodit-react";
 import "../styles/SatuanKerjaCRUD.css";
+import { API_URL, API_UPLOADS } from "../config";
 
-const API_URL = "http://localhost:3000/api/satuankerja";
+// const API_URL = "http://localhost:3000/api/satuankerja";
 
 const SatuanKerjaCRUD = () => {
   const [satkerList, setSatkerList] = useState([]);
@@ -19,18 +20,23 @@ const SatuanKerjaCRUD = () => {
   const tugasEditor = useRef(null);
   const fungsiEditor = useRef(null);
 
-  useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setSatkerList(data))
-      .catch((err) => console.error("Gagal memuat data:", err));
-  }, []);
+useEffect(() => {
+  fetch(`${API_URL}/satuankerja`)
+    .then((res) => res.json())
+    .then((data) => {
+      setSatkerList(data);
+    })
+    .catch((err) => console.error("Gagal memuat data:", err));
+}, []);
+
 
   // 🔹 Simpan data (tambah/edit)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id
+      ? `${API_URL}/satuankerja/${formData.id}`
+      : `${API_URL}/satuankerja`;
 
     await fetch(url, {
       method,
@@ -38,8 +44,11 @@ const SatuanKerjaCRUD = () => {
       body: JSON.stringify(formData),
     });
 
-    const updated = await fetch(API_URL).then((res) => res.json());
-    setSatkerList(updated);
+    const updated = await fetch(`${API_URL}/satuankerja`).then((res) =>
+      res.json()
+    );
+
+    setSatkerList(Array.isArray(updated.data) ? updated.data : updated);
     closeModal();
   };
 
@@ -55,7 +64,7 @@ const SatuanKerjaCRUD = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Hapus satuan kerja ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/satuankerja/${id}`, { method: "DELETE" });
       setSatkerList(satkerList.filter((n) => n.id !== id));
     }
   };

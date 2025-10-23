@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import "../styles/NewsCRUD.css";
-
-const API_URL = "http://localhost:3000/api/infografis";
-const API_UPLOADS = "http://localhost:3000/uploads/infografis";
+import { API_URL, API_UPLOADS } from "../config";
 
 const InfografisCRUD = () => {
   const [infografisList, setInfografisList] = useState([]);
@@ -17,7 +15,7 @@ const InfografisCRUD = () => {
 
   // 🔹 Fetch semua infografis
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/infografis`)
       .then((res) => res.json())
       .then((data) => setInfografisList(data))
       .catch((err) => console.error("Error fetching infografis:", err));
@@ -27,14 +25,18 @@ const InfografisCRUD = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id
+      ? `${API_URL}/infografis/${formData.id}`
+      : `${API_URL}/infografis`;
 
     const body = new FormData();
     Object.entries(formData).forEach(([key, val]) => body.append(key, val));
 
     await fetch(url, { method, body });
 
-    const updated = await fetch(API_URL).then((res) => res.json());
+    const updated = await fetch(`${API_URL}/infografis`).then((res) =>
+      res.json()
+    );
     setInfografisList(updated);
     closeModal();
   };
@@ -42,21 +44,25 @@ const InfografisCRUD = () => {
   // 🔹 Edit
   const handleEdit = (item) => {
     setFormData(item);
-    setImagePreview(item.image ? `${API_UPLOADS}/${item.image}` : null);
+    setImagePreview(
+      item.image ? `${API_UPLOADS}/uploads/infografis/${item.image}` : null
+    );
     setModalMode("edit");
   };
 
   // 🔹 Preview
   const handlePreview = (item) => {
     setFormData(item);
-    setImagePreview(item.image ? `${API_UPLOADS}/${item.image}` : null);
+    setImagePreview(
+      item.image ? `${API_UPLOADS}/uploads/infografis/${item.image}` : null
+    );
     setModalMode("preview");
   };
 
   // 🔹 Delete
   const handleDelete = async (id) => {
     if (window.confirm("Hapus infografis ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/infografis/${id}`, { method: "DELETE" });
       setInfografisList(infografisList.filter((n) => n.id !== id));
     }
   };
@@ -95,7 +101,7 @@ const InfografisCRUD = () => {
                 <td>
                   {item.image && (
                     <img
-                      src={`${API_UPLOADS}/${item.image}`}
+                      src={`${API_UPLOADS}/uploads/infografis/${item.image}`}
                       alt="Infografis"
                       style={{ width: "100px", borderRadius: "8px" }}
                     />

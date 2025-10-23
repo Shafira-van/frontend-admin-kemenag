@@ -183,10 +183,89 @@
   background: #b0b0b0;
 }
 
-/* Responsif */
-@media (max-width: 1000px) {
 
+/* ==========================
+   🎯 FILTER BAR
+========================== */
+.filter-bar {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
 }
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.search-box {
+  flex: 1;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  border-color: #00695c;
+  box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
+  outline: none;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #004d40;
+  margin-bottom: 4px;
+}
+
+.filter-group select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.filter-group select:focus {
+  border-color: #00695c;
+}
+
+/* ==========================
+   📱 RESPONSIVE
+========================== */
+@media (max-width: 768px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+}
+
 /* Responsif */
 @media (max-width: 600px) {
   .table-wrapper {

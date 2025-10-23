@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import "../styles/ProfilKetuaCRUD.css";
-
-const API_URL = "http://localhost:3000/api/profilketua";
+import { API_URL, API_UPLOADS } from "../config";
 
 const ProfilKetuaCRUD = () => {
   const [profilList, setProfilList] = useState([]);
@@ -15,7 +14,7 @@ const ProfilKetuaCRUD = () => {
 
   // Fetch data profil ketua
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/profilketua`)
       .then((res) => res.json())
       .then((data) => setProfilList(data))
       .catch((err) => console.error("Error fetching:", err));
@@ -25,7 +24,7 @@ const ProfilKetuaCRUD = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id ? `${API_URL}/profilketua/${formData.id}` : `${API_URL}/profilketua`;
 
     await fetch(url, {
       method,
@@ -33,7 +32,9 @@ const ProfilKetuaCRUD = () => {
       body: JSON.stringify(formData),
     });
 
-    const updated = await fetch(API_URL).then((res) => res.json());
+    const updated = await fetch(`${API_URL}/profilketua`).then((res) =>
+      res.json()
+    );
     setProfilList(updated);
     closeModal();
   };

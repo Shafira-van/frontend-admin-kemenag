@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
 import JoditEditor from "jodit-react";
 import "../styles/NewsCRUD.css";
-import { formatISO, parseISO, format } from "date-fns";
-
-const API_URL = "http://localhost:3000/api/berita";
-const API_UPLOADS = "http://localhost:3000/uploads/berita";
+import { parseISO, format } from "date-fns";
+import { API_URL, API_UPLOADS } from "../config";
 
 const NewsCRUD = () => {
   const [newsList, setNewsList] = useState([]);
+  const [filteredNews, setFilteredNews] = useState([]);
   const [modalMode, setModalMode] = useState(null); // "edit" | "preview"
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [dateRange, setDateRange] = useState({ from: "", to: "" });
+
   const [formData, setFormData] = useState({
     id: null,
     title: "",
@@ -21,61 +26,128 @@ const NewsCRUD = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Fetch berita
+  // Fetch berita dari backend
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/berita?limit=0`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => setNewsList(data))
-      .catch((err) => console.error("Error fetching:", err));
+      .then((data) => {
+        const allNews = Array.isArray(data.data) ? data.data : data;
+        setNewsList(allNews);
+        setFilteredNews(allNews);
+      })
+      .catch((err) => console.error("Error fetching berita:", err));
   }, []);
 
-  // Handle submit (create/update)
+  // Filter kombinasi (kategori, pencarian, tanggal, limit)
+  useEffect(() => {
+    let result = [...newsList];
+
+    // Filter kategori
+    if (categoryFilter) {
+      result = result.filter(
+        (n) =>
+          n.category &&
+          n.category.toLowerCase() === categoryFilter.toLowerCase()
+      );
+    }
+
+    // Filter pencarian
+    if (searchTerm.trim() !== "") {
+      const keyword = searchTerm.toLowerCase();
+      result = result.filter((item) => {
+        const title = item.title?.toLowerCase() || "";
+        const category = item.category?.toLowerCase() || "";
+        const editor = item.editor?.toLowerCase() || "";
+        return (
+          title.includes(keyword) ||
+          category.includes(keyword) ||
+          editor.includes(keyword)
+        );
+      });
+    }
+
+    // Filter rentang tanggal
+    if (dateRange.from && dateRange.to) {
+      const from = new Date(dateRange.from);
+      const to = new Date(dateRange.to);
+      result = result.filter((item) => {
+        const date = new Date(item.date);
+        return date >= from && date <= to;
+      });
+    }
+
+    // Batasi jumlah tampil
+    result = result.slice(0, itemsPerPage);
+    setFilteredNews(result);
+  }, [searchTerm, categoryFilter, dateRange, itemsPerPage, newsList]);
+
+  // Handle submit berita baru
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
 
-    const body = new FormData();
-    Object.entries(formData).forEach(([key, val]) => body.append(key, val));
+    try {
+      const method = formData.id ? "PUT" : "POST";
+      const url = formData.id
+        ? `${API_URL}/berita/${formData.id}`
+        : `${API_URL}/berita`;
 
-    await fetch(url, { method, body });
-    const updated = await fetch(API_URL).then((res) => res.json());
-    setNewsList(updated);
+      const body = new FormData();
 
-    closeModal();
+      // Pastikan field valid
+      if (formData.title) body.append("title", formData.title);
+      if (formData.date) body.append("date", formData.date);
+      if (formData.category) body.append("category", formData.category);
+      if (formData.editor) body.append("editor", formData.editor);
+      if (formData.content) body.append("content", formData.content);
+      if (formData.image instanceof File) body.append("image", formData.image);
+
+      const res = await fetch(url, { method, body, credentials: "include" });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`HTTP ${res.status} – ${errText}`);
+      }
+
+      // Refresh data terbaru
+      const updated = await fetch(`${API_URL}/berita?limit=0`, {
+        credentials: "include",
+      }).then((res) => res.json());
+
+      const allNews = Array.isArray(updated.data) ? updated.data : updated;
+      setNewsList(allNews);
+      closeModal();
+    } catch (err) {
+      console.error("❌ Error saat submit berita:", err);
+      alert("Gagal menyimpan berita. Cek console/log backend.");
+    }
   };
 
-  // Open modal edit
-  // Saat edit
- const handleEdit = (news) => {
-   const dateValue = news.date ? format(parseISO(news.date), "yyyy-MM-dd") : "";
-   setFormData({ ...news, date: dateValue });
-   setImagePreview(news.image ? `${API_UPLOADS}/${news.image}` : null);
-   setModalMode("edit");
- };
+  const handleEdit = (news) => {
+    const dateValue = news.date
+      ? format(parseISO(news.date), "yyyy-MM-dd")
+      : "";
+    setFormData({ ...news, date: dateValue });
+    setImagePreview(news.image ? `${API_UPLOADS}/berita/${news.image}` : null);
+    setModalMode("edit");
+  };
 
-  // Open modal preview
   const handlePreview = (news) => {
     setFormData(news);
     setImagePreview(
-      news.image
-        ? typeof news.image === "string"
-          ? `${API_UPLOADS}/${news.image}`
-          : URL.createObjectURL(news.image)
-        : null
+      news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null
     );
     setModalMode("preview");
   };
 
-  // Delete berita
   const handleDelete = async (id) => {
     if (window.confirm("Hapus berita ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/berita/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       setNewsList(newsList.filter((n) => n.id !== id));
     }
   };
 
-  // Close modal
   const closeModal = () => {
     setModalMode(null);
     setFormData({
@@ -90,8 +162,6 @@ const NewsCRUD = () => {
     setImagePreview(null);
   };
 
-  
-
   return (
     <div className="news-crud-container">
       <div className="crud-header">
@@ -101,6 +171,78 @@ const NewsCRUD = () => {
         </button>
       </div>
 
+      {/* === FILTER BAR === */}
+      <div className="filter-bar">
+        <div className="filter-group">
+          <div className="search-box">
+            <Search size={16} />
+            <input
+              type="text"
+              placeholder="Cari judul, kategori, atau editor..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="filter-inline">
+            <div className="filter-item">
+              <label>Kategori</label>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}>
+                <option value="">Semua</option>
+                <option value="Bimas Islam">Bimas Islam</option>
+                <option value="Sekretariat Jenderal">
+                  Sekretariat Jenderal
+                </option>
+                <option value="Bimas Kristen">Bimas Kristen</option>
+                <option value="Pendidikan">Pendidikan</option>
+                <option value="Penyelenggara Katolik">
+                  Penyelenggara Katolik
+                </option>
+                <option value="Penyelenggara Buddha">
+                  Penyelenggara Buddha
+                </option>
+              </select>
+            </div>
+
+            <div className="filter-item">
+              <label>Tampilkan</label>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+
+            <div className="filter-item date-range">
+              <label>Periode</label>
+              <div className="date-inputs">
+                <input
+                  type="date"
+                  value={dateRange.from}
+                  onChange={(e) =>
+                    setDateRange({ ...dateRange, from: e.target.value })
+                  }
+                />
+                <span>–</span>
+                <input
+                  type="date"
+                  value={dateRange.to}
+                  onChange={(e) =>
+                    setDateRange({ ...dateRange, to: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* === TABEL BERITA === */}
       <div className="table-wrapper">
         <table className="news-table">
           <thead>
@@ -114,17 +256,19 @@ const NewsCRUD = () => {
             </tr>
           </thead>
           <tbody>
-            {newsList.map((news, index) => (
+            {filteredNews.map((news, index) => (
               <tr key={news.id}>
                 <td>{index + 1}</td>
                 <td>{news.title}</td>
                 <td>{news.category}</td>
                 <td>
-                  {new Date(news.date).toLocaleDateString("id-ID", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {news.date
+                    ? new Date(news.date).toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "-"}
                 </td>
                 <td>{news.editor}</td>
                 <td className="action-buttons">
@@ -146,9 +290,13 @@ const NewsCRUD = () => {
             ))}
           </tbody>
         </table>
+
+        {filteredNews.length === 0 && (
+          <p className="empty-text">Tidak ada berita ditemukan.</p>
+        )}
       </div>
 
-      {/* Modal untuk edit & preview */}
+      {/* === MODAL TAMBAH / EDIT / PREVIEW === */}
       {modalMode && (
         <div className="modal-overlay">
           <div className="modal-content modal-large">
@@ -167,6 +315,7 @@ const NewsCRUD = () => {
                       required
                     />
                   </div>
+
                   <div className="form-grid">
                     <div>
                       <label>Tanggal</label>
@@ -185,12 +334,17 @@ const NewsCRUD = () => {
                       <select
                         value={formData.category}
                         onChange={(e) =>
-                          setFormData({ ...formData, category: e.target.value })
+                          setFormData({
+                            ...formData,
+                            category: e.target.value,
+                          })
                         }
                         required>
                         <option value="">-- Pilih Kategori --</option>
                         <option value="Bimas Islam">Bimas Islam</option>
-                        <option value="Sekjend">Sekjend</option>
+                        <option value="Sekretariat Jenderal">
+                          Sekretariat Jenderal
+                        </option>
                         <option value="Bimas Kristen">Bimas Kristen</option>
                         <option value="Pendidikan">Pendidikan</option>
                         <option value="Penyelenggara Katolik">
@@ -212,6 +366,7 @@ const NewsCRUD = () => {
                         }
                       />
                     </div>
+
                     <div>
                       <label>Gambar</label>
                       <input
@@ -239,17 +394,8 @@ const NewsCRUD = () => {
                     config={{
                       height: 400,
                       toolbarSticky: true,
-                      askBeforePasteHTML: false,
-                      askBeforePasteFromWord: false,
-                      pasteHTMLAction: "insert_as_html",
-                      processPasteHTML: true,
-                      defaultActionOnPaste: "insert_clear_html",
-                      allowPaste: true,
-                      cleanHTML: {
-                        fillEmptyParagraph: false,
-                      },
                       buttons:
-                        "font,fontsize,paragraph,|,bold,italic,underline,strikethrough,|,ul,ol,indent,outdent,|,link,image,table,|,align,undo,redo",
+                        "bold,italic,underline,|,ul,ol,link,table,|,undo,redo",
                     }}
                     onBlur={(newContent) =>
                       setFormData({ ...formData, content: newContent })
@@ -272,14 +418,6 @@ const NewsCRUD = () => {
             ) : (
               <>
                 <h3>{formData.title}</h3>
-                <p>
-                  <strong>Tanggal:</strong>
-                  {new Date(formData.date).toLocaleDateString("id-ID", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
                 <p>
                   <strong>Kategori:</strong> {formData.category}
                 </p>

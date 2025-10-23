@@ -1,89 +1,130 @@
 import React, { useState, useEffect } from "react";
+import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
+import JoditEditor from "jodit-react";
 import "../styles/LayananCRUD.css";
-import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
-import JoditEditor, { Jodit } from "jodit-react";
-
-const API_URL = "http://localhost:3000/api/layanan";
+import { API_URL, API_UPLOADS } from "../config";
 
 const LayananCRUD = () => {
   const [layananList, setLayananList] = useState([]);
   const [modalMode, setModalMode] = useState(null); // "edit" | "preview"
   const [formData, setFormData] = useState({
     id: null,
-    icon: "",
     title: "",
+    category: "",
     desc: "",
     procedure: "",
     requirements: "",
   });
 
-  // Ambil data layanan dari API
+
+  // 🔍 Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // 🔹 Ambil data layanan dari API
   useEffect(() => {
-    fetch(API_URL)
+    fetch(`${API_URL}/layanan`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => setLayananList(data))
+      .then((data) => {
+        setLayananList(Array.isArray(data) ? data : data.data);
+      })
       .catch((err) => console.error("Error fetching layanan:", err));
   }, []);
 
-  // Simpan (Tambah / Edit)
+  // 🔹 Filter otomatis
+  const filteredLayanan = layananList
+    .filter((item) => {
+      const title = item.title?.toLowerCase() || "";
+      const category = item.category?.toLowerCase() || "";
+      const search = searchTerm.toLowerCase();
+
+      return title.includes(search) || category.includes(search);
+    })
+
+    .filter((item) =>
+      categoryFilter ? item.category === categoryFilter : true
+    )
+    .slice(0, itemsPerPage);
+
+  // 🔹 Simpan (Tambah / Edit)
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const method = formData.id ? "PUT" : "POST";
-    const url = formData.id ? `${API_URL}/${formData.id}` : API_URL;
+    const url = formData.id
+      ? `${API_URL}/layanan/${formData.id}`
+      : `${API_URL}/layanan`;
 
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    const body = new FormData();
+    Object.entries(formData).forEach(([key, val]) => body.append(key, val));
 
-    const updated = await fetch(API_URL).then((res) => res.json());
-    setLayananList(updated);
-    closeModal();
+    try {
+      const response = await fetch(url, {
+        method,
+        body,
+        credentials: "include",
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const updated = await fetch(`${API_URL}/layanan`, {
+        credentials: "include",
+      }).then((res) => res.json());
+
+      setLayananList(Array.isArray(updated) ? updated : updated.data);
+      closeModal();
+    } catch (error) {
+      console.error("❌ Gagal menyimpan layanan:", error);
+      alert("Terjadi kesalahan saat menyimpan data layanan!");
+    }
   };
 
-  // Edit data
-  const handleEdit = (data) => {
-    setFormData(data);
+  // 🔹 Edit data
+  const handleEdit = (item) => {
+    setFormData(item);
     setModalMode("edit");
   };
 
-  // Preview data
-  const handlePreview = (data) => {
-    setFormData(data);
+  // 🔹 Preview data
+  const handlePreview = (item) => {
+    setFormData(item);
     setModalMode("preview");
   };
 
-  // Hapus data
+  // 🔹 Hapus data
   const handleDelete = async (id) => {
     if (window.confirm("Apakah Anda yakin ingin menghapus layanan ini?")) {
-      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/layanan/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       setLayananList(layananList.filter((n) => n.id !== id));
     }
   };
 
-  // Tutup modal
+  // 🔹 Tutup modal
   const closeModal = () => {
     setModalMode(null);
     setFormData({
       id: null,
-      icon: "",
       title: "",
+      category: "",
       desc: "",
       procedure: "",
       requirements: "",
     });
+
   };
 
-  // Batasi teks panjang di tabel
+  // 🔹 Fungsi bantu: potong HTML panjang
   const truncateHTML = (html, wordLimit = 20) => {
-    const text = html.replace(/<[^>]+>/g, ""); // hapus tag HTML
+    const text = html.replace(/<[^>]+>/g, "");
     const words = text.split(" ");
     return words.length > wordLimit
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
   };
-
 
   return (
     <div className="layanan-crud-container">
@@ -94,22 +135,69 @@ const LayananCRUD = () => {
         </button>
       </div>
 
+      {/* === FILTER BAR === */}
+      <div className="filter-bar">
+        <div className="filter-row">
+          <div className="search-box">
+            <Search size={16} color="#00695c" />
+            <input
+              type="text"
+              placeholder="Cari layanan..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="filter-group">
+            <label>Kategori:</label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}>
+              <option value="">Semua</option>
+              <option value="Bimas Islam">Bimas Islam</option>
+              <option value="Sekretariat Jenderal">Sekretariat Jenderal</option>
+              <option value="Bimas Kristen">Bimas Kristen</option>
+              <option value="Pendidikan">Pendidikan</option>
+              <option value="Penyelenggara Katolik">
+                Penyelenggara Katolik
+              </option>
+              <option value="Penyelenggara Buddha">Penyelenggara Buddha</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Tampilkan:</label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* === Tabel Layanan === */}
       <div className="table-wrapper">
         <table className="layanan-table">
           <thead>
             <tr>
               <th>No</th>
               <th>Judul</th>
+              <th>Kategori</th>
               <th>Deskripsi</th>
               <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
-            {layananList.map((layanan, index) => (
+            {filteredLayanan.map((layanan, index) => (
               <tr key={layanan.id}>
                 <td>{index + 1}</td>
                 <td>{layanan.title}</td>
-                <td>{truncateHTML(layanan.requirements, 5)}</td>
+                <td>{layanan.category}</td>
+                <td>{truncateHTML(layanan.desc || "", 5)}</td>
                 <td className="action-buttons">
                   <button
                     className="btn-view"
@@ -133,7 +221,7 @@ const LayananCRUD = () => {
         </table>
       </div>
 
-      {/* Modal */}
+      {/* === Modal Edit / Preview === */}
       {modalMode && (
         <div className="modal-overlay">
           <div className="modal-content modal-large">
@@ -142,7 +230,7 @@ const LayananCRUD = () => {
                 <h3>{formData.id ? "Edit Layanan" : "Tambah Layanan"}</h3>
                 <form onSubmit={handleSubmit}>
                   <div>
-                    <label>Judul</label>
+                    <label>Judul Layanan</label>
                     <input
                       type="text"
                       value={formData.title}
@@ -151,6 +239,30 @@ const LayananCRUD = () => {
                       }
                       required
                     />
+                  </div>
+
+                  <div>
+                    <label>Kategori</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) =>
+                        setFormData({ ...formData, category: e.target.value })
+                      }
+                      required>
+                      <option value="">-- Pilih Kategori --</option>
+                      <option value="Bimas Islam">Bimas Islam</option>
+                      <option value="Sekretariat Jenderal">
+                        Sekretariat Jenderal
+                      </option>
+                      <option value="Bimas Kristen">Bimas Kristen</option>
+                      <option value="Pendidikan">Pendidikan</option>
+                      <option value="Penyelenggara Katolik">
+                        Penyelenggara Katolik
+                      </option>
+                      <option value="Penyelenggara Buddha">
+                        Penyelenggara Buddha
+                      </option>
+                    </select>
                   </div>
 
                   <div>
@@ -165,51 +277,23 @@ const LayananCRUD = () => {
                   </div>
 
                   <div>
-                    <label>Prosedur</label>
+                    <label>Syarat</label>
                     <JoditEditor
-                      value={formData.procedure}
-                      config={{
-                        height: 400,
-                        toolbarSticky: true,
-                        askBeforePasteHTML: false,
-                        askBeforePasteFromWord: false,
-                        pasteHTMLAction: "insert_as_html",
-                        processPasteHTML: true,
-                        defaultActionOnPaste: "insert_clear_html",
-                        allowPaste: true,
-                        cleanHTML: {
-                          fillEmptyParagraph: false,
-                        },
-                        buttons:
-                          "font,fontsize,paragraph,|,bold,italic,underline,strikethrough,|,ul,ol,indent,outdent,|,link,image,table,|,align,undo,redo",
-                      }}
+                      value={formData.requirements}
+                      config={{ height: 300 }}
                       onBlur={(newContent) =>
-                        setFormData({ ...formData, procedure: newContent })
+                        setFormData({ ...formData, requirements: newContent })
                       }
                     />
                   </div>
 
                   <div>
-                    <label>Syarat</label>
+                    <label>Prosedur</label>
                     <JoditEditor
-                      value={formData.requirements}
-                      config={{
-                        height: 400,
-                        toolbarSticky: true,
-                        askBeforePasteHTML: false,
-                        askBeforePasteFromWord: false,
-                        pasteHTMLAction: "insert_as_html",
-                        processPasteHTML: true,
-                        defaultActionOnPaste: "insert_clear_html",
-                        allowPaste: true,
-                        cleanHTML: {
-                          fillEmptyParagraph: false,
-                        },
-                        buttons:
-                          "font,fontsize,paragraph,|,bold,italic,underline,strikethrough,|,ul,ol,indent,outdent,|,link,image,table,|,align,undo,redo",
-                      }}
+                      value={formData.procedure}
+                      config={{ height: 300 }}
                       onBlur={(newContent) =>
-                        setFormData({ ...formData, requirements: newContent })
+                        setFormData({ ...formData, procedure: newContent })
                       }
                     />
                   </div>
@@ -231,15 +315,15 @@ const LayananCRUD = () => {
               <>
                 <h3>{formData.title}</h3>
                 <p>
+                  <strong>Kategori:</strong> {formData.category}
+                </p>
+                <p>
                   <strong>Deskripsi:</strong> {formData.desc}
                 </p>
-                <p>
-                  <strong>Prosedur:</strong>
-                </p>
+
+                <h4>Prosedur:</h4>
                 <div dangerouslySetInnerHTML={{ __html: formData.procedure }} />
-                <p>
-                  <strong>Syarat:</strong>
-                </p>
+                <h4>Syarat:</h4>
                 <div
                   dangerouslySetInnerHTML={{ __html: formData.requirements }}
                 />
