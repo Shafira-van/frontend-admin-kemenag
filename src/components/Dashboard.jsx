@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { API_URL } from "../config";
 
 const Dashboard = () => {
   const [dataSummary, setDataSummary] = useState({
@@ -26,13 +27,17 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [berita, layanan, pengaduan, admin] = await Promise.all([
-          fetch("http://localhost:3000/api/berita").then((res) => res.json()),
-          fetch("http://localhost:3000/api/layanan").then((res) => res.json()),
-          fetch("http://localhost:3000/api/pengaduan").then((res) =>
+          fetch(`${API_URL}/berita`, { credentials: "include" }).then((res) =>
             res.json()
           ),
-          fetch("http://localhost:3000/api/profilAdmin").then((res) =>
+          fetch(`${API_URL}/layanan`, { credentials: "include" }).then((res) =>
             res.json()
+          ),
+          fetch(`${API_URL}/pengaduan`, { credentials: "include" }).then(
+            (res) => res.json()
+          ),
+          fetch(`${API_URL}/profilAdmin`, { credentials: "include" }).then(
+            (res) => res.json()
           ),
         ]);
 

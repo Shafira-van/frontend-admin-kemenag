@@ -13,10 +13,12 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${API_URL}/profilAdmin/login`, {
-        username: user,
-        password: pass,
-      });
+      const res = await axios.post(
+        `${API_URL}/profilAdmin/login`,
+        { username: user, password: pass },
+        { withCredentials: true }
+      );
+
 
       console.log("Login berhasil untuk:", user);
 
