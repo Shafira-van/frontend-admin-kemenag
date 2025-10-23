@@ -248,6 +248,39 @@
   border-color: #00695c;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: none;
+  background-color: #00796b;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #005b4f;
+}
+
+.table-info {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+}
 /* ==========================
    📱 RESPONSIVE
 ========================== */

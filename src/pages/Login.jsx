@@ -39,10 +39,7 @@ function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Logo_Kementerian_Agama_2021.svg/120px-Logo_Kementerian_Agama_2021.svg.png"
-            alt="Logo Kemenag"
-          />
+          <img src="src/assets/logoKemenag.png" alt="Logo Kemenag" />
           <h2>Kemenag Pematangsiantar</h2>
           <p>Login Admin Panel</p>
         </div>

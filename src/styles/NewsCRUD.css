@@ -311,8 +311,8 @@
   /* ✅ tinggi default */
   /* max-height: 100px; */
   /* ✅ biar tidak terlalu panjang */
-  border-radius: 10px;
-  overflow: hidden;
+  /* border-radius: 10px; */
+  /* overflow: hidden; */
 }
 
 /* Jika kamu ingin textarea-nya lebih besar lagi */

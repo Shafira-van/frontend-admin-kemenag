@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import "../styles/KuaCRUD.css";
+import JoditEditor from "jodit-react";
 import { API_URL, API_UPLOADS } from "../config";
 
 // const API_URL = "http://localhost:3000/api/kua";
@@ -153,7 +154,12 @@ const KuaCRUD = () => {
                 <td>{kua.name}</td>
                 <td>{kua.address}</td>
                 <td>{kua.phone}</td>
-                <td>{kua.desc?.slice(0, 60)}...</td>
+                <td>
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: kua.desc?.slice(0, 60) + "...",
+                    }}></div>
+                </td>
                 <td>
                   {kua.img ? (
                     <img
@@ -225,13 +231,54 @@ const KuaCRUD = () => {
                   />
 
                   <label>Deskripsi</label>
-                  <textarea
+                  <JoditEditor
                     value={formData.desc}
-                    onChange={(e) =>
-                      setFormData({ ...formData, desc: e.target.value })
+                    config={{
+                      height: 400,
+                      toolbarSticky: true,
+                      readonly: false,
+                      askBeforePasteHTML: false,
+                      askBeforePasteFromWord: false,
+                      disablePlugins: ["pasteStorage"],
+                      defaultActionOnPaste: "insert_as_html",
+                      pasteHTMLActionList: [
+                        "insert_as_html",
+                        "insert_clear_html",
+                      ],
+
+                      // 🌟 Tombol penting + tambahan font size & style
+                      buttons: [
+                        "bold",
+                        "italic",
+                        "underline",
+                        "|",
+                        "ul",
+                        "ol",
+                        "indent",
+                        "outdent",
+                        "|",
+                        "font", // ubah font family
+                        "fontsize", // ubah ukuran font
+                        "brush", // ubah warna / gaya huruf
+                        "|",
+                        "align",
+                        "link",
+                        "image",
+                        "|",
+                        "undo",
+                        "redo",
+                        "fullscreen",
+                      ],
+
+                      // ✏️ Styling tambahan
+                      style: {
+                        fontSize: "15px",
+                        lineHeight: "1.6",
+                      },
+                    }}
+                    onBlur={(newContent) =>
+                      setFormData({ ...formData, desc: newContent })
                     }
-                    rows="3"
-                    required
                   />
 
                   <label>Upload Gambar</label>

@@ -183,29 +183,40 @@ useEffect(() => {
                   <div>
                     <label>Tugas</label>
                     <JoditEditor
-                      ref={tugasEditor}
                       value={formData.tugas}
                       config={{
                         height: 400,
                         toolbarSticky: true,
+                        readonly: false,
                         askBeforePasteHTML: false,
                         askBeforePasteFromWord: false,
-                        pasteHTMLAction: "insert_as_html",
-                        processPasteHTML: true,
-                        defaultActionOnPaste: "insert_clear_html",
-                        allowPaste: true,
-                        cleanHTML: {
-                          fillEmptyParagraph: false,
-                        },
-                        buttons:
-                          "font,fontsize,paragraph,|,bold,italic,underline,strikethrough,|,ul,ol,indent,outdent,|,link,image,table,|,align,undo,redo",
-                        // aktifkan fitur font & ukuran huruf
-                        style: {
-                          fontSize: "14px",
-                        },
-                        toolbarAdaptive: false,
-                        toolbarButtonSize: "middle",
-                        removeButtons: ["source"], // opsional, sembunyikan tombol kode HTML
+                        disablePlugins: ["pasteStorage"],
+                        defaultActionOnPaste: "insert_as_html",
+                        pasteHTMLActionList: [
+                          "insert_as_html",
+                          "insert_clear_html",
+                        ],
+
+                        // 🌟 Hanya tombol yang paling penting
+                        buttons: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "|",
+                          "ul", // bullet list
+                          "ol", // numbered list
+                          "indent",
+                          "outdent",
+                          "|",
+                          "align", // left, center, right, justify
+                          "|",
+                          "link",
+                          "image",
+                          "|",
+                          "undo",
+                          "redo",
+                          "fullscreen",
+                        ],
                       }}
                       onBlur={(newContent) =>
                         setFormData({ ...formData, tugas: newContent })
@@ -216,29 +227,40 @@ useEffect(() => {
                   <div>
                     <label>Fungsi</label>
                     <JoditEditor
-                      ref={tugasEditor}
                       value={formData.fungsi}
                       config={{
                         height: 400,
                         toolbarSticky: true,
+                        readonly: false,
                         askBeforePasteHTML: false,
                         askBeforePasteFromWord: false,
-                        pasteHTMLAction: "insert_as_html",
-                        processPasteHTML: true,
-                        defaultActionOnPaste: "insert_clear_html",
-                        allowPaste: true,
-                        cleanHTML: {
-                          fillEmptyParagraph: false,
-                        },
-                        buttons:
-                          "font,fontsize,paragraph,|,bold,italic,underline,strikethrough,|,ul,ol,indent,outdent,|,link,image,table,|,align,undo,redo",
-                        // aktifkan fitur font & ukuran huruf
-                        style: {
-                          fontSize: "14px",
-                        },
-                        toolbarAdaptive: false,
-                        toolbarButtonSize: "middle",
-                        removeButtons: ["source"], // opsional, sembunyikan tombol kode HTML
+                        disablePlugins: ["pasteStorage"],
+                        defaultActionOnPaste: "insert_as_html",
+                        pasteHTMLActionList: [
+                          "insert_as_html",
+                          "insert_clear_html",
+                        ],
+
+                        // 🌟 Hanya tombol yang paling penting
+                        buttons: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "|",
+                          "ul", // bullet list
+                          "ol", // numbered list
+                          "indent",
+                          "outdent",
+                          "|",
+                          "align", // left, center, right, justify
+                          "|",
+                          "link",
+                          "image",
+                          "|",
+                          "undo",
+                          "redo",
+                          "fullscreen",
+                        ],
                       }}
                       onBlur={(newContent) =>
                         setFormData({ ...formData, fungsi: newContent })

@@ -82,6 +82,7 @@ const NewsCRUD = () => {
   }, [searchTerm, categoryFilter, dateRange, itemsPerPage, newsList]);
 
   // Handle submit berita baru
+  // === Fungsi handleSubmit (versi diperbaiki) ===
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -93,9 +94,20 @@ const NewsCRUD = () => {
 
       const body = new FormData();
 
-      // Pastikan field valid
+      // 🔧 Pastikan tanggal dikirim tanpa konversi timezone
+      let adjustedDate = formData.date;
+      if (formData.date) {
+        const localDate = new Date(formData.date);
+        adjustedDate = new Date(
+          localDate.getTime() - localDate.getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .split("T")[0];
+      }
+
+      // Isi field berita
       if (formData.title) body.append("title", formData.title);
-      if (formData.date) body.append("date", formData.date);
+      if (adjustedDate) body.append("date", adjustedDate); // <- sudah aman
       if (formData.category) body.append("category", formData.category);
       if (formData.editor) body.append("editor", formData.editor);
       if (formData.content) body.append("content", formData.content);
@@ -121,12 +133,14 @@ const NewsCRUD = () => {
     }
   };
 
+  // === Fungsi handleEdit (versi diperbaiki) ===
   const handleEdit = (news) => {
     const dateValue = news.date
-      ? format(parseISO(news.date), "yyyy-MM-dd")
+      ? new Date(news.date).toISOString().split("T")[0] // 🔧 menjaga tanggal tetap lokal
       : "";
+
     setFormData({ ...news, date: dateValue });
-    setImagePreview(news.image ? `${API_UPLOADS}/berita/${news.image}` : null);
+    setImagePreview(news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null);
     setModalMode("edit");
   };
 
@@ -394,8 +408,36 @@ const NewsCRUD = () => {
                     config={{
                       height: 400,
                       toolbarSticky: true,
-                      buttons:
-                        "bold,italic,underline,|,ul,ol,link,table,|,undo,redo",
+                      readonly: false,
+                      askBeforePasteHTML: false,
+                      askBeforePasteFromWord: false,
+                      disablePlugins: ["pasteStorage"],
+                      defaultActionOnPaste: "insert_as_html",
+                      pasteHTMLActionList: [
+                        "insert_as_html",
+                        "insert_clear_html",
+                      ],
+
+                      // 🌟 Hanya tombol yang paling penting
+                      buttons: [
+                        "bold",
+                        "italic",
+                        "underline",
+                        "|",
+                        "ul", // bullet list
+                        "ol", // numbered list
+                        "indent",
+                        "outdent",
+                        "|",
+                        "align", // left, center, right, justify
+                        "|",
+                        "link",
+                        "image",
+                        "|",
+                        "undo",
+                        "redo",
+                        "fullscreen",
+                      ],
                     }}
                     onBlur={(newContent) =>
                       setFormData({ ...formData, content: newContent })

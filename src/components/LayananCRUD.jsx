@@ -16,7 +16,6 @@ const LayananCRUD = () => {
     requirements: "",
   });
 
-
   // 🔍 Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -48,34 +47,49 @@ const LayananCRUD = () => {
     .slice(0, itemsPerPage);
 
   // 🔹 Simpan (Tambah / Edit)
+  // 🔹 Simpan (Tambah / Edit)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Tentukan mode dan URL API
     const method = formData.id ? "PUT" : "POST";
     const url = formData.id
       ? `${API_URL}/layanan/${formData.id}`
       : `${API_URL}/layanan`;
 
-    const body = new FormData();
-    Object.entries(formData).forEach(([key, val]) => body.append(key, val));
-
+    // 🔧 Buat body JSON (bukan FormData lagi)
+    const body = {
+      title: formData.title,
+      category: formData.category,
+      desc: formData.desc,
+      procedure: formData.procedure,
+      requirements: formData.requirements,
+    };
     try {
       const response = await fetch(url, {
         method,
-        body,
+        headers: {
+          "Content-Type": "application/json", // ✅ penting
+        },
+        body: JSON.stringify(body), // kirim JSON string
         credentials: "include",
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      // Tangani error HTTP manual
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status} – ${errorText}`);
+      }
 
+      // Refresh daftar layanan setelah simpan
       const updated = await fetch(`${API_URL}/layanan`, {
         credentials: "include",
       }).then((res) => res.json());
 
       setLayananList(Array.isArray(updated) ? updated : updated.data);
       closeModal();
+      alert("✅ Layanan berhasil disimpan!");
     } catch (error) {
-      console.error("❌ Gagal menyimpan layanan:", error);
       alert("Terjadi kesalahan saat menyimpan data layanan!");
     }
   };
@@ -114,7 +128,6 @@ const LayananCRUD = () => {
       procedure: "",
       requirements: "",
     });
-
   };
 
   // 🔹 Fungsi bantu: potong HTML panjang
@@ -280,7 +293,40 @@ const LayananCRUD = () => {
                     <label>Syarat</label>
                     <JoditEditor
                       value={formData.requirements}
-                      config={{ height: 300 }}
+                      config={{
+                        height: 400,
+                        toolbarSticky: true,
+                        readonly: false,
+                        askBeforePasteHTML: false,
+                        askBeforePasteFromWord: false,
+                        disablePlugins: ["pasteStorage"],
+                        defaultActionOnPaste: "insert_as_html",
+                        pasteHTMLActionList: [
+                          "insert_as_html",
+                          "insert_clear_html",
+                        ],
+
+                        // 🌟 Hanya tombol yang paling penting
+                        buttons: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "|",
+                          "ul", // bullet list
+                          "ol", // numbered list
+                          "indent",
+                          "outdent",
+                          "|",
+                          "align", // left, center, right, justify
+                          "|",
+                          "link",
+                          "image",
+                          "|",
+                          "undo",
+                          "redo",
+                          "fullscreen",
+                        ],
+                      }}
                       onBlur={(newContent) =>
                         setFormData({ ...formData, requirements: newContent })
                       }
@@ -291,7 +337,40 @@ const LayananCRUD = () => {
                     <label>Prosedur</label>
                     <JoditEditor
                       value={formData.procedure}
-                      config={{ height: 300 }}
+                      config={{
+                        height: 400,
+                        toolbarSticky: true,
+                        readonly: false,
+                        askBeforePasteHTML: false,
+                        askBeforePasteFromWord: false,
+                        disablePlugins: ["pasteStorage"],
+                        defaultActionOnPaste: "insert_as_html",
+                        pasteHTMLActionList: [
+                          "insert_as_html",
+                          "insert_clear_html",
+                        ],
+
+                        // 🌟 Hanya tombol yang paling penting
+                        buttons: [
+                          "bold",
+                          "italic",
+                          "underline",
+                          "|",
+                          "ul", // bullet list
+                          "ol", // numbered list
+                          "indent",
+                          "outdent",
+                          "|",
+                          "align", // left, center, right, justify
+                          "|",
+                          "link",
+                          "image",
+                          "|",
+                          "undo",
+                          "redo",
+                          "fullscreen",
+                        ],
+                      }}
                       onBlur={(newContent) =>
                         setFormData({ ...formData, procedure: newContent })
                       }
