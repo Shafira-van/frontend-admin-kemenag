@@ -23,13 +23,20 @@ const LayananCRUD = () => {
 
   // 🔹 Ambil data layanan dari API
   useEffect(() => {
-    fetch(`${API_URL}/layanan`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchLayanan = async () => {
+      try {
+        const res = await fetch(`${API_URL}/layanan?limit=${itemsPerPage}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
         setLayananList(Array.isArray(data) ? data : data.data);
-      })
-      .catch((err) => console.error("Error fetching layanan:", err));
-  }, []);
+      } catch (err) {
+        console.error("Error fetching layanan:", err);
+      }
+    };
+
+    fetchLayanan();
+  }, [itemsPerPage]); // 🔁 refetch tiap kali itemsPerPage berubah
 
   // 🔹 Filter otomatis
   const filteredLayanan = layananList
@@ -46,7 +53,6 @@ const LayananCRUD = () => {
     )
     .slice(0, itemsPerPage);
 
-  // 🔹 Simpan (Tambah / Edit)
   // 🔹 Simpan (Tambah / Edit)
   const handleSubmit = async (e) => {
     e.preventDefault();

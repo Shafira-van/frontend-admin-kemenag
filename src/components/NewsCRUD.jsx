@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
 import JoditEditor from "jodit-react";
 import "../styles/NewsCRUD.css";
-import { parseISO, format } from "date-fns";
 import { API_URL, API_UPLOADS } from "../config";
 
 const NewsCRUD = () => {
@@ -26,19 +25,30 @@ const NewsCRUD = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Fetch berita dari backend
+  // ===========================================================
+  // 🔹 Ambil data berita dari backend (refetch tiap limit berubah)
+  // ===========================================================
   useEffect(() => {
-    fetch(`${API_URL}/berita?limit=0`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchNews = async () => {
+      try {
+        const res = await fetch(`${API_URL}/berita?limit=${itemsPerPage}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
         const allNews = Array.isArray(data.data) ? data.data : data;
         setNewsList(allNews);
         setFilteredNews(allNews);
-      })
-      .catch((err) => console.error("Error fetching berita:", err));
-  }, []);
+      } catch (err) {
+        console.error("Error fetching berita:", err);
+      }
+    };
 
-  // Filter kombinasi (kategori, pencarian, tanggal, limit)
+    fetchNews();
+  }, [itemsPerPage]);
+
+  // ===========================================================
+  // 🔍 Filter kombinasi (kategori, pencarian, tanggal)
+  // ===========================================================
   useEffect(() => {
     let result = [...newsList];
 
@@ -76,13 +86,12 @@ const NewsCRUD = () => {
       });
     }
 
-    // Batasi jumlah tampil
-    result = result.slice(0, itemsPerPage);
     setFilteredNews(result);
-  }, [searchTerm, categoryFilter, dateRange, itemsPerPage, newsList]);
+  }, [searchTerm, categoryFilter, dateRange, newsList]);
 
-  // Handle submit berita baru
-  // === Fungsi handleSubmit (versi diperbaiki) ===
+  // ===========================================================
+  // 📝 Handle submit berita baru / edit
+  // ===========================================================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -94,23 +103,14 @@ const NewsCRUD = () => {
 
       const body = new FormData();
 
-      // 🔧 Pastikan tanggal dikirim tanpa konversi timezone
+      // ✅ Simpan tanggal asli tanpa ubah timezone
       let adjustedDate = formData.date;
-      if (formData.date) {
-        const localDate = new Date(formData.date);
-        adjustedDate = new Date(
-          localDate.getTime() - localDate.getTimezoneOffset() * 60000
-        )
-          .toISOString()
-          .split("T")[0];
-      }
 
-      // Isi field berita
-      if (formData.title) body.append("title", formData.title);
-      if (adjustedDate) body.append("date", adjustedDate); // <- sudah aman
-      if (formData.category) body.append("category", formData.category);
-      if (formData.editor) body.append("editor", formData.editor);
-      if (formData.content) body.append("content", formData.content);
+      body.append("title", formData.title || "");
+      body.append("date", adjustedDate || "");
+      body.append("category", formData.category || "");
+      body.append("editor", formData.editor || "");
+      body.append("content", formData.content || "");
       if (formData.image instanceof File) body.append("image", formData.image);
 
       const res = await fetch(url, { method, body, credentials: "include" });
@@ -120,30 +120,38 @@ const NewsCRUD = () => {
       }
 
       // Refresh data terbaru
-      const updated = await fetch(`${API_URL}/berita?limit=0`, {
+      const updated = await fetch(`${API_URL}/berita?limit=${itemsPerPage}`, {
         credentials: "include",
       }).then((res) => res.json());
 
       const allNews = Array.isArray(updated.data) ? updated.data : updated;
       setNewsList(allNews);
       closeModal();
+      alert("✅ Berita berhasil disimpan!");
     } catch (err) {
       console.error("❌ Error saat submit berita:", err);
       alert("Gagal menyimpan berita. Cek console/log backend.");
     }
   };
 
-  // === Fungsi handleEdit (versi diperbaiki) ===
+  // ===========================================================
+  // ✏️ Edit berita
+  // ===========================================================
   const handleEdit = (news) => {
     const dateValue = news.date
-      ? new Date(news.date).toISOString().split("T")[0] // 🔧 menjaga tanggal tetap lokal
+      ? new Date(news.date).toISOString().split("T")[0]
       : "";
 
     setFormData({ ...news, date: dateValue });
-    setImagePreview(news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null);
+    setImagePreview(
+      news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null
+    );
     setModalMode("edit");
   };
 
+  // ===========================================================
+  // 👁️ Preview berita
+  // ===========================================================
   const handlePreview = (news) => {
     setFormData(news);
     setImagePreview(
@@ -152,6 +160,9 @@ const NewsCRUD = () => {
     setModalMode("preview");
   };
 
+  // ===========================================================
+  // 🗑️ Hapus berita
+  // ===========================================================
   const handleDelete = async (id) => {
     if (window.confirm("Hapus berita ini?")) {
       await fetch(`${API_URL}/berita/${id}`, {
@@ -162,6 +173,9 @@ const NewsCRUD = () => {
     }
   };
 
+  // ===========================================================
+  // ❌ Tutup modal
+  // ===========================================================
   const closeModal = () => {
     setModalMode(null);
     setFormData({
@@ -176,6 +190,9 @@ const NewsCRUD = () => {
     setImagePreview(null);
   };
 
+  // ===========================================================
+  // 🧩 Render UI
+  // ===========================================================
   return (
     <div className="news-crud-container">
       <div className="crud-header">
@@ -229,6 +246,7 @@ const NewsCRUD = () => {
                 <option value={20}>20</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
+                <option value={0}>Semua</option>
               </select>
             </div>
 
@@ -417,19 +435,17 @@ const NewsCRUD = () => {
                         "insert_as_html",
                         "insert_clear_html",
                       ],
-
-                      // 🌟 Hanya tombol yang paling penting
                       buttons: [
                         "bold",
                         "italic",
                         "underline",
                         "|",
-                        "ul", // bullet list
-                        "ol", // numbered list
+                        "ul",
+                        "ol",
                         "indent",
                         "outdent",
                         "|",
-                        "align", // left, center, right, justify
+                        "align",
                         "|",
                         "link",
                         "image",
@@ -473,7 +489,10 @@ const NewsCRUD = () => {
                     className="preview-img"
                   />
                 )}
-                <div dangerouslySetInnerHTML={{ __html: formData.content }} />
+                <div
+                  className="news-content"
+                  dangerouslySetInnerHTML={{ __html: formData.content }}
+                />
                 <button className="btn-cancel" onClick={closeModal}>
                   Tutup
                 </button>
