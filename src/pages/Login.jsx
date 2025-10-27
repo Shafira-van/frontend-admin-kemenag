@@ -4,6 +4,7 @@ import axios from "axios"; // install dulu: npm install axios
 import "../styles/Login.css";
 import { ClockFading } from "lucide-react";
 import { API_URL } from "../config";
+import logoKemenag from "../assets/logoKemenag.png";
 
 function Login() {
   const [user, setUser] = useState("");
@@ -39,7 +40,7 @@ function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img src="src/assets/logoKemenag.png" alt="Logo Kemenag" />
+          <img src={logoKemenag} alt="Logo Kemenag" />
           <h2>Kemenag Pematangsiantar</h2>
           <p>Login Admin Panel</p>
         </div>
