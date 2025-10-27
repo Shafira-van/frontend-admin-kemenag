@@ -7,12 +7,14 @@ import { API_URL, API_UPLOADS } from "../config";
 const NewsCRUD = () => {
   const [newsList, setNewsList] = useState([]);
   const [filteredNews, setFilteredNews] = useState([]);
-  const [modalMode, setModalMode] = useState(null); // "edit" | "preview"
-
+  const [modalMode, setModalMode] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
+
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [formData, setFormData] = useState({
     id: null,
@@ -25,30 +27,38 @@ const NewsCRUD = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
 
-  // ===========================================================
-  // 🔹 Ambil data berita dari backend (refetch tiap limit berubah)
-  // ===========================================================
+  /* ============================================================
+     📡 Ambil data berita sesuai halaman dan limit
+  ============================================================ */
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch(`${API_URL}/berita?limit=${itemsPerPage}`, {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${API_URL}/berita?page=${currentPage}&limit=${itemsPerPage}`,
+          { credentials: "include" }
+        );
         const data = await res.json();
-        const allNews = Array.isArray(data.data) ? data.data : data;
-        setNewsList(allNews);
-        setFilteredNews(allNews);
+
+        const berita = Array.isArray(data.data) ? data.data : data;
+        setNewsList(berita);
+
+        // Hitung total halaman kalau backend kirim total count
+        if (data.total) {
+          setTotalPages(Math.ceil(data.total / itemsPerPage));
+        } else {
+          setTotalPages(1);
+        }
       } catch (err) {
         console.error("Error fetching berita:", err);
       }
     };
 
     fetchNews();
-  }, [itemsPerPage]);
+  }, [currentPage, itemsPerPage]);
 
-  // ===========================================================
-  // 🔍 Filter kombinasi (kategori, pencarian, tanggal)
-  // ===========================================================
+  /* ============================================================
+     🔍 Filter kombinasi (kategori, pencarian, tanggal)
+  ============================================================ */
   useEffect(() => {
     let result = [...newsList];
 
@@ -76,7 +86,7 @@ const NewsCRUD = () => {
       });
     }
 
-    // Filter rentang tanggal
+    // Filter tanggal
     if (dateRange.from && dateRange.to) {
       const from = new Date(dateRange.from);
       const to = new Date(dateRange.to);
@@ -89,80 +99,26 @@ const NewsCRUD = () => {
     setFilteredNews(result);
   }, [searchTerm, categoryFilter, dateRange, newsList]);
 
-  // ===========================================================
-  // 📝 Handle submit berita baru / edit
-  // ===========================================================
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  /* ============================================================
+     🧭 Reset ke halaman pertama setiap filter berubah
+  ============================================================ */
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter, dateRange, itemsPerPage]);
 
-    try {
-      const method = formData.id ? "PUT" : "POST";
-      const url = formData.id
-        ? `${API_URL}/berita/${formData.id}`
-        : `${API_URL}/berita`;
-
-      const body = new FormData();
-
-      // ✅ Simpan tanggal asli tanpa ubah timezone
-      let adjustedDate = formData.date;
-
-      body.append("title", formData.title || "");
-      body.append("date", adjustedDate || "");
-      body.append("category", formData.category || "");
-      body.append("editor", formData.editor || "");
-      body.append("content", formData.content || "");
-      if (formData.image instanceof File) body.append("image", formData.image);
-
-      const res = await fetch(url, { method, body, credentials: "include" });
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`HTTP ${res.status} – ${errText}`);
-      }
-
-      // Refresh data terbaru
-      const updated = await fetch(`${API_URL}/berita?limit=${itemsPerPage}`, {
-        credentials: "include",
-      }).then((res) => res.json());
-
-      const allNews = Array.isArray(updated.data) ? updated.data : updated;
-      setNewsList(allNews);
-      closeModal();
-      alert("✅ Berita berhasil disimpan!");
-    } catch (err) {
-      console.error("❌ Error saat submit berita:", err);
-      alert("Gagal menyimpan berita. Cek console/log backend.");
+  /* ============================================================
+     🔄 Pagination handler
+  ============================================================ */
+  const handlePageChange = (pageNum) => {
+    if (pageNum >= 1 && pageNum <= totalPages) {
+      setCurrentPage(pageNum);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  // ===========================================================
-  // ✏️ Edit berita
-  // ===========================================================
-  const handleEdit = (news) => {
-    const dateValue = news.date
-      ? new Date(news.date).toISOString().split("T")[0]
-      : "";
-
-    setFormData({ ...news, date: dateValue });
-    setImagePreview(
-      news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null
-    );
-    setModalMode("edit");
-  };
-
-  // ===========================================================
-  // 👁️ Preview berita
-  // ===========================================================
-  const handlePreview = (news) => {
-    setFormData(news);
-    setImagePreview(
-      news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null
-    );
-    setModalMode("preview");
-  };
-
-  // ===========================================================
-  // 🗑️ Hapus berita
-  // ===========================================================
+  /* ============================================================
+     🗑️ Hapus berita
+  ============================================================ */
   const handleDelete = async (id) => {
     if (window.confirm("Hapus berita ini?")) {
       await fetch(`${API_URL}/berita/${id}`, {
@@ -173,26 +129,9 @@ const NewsCRUD = () => {
     }
   };
 
-  // ===========================================================
-  // ❌ Tutup modal
-  // ===========================================================
-  const closeModal = () => {
-    setModalMode(null);
-    setFormData({
-      id: null,
-      title: "",
-      date: "",
-      category: "",
-      editor: "",
-      content: "",
-      image: "",
-    });
-    setImagePreview(null);
-  };
-
-  // ===========================================================
+  // ============================================================
   // 🧩 Render UI
-  // ===========================================================
+  // ============================================================
   return (
     <div className="news-crud-container">
       <div className="crud-header">
@@ -290,7 +229,7 @@ const NewsCRUD = () => {
           <tbody>
             {filteredNews.map((news, index) => (
               <tr key={news.id}>
-                <td>{index + 1}</td>
+                <td>{(currentPage - 1) * itemsPerPage + (index + 1)}</td>
                 <td>{news.title}</td>
                 <td>{news.category}</td>
                 <td>
@@ -306,10 +245,12 @@ const NewsCRUD = () => {
                 <td className="action-buttons">
                   <button
                     className="btn-view"
-                    onClick={() => handlePreview(news)}>
+                    onClick={() => console.log(news)}>
                     <Eye size={16} />
                   </button>
-                  <button className="btn-edit" onClick={() => handleEdit(news)}>
+                  <button
+                    className="btn-edit"
+                    onClick={() => console.log(news)}>
                     <Edit size={16} />
                   </button>
                   <button
@@ -328,177 +269,17 @@ const NewsCRUD = () => {
         )}
       </div>
 
-      {/* === MODAL TAMBAH / EDIT / PREVIEW === */}
-      {modalMode && (
-        <div className="modal-overlay">
-          <div className="modal-content modal-large">
-            {modalMode === "edit" ? (
-              <>
-                <h3>{formData.id ? "Edit Berita" : "Tambah Berita"}</h3>
-                <form onSubmit={handleSubmit}>
-                  <div>
-                    <label>Judul Berita</label>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="form-grid">
-                    <div>
-                      <label>Tanggal</label>
-                      <input
-                        type="date"
-                        value={formData.date || ""}
-                        onChange={(e) =>
-                          setFormData({ ...formData, date: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label>Kategori</label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            category: e.target.value,
-                          })
-                        }
-                        required>
-                        <option value="">-- Pilih Kategori --</option>
-                        <option value="Bimas Islam">Bimas Islam</option>
-                        <option value="Sekretariat Jenderal">
-                          Sekretariat Jenderal
-                        </option>
-                        <option value="Bimas Kristen">Bimas Kristen</option>
-                        <option value="Pendidikan">Pendidikan</option>
-                        <option value="Penyelenggara Katolik">
-                          Penyelenggara Katolik
-                        </option>
-                        <option value="Penyelenggara Buddha">
-                          Penyelenggara Buddha
-                        </option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label>Editor</label>
-                      <input
-                        type="text"
-                        value={formData.editor}
-                        onChange={(e) =>
-                          setFormData({ ...formData, editor: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <label>Gambar</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          setFormData({ ...formData, image: file });
-                          setImagePreview(URL.createObjectURL(file));
-                        }}
-                      />
-                      {imagePreview && (
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="preview-img"
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  <label>Isi Berita</label>
-                  <JoditEditor
-                    value={formData.content}
-                    config={{
-                      height: 400,
-                      toolbarSticky: true,
-                      readonly: false,
-                      askBeforePasteHTML: false,
-                      askBeforePasteFromWord: false,
-                      disablePlugins: ["pasteStorage"],
-                      defaultActionOnPaste: "insert_as_html",
-                      pasteHTMLActionList: [
-                        "insert_as_html",
-                        "insert_clear_html",
-                      ],
-                      buttons: [
-                        "bold",
-                        "italic",
-                        "underline",
-                        "|",
-                        "ul",
-                        "ol",
-                        "indent",
-                        "outdent",
-                        "|",
-                        "align",
-                        "|",
-                        "link",
-                        "image",
-                        "|",
-                        "undo",
-                        "redo",
-                        "fullscreen",
-                      ],
-                    }}
-                    onBlur={(newContent) =>
-                      setFormData({ ...formData, content: newContent })
-                    }
-                  />
-
-                  <div className="form-actions">
-                    <button type="submit" className="btn-save">
-                      Simpan
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-cancel"
-                      onClick={closeModal}>
-                      Batal
-                    </button>
-                  </div>
-                </form>
-              </>
-            ) : (
-              <>
-                <h3>{formData.title}</h3>
-                <p>
-                  <strong>Kategori:</strong> {formData.category}
-                </p>
-                <p>
-                  <strong>Editor:</strong> {formData.editor}
-                </p>
-                {imagePreview && (
-                  <img
-                    src={imagePreview}
-                    alt={formData.title}
-                    className="preview-img"
-                  />
-                )}
-                <div
-                  className="news-content"
-                  dangerouslySetInnerHTML={{ __html: formData.content }}
-                />
-                <button className="btn-cancel" onClick={closeModal}>
-                  Tutup
-                </button>
-              </>
-            )}
-          </div>
+      {/* === PAGINATION === */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={currentPage === i + 1 ? "active" : ""}
+              onClick={() => handlePageChange(i + 1)}>
+              {i + 1}
+            </button>
+          ))}
         </div>
       )}
     </div>
