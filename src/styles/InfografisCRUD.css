@@ -1,7 +1,7 @@
 /* ==========================
    🎯 WRAPPER & HEADER (namespaced)
 ========================== */
-.profiladmin-container {
+.infografis-crud-container {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
@@ -9,21 +9,21 @@
   box-sizing: border-box;
 }
 
-.profiladmin-container .crud-header {
+.infografis-crud-container .crud-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.profiladmin-container .crud-header h2 {
+.infografis-crud-container .crud-header h2 {
   margin: 0;
   font-size: 22px;
   font-weight: 700;
   color: #004d40;
 }
 
-.profiladmin-container .btn-add {
+.infografis-crud-container .btn-add {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -37,14 +37,14 @@
   font-weight: 500;
 }
 
-.profiladmin-container .btn-add:hover {
+.infografis-crud-container .btn-add:hover {
   background: #004d40;
 }
 
 /* ==========================
    🔍 FILTER SECTION (namespaced)
 ========================== */
-.profiladmin-container .filter-bar {
+.infografis-crud-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
@@ -56,7 +56,7 @@
 }
 
 /* Search box */
-.profiladmin-container .search-box {
+.infografis-crud-container .search-box {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -67,13 +67,13 @@
   transition: all 0.2s ease;
 }
 
-.profiladmin-container .search-box:hover,
-.profiladmin-container .search-box:focus-within {
+.infografis-crud-container .search-box:hover,
+.infografis-crud-container .search-box:focus-within {
   border-color: #00695c;
   box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
 }
 
-.profiladmin-container .search-box input {
+.infografis-crud-container .search-box input {
   border: none;
   outline: none;
   flex: 1;
@@ -83,28 +83,28 @@
 }
 
 /* Inline filter row */
-.profiladmin-container .filter-inline {
+.infografis-crud-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 20px;
 }
 
-.profiladmin-container .filter-item {
+.infografis-crud-container .filter-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 180px;
 }
 
-.profiladmin-container .filter-item label {
+.infografis-crud-container .filter-item label {
   font-size: 13px;
   font-weight: 600;
   color: #004d40;
 }
 
-.profiladmin-container .filter-item select,
-.profiladmin-container .filter-item input[type="date"] {
+.infografis-crud-container .filter-item select,
+.infografis-crud-container .filter-item input[type="date"] {
   padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -114,19 +114,19 @@
   transition: border-color 0.2s ease;
 }
 
-.profiladmin-container .filter-item select:focus,
-.profiladmin-container .filter-item input[type="date"]:focus {
+.infografis-crud-container .filter-item select:focus,
+.infografis-crud-container .filter-item input[type="date"]:focus {
   border-color: #00695c;
 }
 
 /* Date range */
-.profiladmin-container .date-range .date-inputs {
+.infografis-crud-container .date-range .date-inputs {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.profiladmin-container .date-range span {
+.infografis-crud-container .date-range span {
   font-weight: 600;
   color: #777;
 }
@@ -134,44 +134,45 @@
 /* ==========================
    📋 TABLE (namespaced)
 ========================== */
-.profiladmin-container .table-wrapper {
+.infografis-crud-container .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
   border: 1px solid #eee;
 }
 
-.profiladmin-container .news-table {
+.infografis-crud-container .infografis-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.profiladmin-container .news-table th,
-.profiladmin-container .news-table td {
+.infografis-crud-container .infografis-table th,
+.infografis-crud-container .infografis-table td {
   padding: 12px;
   border-bottom: 1px solid #e0e0e0;
   text-align: left;
   vertical-align: middle;
 }
 
-.profiladmin-container .news-table th {
+.infografis-crud-container .infografis-table th {
   background: #f5f5f5;
   font-weight: 600;
   color: #333;
 }
 
-.profiladmin-container .news-table tr:hover td {
+.infografis-crud-container .infografis-table tr:hover td {
   background: #f9f9f9;
 }
 
-.profiladmin-container .news-table td {
+.infografis-crud-container .infografis-table td {
   color: #444;
 }
 
-.profiladmin-container .preview-img {
+.infografis-crud-container .preview-img {
   width: 100%;
-  max-width: 24rem;
-  max-height: 13rem;
+  max-width: 13rem;
+  max-height: 24rem;
+  align-self: center;
   object-fit: cover;
   border-radius: 8px;
 }
@@ -179,13 +180,13 @@
 /* ==========================
    ⚙️ ACTION BUTTONS (namespaced)
 ========================== */
-.profiladmin-container .action-buttons {
+.infografis-crud-container .action-buttons {
   display: flex;
   align-items: center;
   gap: 0px !important;
 }
 
-.profiladmin-container .action-buttons button {
+.infografis-crud-container .action-buttons button {
   border: none;
   background: none;
   cursor: pointer;
@@ -194,27 +195,27 @@
   transition: transform 0.2s;
 }
 
-.profiladmin-container .action-buttons button:hover {
+.infografis-crud-container .action-buttons button:hover {
   transform: scale(1.15);
   background: none;
 }
 
-.profiladmin-container .btn-view {
+.infografis-crud-container .btn-view {
   color: #2e7d32;
 }
 
-.profiladmin-container .btn-edit {
+.infografis-crud-container .btn-edit {
   color: #0277bd;
 }
 
-.profiladmin-container .btn-delete {
+.infografis-crud-container .btn-delete {
   color: #d32f2f;
 }
 
 /* ==========================
    🧩 MODAL (namespaced)
 ========================== */
-.profiladmin-container .modal-overlay {
+.infografis-crud-container .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
   background: rgba(0, 0, 0, 0.45) !important;
@@ -227,26 +228,28 @@
   box-sizing: border-box;
 }
 
-.profiladmin-container .modal-content {
+.infografis-crud-container .modal-content {
   background: #ffffff !important;
   border-radius: 16px !important;
-  width: 100% !important;
+  width: 40% !important;
   max-width: 1400px !important;
   overflow-y: auto !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
   padding: 32px !important;
   position: relative !important;
   transition: all 0.3s ease !important;
-  animation: newsFadeIn 0.25s ease !important;
-  margin-top: 70px;
+  animation: infografisFadeIn 0.25s ease !important;
+  margin-top: 60px;
+  margin-bottom: 0;
+  max-height: 80vh;
 }
 
-.profiladmin-container .modal-content h3 {
+.infografis-crud-container .modal-content h3 {
   margin-bottom: 15px;
   color: #004d40;
 }
 
-.profiladmin-container .modal-content label {
+.infografis-crud-container .modal-content label {
   display: block;
   margin-top: 10px;
   font-size: 14px;
@@ -254,8 +257,8 @@
   color: #333;
 }
 
-.profiladmin-container .modal-content input,
-.profiladmin-container .modal-content select {
+.infografis-crud-container .modal-content input,
+.infografis-crud-container .modal-content select {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
@@ -264,25 +267,25 @@
   box-sizing: border-box;
 }
 
-.profiladmin-container .form-grid {
+.infografis-crud-container .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
 }
 
-.profiladmin-container .form-actions {
+.infografis-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
-  position: sticky;
+  position: static;
   bottom: 0;
-  background: white;
+  background: none;
   padding-top: 10px;
   box-sizing: border-box;
 }
 
-.profiladmin-container .btn-save {
+.infografis-crud-container .btn-save {
   background: #00695c;
   color: white;
   border: none;
@@ -292,11 +295,11 @@
   font-weight: 500;
 }
 
-.profiladmin-container .btn-save:hover {
+.infografis-crud-container .btn-save:hover {
   background: #004d40;
 }
 
-.profiladmin-container .btn-cancel {
+.infografis-crud-container .btn-cancel {
   background: #ccc;
   border: none;
   padding: 8px 14px;
@@ -304,11 +307,11 @@
   cursor: pointer;
 }
 
-.profiladmin-container .btn-cancel:hover {
+.infografis-crud-container .btn-cancel:hover {
   background: #b0b0b0;
 }
 
-.profiladmin-container .required {
+.infografis-crud-container .required {
   color: red;
   margin-left: 3px;
 }
@@ -316,14 +319,14 @@
 /* ==========================
    ✏️ JODIT EDITOR AREA (namespaced)
 ========================== */
-.profiladmin-container .modal-content form .jodit-container {
+.infografis-crud-container .modal-content form .jodit-container {
   min-height: 340px !important;
   width: 100% !important;
   max-width: 100% !important;
   font-size: 15px;
 }
 
-.profiladmin-container .jodit-wysiwyg {
+.infografis-crud-container .jodit-wysiwyg {
   padding: 12px !important;
   font-size: 15px !important;
   line-height: 1.6 !important;
@@ -332,7 +335,7 @@
 /* ==========================
    🔔 ANIMATIONS (namespaced)
 ========================== */
-@keyframes newsFadeIn {
+@keyframes infografisFadeIn {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -348,49 +351,49 @@
    📱 RESPONSIVE (namespaced)
 ========================== */
 @media (max-width: 768px) {
-  .profiladmin-container .modal-content {
+  .infografis-crud-container .modal-content {
     width: 95%;
     height: 90vh;
     padding: 24px;
   }
 
-  .profiladmin-container .filter-inline {
+  .infografis-crud-container .filter-inline {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .profiladmin-container .filter-item {
+  .infografis-crud-container .filter-item {
     width: 100%;
   }
 
-  .profiladmin-container {
+  .infografis-crud-container {
     padding: 15px;
   }
 
-  .profiladmin-container .crud-header h2 {
+  .infografis-crud-container .crud-header h2 {
     font-size: 18px;
   }
 
-  .profiladmin-container .btn-add {
+  .infografis-crud-container .btn-add {
     padding: 8px 10px;
   }
 
-  .profiladmin-container .news-table th,
-  .profiladmin-container .news-table td {
+  .infografis-crud-container .infografis-table th,
+  .infografis-crud-container .infografis-table td {
     font-size: 12px;
     padding: 8px;
   }
 }
 
 /* Wrapper untuk preview + overlay teks (namespaced) */
-.profiladmin-container .preview-wrap {
+.infografis-crud-container .preview-wrap {
   position: relative;
   display: inline-block;
   margin-top: 8px;
 }
 
 /* Overlay note di pojok kiri bawah gambar (namespaced) */
-.profiladmin-container .image-hint {
+.infografis-crud-container .image-hint {
   position: absolute;
   left: 8px;
   bottom: 8px;
@@ -403,14 +406,14 @@
 }
 
 /* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
-.profiladmin-container .image-hint-inline {
+.infografis-crud-container .image-hint-inline {
   margin-top: 6px;
   font-size: 12px;
   color: #666;
 }
 
 @media (max-width: 1024px) {
-  .profiladmin-container .modal-content {
+  .infografis-crud-container .modal-content {
     max-width: 95% !important;
     height: 90vh !important;
     padding: 28px !important;
@@ -419,11 +422,11 @@
 
 /* Smartphone (≤600px) — namespaced mobile tweaks */
 @media (max-width: 600px) {
-  .profiladmin-container .modal-overlay {
+  .infografis-crud-container .modal-overlay {
     padding: 0;
   }
 
-  .profiladmin-container .modal-content {
+  .infografis-crud-container .modal-content {
     margin: 0 !important;
     width: 100% !important;
     height: 80vh !important;
@@ -434,27 +437,27 @@
     text-align: justify;
   }
 
-  .profiladmin-container .modal-content h3 {
+  .infografis-crud-container .modal-content h3 {
     font-size: 18px;
     margin-bottom: 10px;
   }
 
-  .profiladmin-container .form-grid {
+  .infografis-crud-container .form-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .profiladmin-container .modal-content input,
-  .profiladmin-container .modal-content select {
+  .infografis-crud-container .modal-content input,
+  .infografis-crud-container .modal-content select {
     padding: 10px;
     font-size: 14px;
   }
 
-  .profiladmin-container .modal-content form .jodit-container {
+  .infografis-crud-container .modal-content form .jodit-container {
     min-height: 400px !important;
   }
 
-  .profiladmin-container .form-actions {
+  .infografis-crud-container .form-actions {
     position: sticky;
     bottom: 0;
     background: #fff;
@@ -463,21 +466,21 @@
     gap: 10px;
   }
 
-  .profiladmin-container .btn-add {
+  .infografis-crud-container .btn-add {
     padding: 8px 10px;
   }
 
-  .profiladmin-container .news-table th,
-  .profiladmin-container .news-table td {
+  .infografis-crud-container .infografis-table th,
+  .infografis-crud-container .infografis-table td {
     font-size: 12px;
     padding: 8px;
   }
 
-  .profiladmin-container .date-inputs {
+  .infografis-crud-container .date-inputs {
     gap: 6px;
   }
 
-  .profiladmin-container .date-inputs input {
+  .infografis-crud-container .date-inputs input {
     width: 46%;
   }
 }

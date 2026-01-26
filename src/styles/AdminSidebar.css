@@ -84,13 +84,18 @@
   padding: 8px;
   border-radius: 6px;
   cursor: pointer;
-  z-index: 2001;
+  z-index: 2000;
   /* di atas navbar (1000) */
   transition: background 0.2s ease;
+  padding: 0;
 }
 
 .sidebar-toggle:hover {
   background: #00796b;
+}
+
+.sidebar-toggle svg{
+
 }
 
 /* ==== OVERLAY ==== */

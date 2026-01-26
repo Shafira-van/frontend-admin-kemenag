@@ -1,28 +1,29 @@
 /* ==========================
-   🎯 WRAPPER & HEADER
+   🎯 WRAPPER & HEADER (namespaced)
 ========================== */
 .news-crud-container {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
-.crud-header {
+.news-crud-container .crud-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.crud-header h2 {
+.news-crud-container .crud-header h2 {
+  margin: 0;
   font-size: 22px;
   font-weight: 700;
   color: #004d40;
-  margin: 0;
 }
 
-.btn-add {
+.news-crud-container .btn-add {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -36,14 +37,14 @@
   font-weight: 500;
 }
 
-.btn-add:hover {
+.news-crud-container .btn-add:hover {
   background: #004d40;
 }
 
 /* ==========================
-   🔍 FILTER SECTION
+   🔍 FILTER SECTION (namespaced)
 ========================== */
-.filter-bar {
+.news-crud-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
@@ -54,8 +55,8 @@
   gap: 16px;
 }
 
-/* 🔸 Search box */
-.search-box {
+/* Search box */
+.news-crud-container .search-box {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -66,13 +67,13 @@
   transition: all 0.2s ease;
 }
 
-.search-box:hover,
-.search-box:focus-within {
+.news-crud-container .search-box:hover,
+.news-crud-container .search-box:focus-within {
   border-color: #00695c;
   box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
 }
 
-.search-box input {
+.news-crud-container .search-box input {
   border: none;
   outline: none;
   flex: 1;
@@ -81,29 +82,29 @@
   color: #333;
 }
 
-/* 🔸 Inline filter row */
-.filter-inline {
+/* Inline filter row */
+.news-crud-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 20px;
 }
 
-.filter-item {
+.news-crud-container .filter-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 180px;
 }
 
-.filter-item label {
+.news-crud-container .filter-item label {
   font-size: 13px;
   font-weight: 600;
   color: #004d40;
 }
 
-.filter-item select,
-.filter-item input[type="date"] {
+.news-crud-container .filter-item select,
+.news-crud-container .filter-item input[type="date"] {
   padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -113,78 +114,78 @@
   transition: border-color 0.2s ease;
 }
 
-.filter-item select:focus,
-.filter-item input[type="date"]:focus {
+.news-crud-container .filter-item select:focus,
+.news-crud-container .filter-item input[type="date"]:focus {
   border-color: #00695c;
 }
 
-/* 🔸 Date range */
-.date-range .date-inputs {
+/* Date range */
+.news-crud-container .date-range .date-inputs {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.date-range span {
+.news-crud-container .date-range span {
   font-weight: 600;
   color: #777;
 }
 
 /* ==========================
-   📋 TABLE
+   📋 TABLE (namespaced)
 ========================== */
-.table-wrapper {
+.news-crud-container .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
   border: 1px solid #eee;
 }
 
-.news-table {
+.news-crud-container .news-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.news-table th,
-.news-table td {
+.news-crud-container .news-table th,
+.news-crud-container .news-table td {
   padding: 12px;
   border-bottom: 1px solid #e0e0e0;
   text-align: left;
   vertical-align: middle;
 }
 
-.news-table th {
+.news-crud-container .news-table th {
   background: #f5f5f5;
   font-weight: 600;
   color: #333;
 }
 
-.news-table tr:hover td {
+.news-crud-container .news-table tr:hover td {
   background: #f9f9f9;
 }
 
-.news-table td {
+.news-crud-container .news-table td {
   color: #444;
 }
 
-.preview-img {
+.news-crud-container .preview-img {
   width: 100%;
-  max-width: 250px;
-  max-height: 200px;
+  max-width: 24rem;
+  max-height: 13rem;
   object-fit: cover;
   border-radius: 8px;
 }
 
 /* ==========================
-   ⚙️ ACTION BUTTONS
+   ⚙️ ACTION BUTTONS (namespaced)
 ========================== */
-.action-buttons {
+.news-crud-container .action-buttons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0px !important;
 }
 
-.action-buttons button {
+.news-crud-container .action-buttons button {
   border: none;
   background: none;
   cursor: pointer;
@@ -193,145 +194,153 @@
   transition: transform 0.2s;
 }
 
-.action-buttons button:hover {
+.news-crud-container .action-buttons button:hover {
   transform: scale(1.15);
+  background: none;
 }
 
-.btn-view {
+.news-crud-container .btn-view {
   color: #2e7d32;
 }
 
-.btn-edit {
+.news-crud-container .btn-edit {
   color: #0277bd;
 }
 
-.btn-delete {
+.news-crud-container .btn-delete {
   color: #d32f2f;
 }
 
 /* ==========================
-   🧩 MODAL
+   🧩 MODAL (namespaced)
 ========================== */
-.modal-overlay {
+.news-crud-container .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0, 0, 0, 0.45)!important;
-  display: flex!important;
-  justify-content: center!important;
-  align-items: center!important;
-  z-index: 999!important;
-  overflow-y: auto!important;
-  padding: 30px!important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 999 !important;
+  overflow-y: auto !important;
+  padding: 30px !important;
+  box-sizing: border-box;
 }
 
-.modal-content {
-  background: #ffffff!important;
-  border-radius: 16px!important;
-  width: 100% !important;
-  max-width: 1400px!important;
-  /* ✅ modal penuh di desktop */
-  overflow-y: auto!important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3)!important;
-  padding: 32px!important;
-  position: relative!important;
-  transition: all 0.3s ease!important;
-  animation: fadeIn 0.25s ease!important;
+.news-crud-container .modal-content {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  width: 100% !important;  
+  max-width: 1400px !important;
+  overflow-y: auto !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  padding: 32px !important;
+  position: relative !important;
+  transition: all 0.3s ease !important;
+  animation: newsFadeIn 0.25s ease !important;
+  margin-top: 10vh;
+  margin-bottom: 0;
+  max-height: 80vh;
 }
 
-.modal-content h3 {
+.news-crud-container .modal-content h3 {
   margin-bottom: 15px;
   color: #004d40;
 }
 
-.modal-content label {
+.news-crud-container .modal-content label {
+  display: block;
+  margin-top: 10px;
   font-size: 14px;
   font-weight: 600;
   color: #333;
-  display: block;
-  margin-top: 10px;
 }
 
-.modal-content input,
-.modal-content select {
+.news-crud-container .modal-content input,
+.news-crud-container .modal-content select {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
   margin-top: 6px;
+  box-sizing: border-box;
 }
 
-.form-grid {
+.news-crud-container .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
 }
 
-.form-actions {
+.news-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
-  position: sticky;
+  position: static;
   bottom: 0;
-  background: white;
+  /* background: white; */
   padding-top: 10px;
+  box-sizing: border-box;
 }
 
-.btn-save {
+.news-crud-container .btn-save {
   background: #00695c;
-  color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
+  width: fit-content;
+  display: flex;
+  margin-top: 6px;
 }
 
-.btn-save:hover {
+.news-crud-container .btn-save:hover {
   background: #004d40;
 }
 
-.btn-cancel {
+
+.news-crud-container .btn-cancel {
   background: #ccc;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  width: fit-content;
+  display: flex;
+  margin-top: 6px;
+  align-self: flex-end;
 }
 
-.btn-cancel:hover {
+.news-crud-container .btn-cancel:hover {
   background: #b0b0b0;
 }
 
-/* ==========================
-   ✏️ JODIT EDITOR AREA
-========================== */
-.jodit-container {
-  /* min-height: 400px !important; */
-  /* ✅ tinggi default */
-  /* max-height: 100px; */
-  /* ✅ biar tidak terlalu panjang */
-  /* border-radius: 10px; */
-  /* overflow: hidden; */
+.news-crud-container .required {
+  color: red;
+  margin-left: 3px;
 }
 
-/* Jika kamu ingin textarea-nya lebih besar lagi */
-.modal-content form .jodit-container {
+/* ==========================
+   ✏️ JODIT EDITOR AREA (namespaced)
+========================== */
+.news-crud-container .modal-content form .jodit-container {
   min-height: 340px !important;
-  /* ✅ lebar penuh modal */
   width: 100% !important;
   max-width: 100% !important;
   font-size: 15px;
 }
 
-/* Tambahkan padding biar isi editor nggak terlalu mepet */
-.jodit-wysiwyg {
+.news-crud-container .jodit-wysiwyg {
   padding: 12px !important;
   font-size: 15px !important;
   line-height: 1.6 !important;
 }
 
-@keyframes fadeIn {
+/* ==========================
+   🔔 ANIMATIONS (namespaced)
+========================== */
+@keyframes newsFadeIn {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -342,21 +351,23 @@
     transform: translateY(0);
   }
 }
+
 /* ==========================
-   📱 RESPONSIVE
+   📱 RESPONSIVE (namespaced)
 ========================== */
 @media (max-width: 768px) {
-  .modal-content {
-      width: 95%;
-      height: 90vh;
-      padding: 24px;
-    }
-    .filter-inline {
+  .news-crud-container .modal-content {
+    width: 95%;
+    height: 90vh;
+    padding: 24px;
+  }
+
+  .news-crud-container .filter-inline {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .filter-item {
+  .news-crud-container .filter-item {
     width: 100%;
   }
 
@@ -364,40 +375,117 @@
     padding: 15px;
   }
 
-  .crud-header h2 {
+  .news-crud-container .crud-header h2 {
     font-size: 18px;
   }
 
-  .btn-add {
+  .news-crud-container .btn-add {
     padding: 8px 10px;
   }
 
-  .news-table th,
-  .news-table td {
+  .news-crud-container .news-table th,
+  .news-crud-container .news-table td {
     font-size: 12px;
     padding: 8px;
   }
 }
 
-@media (max-width: 1024px) {
-  .modal-content {
-      max-width: 95%!important;
-      height: 90vh!important;
-      padding: 28px!important;
-    }
+/* Wrapper untuk preview + overlay teks (namespaced) */
+.news-crud-container .preview-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
 }
 
-/* Smartphone (bawah 600px) */
+/* Overlay note di pojok kiri bawah gambar (namespaced) */
+.news-crud-container .image-hint {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
+.news-crud-container .image-hint-inline {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+@media (max-width: 1024px) {
+  .news-crud-container .modal-content {
+    max-width: 95% !important;
+    height: 90vh !important;
+    padding: 28px !important;
+  }
+}
+
+/* Smartphone (≤600px) — namespaced mobile tweaks */
 @media (max-width: 600px) {
-  .modal-overlay {
-      padding: 10px;
-    }
-  
-    .modal-content {
-      width: 100%!important;
-      height: 95vh!important;
-      max-width: none!important;
-      border-radius: 10px!important;
-      padding: 180px!important;
-    }
+  .news-crud-container .modal-overlay {
+    padding: 0;
+  }
+
+  .news-crud-container .modal-content {
+    margin: 0 !important;
+    width: 100% !important;
+    height:80vh !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    padding: 16px !important;
+    box-shadow: none !important;
+    text-align: justify;
+  }
+
+  .news-crud-container .modal-content h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .news-crud-container .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .news-crud-container .modal-content input,
+  .news-crud-container .modal-content select {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .news-crud-container .modal-content form .jodit-container {
+    min-height: 400px !important;
+  }
+
+  .news-crud-container .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+
+  .news-crud-container .btn-add {
+    padding: 8px 10px;
+  }
+
+  .news-crud-container .news-table th,
+  .news-crud-container .news-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .news-crud-container .date-inputs {
+    gap: 6px;
+  }
+
+  .news-crud-container .date-inputs input {
+    width: 46%;
+  }
 }

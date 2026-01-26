@@ -35,7 +35,7 @@ const AdminSidebar = () => {
     <>
       {/* Tombol toggle di tablet/HP */}
       <button className="sidebar-toggle" onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {/* Sidebar */}

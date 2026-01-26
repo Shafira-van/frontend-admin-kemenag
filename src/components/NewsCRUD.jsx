@@ -25,6 +25,16 @@ const NewsCRUD = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
 
+  // error state untuk tiap field
+  const [errors, setErrors] = useState({
+    title: "",
+    date: "",
+    category: "",
+    editor: "",
+    content: "",
+    image: "",
+  });
+
   /* ============================================================
      📡 Ambil data berita sesuai kategori + limit
   ============================================================ */
@@ -33,10 +43,8 @@ const NewsCRUD = () => {
       try {
         let url = `${API_URL}/berita?limit=${itemsPerPage}`;
         if (categoryFilter) {
-          // Jika kategori dipilih, ambil data berdasarkan kategori
           url = `${API_URL}/berita/category/${categoryFilter.toLowerCase()}?limit=${itemsPerPage}`;
         }
-
         const res = await fetch(url, { credentials: "include" });
         const data = await res.json();
         const allNews = Array.isArray(data.data) ? data.data : data;
@@ -48,7 +56,7 @@ const NewsCRUD = () => {
     };
 
     fetchNews();
-  }, [itemsPerPage, categoryFilter]); // 🔹 refetch saat limit / kategori berubah
+  }, [itemsPerPage, categoryFilter]);
 
   /* ============================================================
      🔍 Filter kombinasi (kategori, pencarian, tanggal)
@@ -56,7 +64,6 @@ const NewsCRUD = () => {
   useEffect(() => {
     let result = [...newsList];
 
-    // Filter kategori (redundant tapi tetap aman)
     if (categoryFilter) {
       result = result.filter(
         (n) =>
@@ -65,7 +72,6 @@ const NewsCRUD = () => {
       );
     }
 
-    // Filter pencarian
     if (searchTerm.trim() !== "") {
       const keyword = searchTerm.toLowerCase();
       result = result.filter((item) => {
@@ -80,7 +86,6 @@ const NewsCRUD = () => {
       });
     }
 
-    // Filter rentang tanggal
     if (dateRange.from && dateRange.to) {
       const from = new Date(dateRange.from);
       const to = new Date(dateRange.to);
@@ -101,10 +106,66 @@ const NewsCRUD = () => {
   }, [categoryFilter]);
 
   /* ============================================================
-     📝 Handle submit berita baru / edit
+     ✅ Validasi sebelum submit (gambar JPG/PNG/WebP, MAKS 2MB)
+  ============================================================ */
+  const validate = () => {
+    const newErrors = {
+      title: "",
+      date: "",
+      category: "",
+      editor: "",
+      content: "",
+      image: "",
+    };
+
+    if (!formData.title || !formData.title.trim())
+      newErrors.title = "Judul wajib diisi.";
+    if (!formData.date) newErrors.date = "Tanggal wajib diisi.";
+    if (!formData.category) newErrors.category = "Kategori wajib dipilih.";
+    if (!formData.editor || !formData.editor.trim())
+      newErrors.editor = "Editor wajib diisi.";
+
+    const textContent = (formData.content || "")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .trim();
+    if (!textContent) newErrors.content = "Isi berita wajib diisi.";
+
+    // Gambar wajib saat TAMBAH (id null). Saat edit: wajib jika tidak ada gambar lama & tidak unggah baru.
+    const isCreate = !formData.id;
+    const hasExistingImage = !!imagePreview;
+    const hasNewFile = formData.image instanceof File;
+    if (
+      (isCreate && !hasNewFile) ||
+      (!isCreate && !hasExistingImage && !hasNewFile)
+    ) {
+      newErrors.image = "Gambar wajib diunggah (JPG/PNG/WebP maksimal 2MB).";
+    }
+
+    // Jika ada file baru, cek tipe + ukuran MAKS 2MB
+    if (hasNewFile) {
+      const f = formData.image;
+      const isAllowedType =
+        f.type === "image/jpeg" ||
+        f.type === "image/png" ||
+        f.type === "image/webp" ||
+        /\.(jpe?g|png|webp)$/i.test(f.name);
+      const isMax2Mb = f.size <= 2 * 1024 * 1024;
+      if (!isAllowedType || !isMax2Mb) {
+        newErrors.image = "Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.values(newErrors).every((msg) => msg === "");
+  };
+
+  /* ============================================================
+     📝 Submit tambah / edit
   ============================================================ */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
     try {
       const method = formData.id ? "PUT" : "POST";
@@ -113,7 +174,6 @@ const NewsCRUD = () => {
         : `${API_URL}/berita`;
 
       const body = new FormData();
-
       body.append("title", formData.title || "");
       body.append("date", formData.date || "");
       body.append("category", formData.category || "");
@@ -127,10 +187,9 @@ const NewsCRUD = () => {
         throw new Error(`HTTP ${res.status} – ${errText}`);
       }
 
-      // Refresh data terbaru
       const updated = await fetch(`${API_URL}/berita?limit=${itemsPerPage}`, {
         credentials: "include",
-      }).then((res) => res.json());
+      }).then((r) => r.json());
 
       const allNews = Array.isArray(updated.data) ? updated.data : updated;
       setNewsList(allNews);
@@ -150,10 +209,27 @@ const NewsCRUD = () => {
       ? new Date(news.date).toISOString().split("T")[0]
       : "";
 
-    setFormData({ ...news, date: dateValue });
+    setFormData({
+      id: news.id ?? null,
+      title: news.title ?? "",
+      date: dateValue,
+      category: news.category ?? "",
+      editor: news.editor ?? "",
+      content: news.content ?? "",
+      image: "",
+    });
+
     setImagePreview(
       news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null
     );
+    setErrors({
+      title: "",
+      date: "",
+      category: "",
+      editor: "",
+      content: "",
+      image: "",
+    });
     setModalMode("edit");
   };
 
@@ -177,8 +253,39 @@ const NewsCRUD = () => {
         method: "DELETE",
         credentials: "include",
       });
-      setNewsList(newsList.filter((n) => n.id !== id));
+      setNewsList((prev) => prev.filter((n) => n.id !== id));
+      setFilteredNews((prev) => prev.filter((n) => n.id !== id));
     }
+  };
+
+  /* ============================================================
+     🖼️ OnChange Gambar: validasi tipe & MAKS 2MB + preview
+  ============================================================ */
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isAllowedType =
+      file.type === "image/jpeg" ||
+      file.type === "image/png" ||
+      file.type === "image/webp" ||
+      /\.(jpe?g|png|webp)$/i.test(file.name);
+
+    const isMax2Mb = file.size <= 2 * 1024 * 1024;
+
+    if (!isAllowedType || !isMax2Mb) {
+      setErrors({
+        ...errors,
+        image: "Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.",
+      });
+      setFormData({ ...formData, image: "" });
+      setImagePreview(null);
+      return;
+    }
+
+    setFormData({ ...formData, image: file });
+    setImagePreview(URL.createObjectURL(file));
+    if (errors.image) setErrors({ ...errors, image: "" });
   };
 
   /* ============================================================
@@ -196,6 +303,14 @@ const NewsCRUD = () => {
       image: "",
     });
     setImagePreview(null);
+    setErrors({
+      title: "",
+      date: "",
+      category: "",
+      editor: "",
+      content: "",
+      image: "",
+    });
   };
 
   /* ============================================================
@@ -311,20 +426,24 @@ const NewsCRUD = () => {
                     : "-"}
                 </td>
                 <td>{news.editor}</td>
-                <td className="action-buttons">
-                  <button
-                    className="btn-view"
-                    onClick={() => handlePreview(news)}>
-                    <Eye size={16} />
-                  </button>
-                  <button className="btn-edit" onClick={() => handleEdit(news)}>
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(news.id)}>
-                    <Trash2 size={16} />
-                  </button>
+                <td className="action-cell">
+                  <div className="action-buttons">
+                    <button
+                      className="btn-view"
+                      onClick={() => handlePreview(news)}>
+                      <Eye size={16} />
+                    </button>
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleEdit(news)}>
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(news.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -343,43 +462,65 @@ const NewsCRUD = () => {
             {modalMode === "edit" ? (
               <>
                 <h3>{formData.id ? "Edit Berita" : "Tambah Berita"}</h3>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                   <div>
-                    <label>Judul Berita</label>
+                    <label>
+                      Judul Berita<span className="required">*</span>
+                    </label>
                     <input
                       type="text"
                       value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setFormData({ ...formData, title: e.target.value });
+                        if (errors.title) setErrors({ ...errors, title: "" });
+                      }}
                       required
+                      aria-invalid={!!errors.title}
+                      className={errors.title ? "is-invalid" : ""}
                     />
+                    {errors.title && (
+                      <div className="error-text">{errors.title}</div>
+                    )}
                   </div>
 
                   <div className="form-grid">
                     <div>
-                      <label>Tanggal</label>
+                      <label>
+                        Tanggal<span className="required">*</span>
+                      </label>
                       <input
                         type="date"
                         value={formData.date || ""}
-                        onChange={(e) =>
-                          setFormData({ ...formData, date: e.target.value })
-                        }
+                        onChange={(e) => {
+                          setFormData({ ...formData, date: e.target.value });
+                          if (errors.date) setErrors({ ...errors, date: "" });
+                        }}
                         required
+                        aria-invalid={!!errors.date}
+                        className={errors.date ? "is-invalid" : ""}
                       />
+                      {errors.date && (
+                        <div className="error-text">{errors.date}</div>
+                      )}
                     </div>
 
                     <div>
-                      <label>Kategori</label>
+                      <label>
+                        Kategori<span className="required">*</span>
+                      </label>
                       <select
                         value={formData.category}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setFormData({
                             ...formData,
                             category: e.target.value,
-                          })
-                        }
-                        required>
+                          });
+                          if (errors.category)
+                            setErrors({ ...errors, category: "" });
+                        }}
+                        required
+                        aria-invalid={!!errors.category}
+                        className={errors.category ? "is-invalid" : ""}>
                         <option value="">-- Pilih Kategori --</option>
                         <option value="Bimas Islam">Bimas Islam</option>
                         <option value="Sekretariat Jenderal">
@@ -394,41 +535,70 @@ const NewsCRUD = () => {
                           Penyelenggara Buddha
                         </option>
                       </select>
+                      {errors.category && (
+                        <div className="error-text">{errors.category}</div>
+                      )}
                     </div>
 
                     <div>
-                      <label>Editor</label>
+                      <label>
+                        Editor<span className="required">*</span>
+                      </label>
                       <input
                         type="text"
                         value={formData.editor}
-                        onChange={(e) =>
-                          setFormData({ ...formData, editor: e.target.value })
-                        }
+                        onChange={(e) => {
+                          setFormData({ ...formData, editor: e.target.value });
+                          if (errors.editor)
+                            setErrors({ ...errors, editor: "" });
+                        }}
+                        required
+                        aria-invalid={!!errors.editor}
+                        className={errors.editor ? "is-invalid" : ""}
                       />
+                      {errors.editor && (
+                        <div className="error-text">{errors.editor}</div>
+                      )}
                     </div>
 
                     <div>
-                      <label>Gambar</label>
+                      <label>
+                        Gambar<span className="required">*</span>
+                      </label>
                       <input
                         type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          setFormData({ ...formData, image: file });
-                          setImagePreview(URL.createObjectURL(file));
-                        }}
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handleImageChange}
+                        aria-invalid={!!errors.image}
+                        className={errors.image ? "is-invalid" : ""}
                       />
+                      {/* Preview + overlay note */}
                       {imagePreview && (
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="preview-img"
-                        />
+                        <div className="preview-wrap">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="preview-img"
+                          />
+                          <div className="image-hint">
+                            Format JPG/PNG/WebP, maksimal 2MB
+                          </div>
+                        </div>
+                      )}
+                      {!imagePreview && (
+                        <div className="image-hint-inline">
+                          Format JPG/PNG/WebP, maksimal 2MB
+                        </div>
+                      )}
+                      {errors.image && (
+                        <div className="error-text">{errors.image}</div>
                       )}
                     </div>
                   </div>
 
-                  <label>Isi Berita</label>
+                  <label>
+                    Isi Berita<span className="required">*</span>
+                  </label>
                   <JoditEditor
                     value={formData.content}
                     config={{
@@ -460,13 +630,16 @@ const NewsCRUD = () => {
                         "|",
                         "undo",
                         "redo",
-                        "fullscreen",
                       ],
                     }}
-                    onBlur={(newContent) =>
-                      setFormData({ ...formData, content: newContent })
-                    }
+                    onBlur={(newContent) => {
+                      setFormData({ ...formData, content: newContent });
+                      if (errors.content) setErrors({ ...errors, content: "" });
+                    }}
                   />
+                  {errors.content && (
+                    <div className="error-text">{errors.content}</div>
+                  )}
 
                   <div className="form-actions">
                     <button type="submit" className="btn-save">

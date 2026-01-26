@@ -1,82 +1,209 @@
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
 import "../styles/ProfilAdminCRUD.css";
-import { API_URL, API_UPLOADS } from "../config";
-
-// const API_URL = "http://localhost:3000/api/profilAdmin"; // Ganti sesuai endpoint kamu
+import { API_URL } from "../config";
 
 const ProfilAdminCRUD = () => {
   const [adminList, setAdminList] = useState([]);
+  const [filteredAdmin, setFilteredAdmin] = useState([]);
+
   const [modalMode, setModalMode] = useState(null); // "edit" | "preview"
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [formData, setFormData] = useState({
     id: null,
     username: "",
     email: "",
     password: "",
     role: "",
-    created_at: "",
   });
 
-  // Fetch data admin dari API
+  const [errors, setErrors] = useState({
+    username: "",
+    email: "",
+    role: "",
+    password: "",
+  });
+
+  /* =========================
+     Fetch admins
+  ========================= */
   useEffect(() => {
-    fetch(`${API_URL}/profilAdmin`)
-      .then((res) => res.json())
-      .then((data) => setAdminList(data))
-      .catch((err) => console.error("Error fetching:", err));
-  }, []);
+    const fetchAdmins = async () => {
+      try {
+        let url = `${API_URL}/profilAdmin?limit=${itemsPerPage}`;
+        if (itemsPerPage === 0) url = `${API_URL}/profilAdmin`;
 
-  // Handle create / update
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        const res = await fetch(url, { credentials: "include" });
+        const data = await res.json();
 
-    const method = formData.id ? "PUT" : "POST";
-    const url = formData.id
-      ? `${API_URL}/profilAdmin/${formData.id}`
-      : `${API_URL}/profilAdmin`;
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data.data)
+          ? data.data
+          : data;
 
-    // Jika tambah admin baru, gunakan password default
-    const payload = {
-      ...formData,
-      password: formData.id ? formData.password : "123456",
+        setAdminList(list);
+        setFilteredAdmin(list);
+      } catch (err) {
+        console.error("Error fetching admins:", err);
+      }
     };
 
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    fetchAdmins();
+  }, [itemsPerPage]);
 
-    const updated = await fetch(`${API_URL}/profilAdmin`).then((res) =>
-      res.json()
-    );
-    setAdminList(updated);
-    closeModal();
+  /* =========================
+     Search + Filter
+  ========================= */
+  useEffect(() => {
+    let result = [...adminList];
+
+    if (roleFilter) {
+      result = result.filter((a) => a.role === roleFilter);
+    }
+
+    if (searchTerm.trim() !== "") {
+      const kw = searchTerm.toLowerCase();
+      result = result.filter(
+        (a) =>
+          a.username.toLowerCase().includes(kw) ||
+          a.email.toLowerCase().includes(kw)
+      );
+    }
+
+    setFilteredAdmin(result);
+  }, [searchTerm, roleFilter, adminList]);
+
+  /* =========================
+     Validation
+  ========================= */
+  const validate = () => {
+    const v = { username: "", email: "", role: "", password: "" };
+
+    if (!formData.username?.trim()) v.username = "Username wajib diisi.";
+    if (!formData.email?.trim()) v.email = "Email wajib diisi.";
+    else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email.trim())
+    )
+      v.email = "Format email tidak valid.";
+    if (!formData.role) v.role = "Role wajib dipilih.";
+    if (formData.password && formData.password.length < 6)
+      v.password = "Password minimal 6 karakter.";
+
+    setErrors(v);
+    return Object.values(v).every((e) => e === "");
   };
 
-  // Edit admin
+  /* =========================
+     Submit
+  ========================= */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    try {
+      const method = formData.id ? "PUT" : "POST";
+
+      const url = formData.id
+        ? `${API_URL}/profilAdmin/${formData.id}`
+        : `${API_URL}/profilAdmin`;
+
+      const payload = {
+        username: formData.username,
+        email: formData.email,
+        role: formData.role,
+        ...(formData.password ? { password: formData.password } : {}),
+      };
+
+      if (!formData.id && !formData.password) {
+        payload.password = "123456"; // default password
+      }
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(t);
+      }
+
+      // refresh list
+      const updated = await fetch(`${API_URL}/profilAdmin`, {
+        credentials: "include",
+      }).then((r) => r.json());
+
+      const list = Array.isArray(updated)
+        ? updated
+        : Array.isArray(updated.data)
+        ? updated.data
+        : updated;
+
+      setAdminList(list);
+      setFilteredAdmin(list);
+
+      closeModal();
+      alert("Admin berhasil disimpan.");
+    } catch (err) {
+      console.error(err);
+      alert("Gagal menyimpan admin.");
+    }
+  };
+
+  /* =========================
+     Edit / Preview / Delete
+  ========================= */
   const handleEdit = (admin) => {
     setFormData({
-      ...admin,
+      id: admin.id,
+      username: admin.username,
+      email: admin.email,
       password: "",
+      role: admin.role,
     });
+    setErrors({});
     setModalMode("edit");
   };
 
-  // Preview admin
   const handlePreview = (admin) => {
     setFormData(admin);
     setModalMode("preview");
   };
 
-  // Hapus admin
   const handleDelete = async (id) => {
-    if (window.confirm("Yakin ingin menghapus admin ini?")) {
-      await fetch(`${API_URL}/profilAdmin/${id}`, { method: "DELETE" });
-      setAdminList(adminList.filter((a) => a.id !== id));
+    if (!window.confirm("Hapus admin ini?")) return;
+
+    try {
+      await fetch(`${API_URL}/profilAdmin/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      setAdminList((p) => p.filter((a) => a.id !== id));
+      setFilteredAdmin((p) => p.filter((a) => a.id !== id));
+    } catch (err) {
+      alert("Gagal menghapus admin");
     }
   };
 
-  // Tutup modal
+  const openCreateModal = () => {
+    setFormData({
+      id: null,
+      username: "",
+      email: "",
+      password: "",
+      role: "",
+    });
+    setErrors({});
+    setModalMode("edit");
+  };
+
   const closeModal = () => {
     setModalMode(null);
     setFormData({
@@ -85,52 +212,98 @@ const ProfilAdminCRUD = () => {
       email: "",
       password: "",
       role: "",
-      created_at: "",
     });
+    setErrors({});
   };
 
+  /* =========================
+     Render
+  ========================= */
   return (
     <div className="profiladmin-container">
       <div className="crud-header">
         <h2>Manajemen Admin</h2>
-        <button className="btn-add" onClick={() => setModalMode("edit")}>
+        <button className="btn-add" onClick={openCreateModal}>
           <PlusCircle size={18} /> Tambah Admin
         </button>
       </div>
 
+      {/* FILTER BAR */}
+      <div className="filter-bar">
+        <div className="search-box">
+          <Search size={16} />
+          <input
+            type="text"
+            placeholder="Cari username atau email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="filter-inline">
+          <div className="filter-item">
+            <label>Role</label>
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}>
+              <option value="">Semua</option>
+              <option value="superadmin">Super Admin</option>
+              <option value="admin">Admin</option>
+              <option value="editor">Editor</option>
+            </select>
+          </div>
+
+          <div className="filter-item">
+            <label>Tampilkan</label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={0}>Semua</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* TABLE */}
       <div className="table-wrapper">
-        <table className="profiladmin-table">
+        <table className="news-table">
           <thead>
             <tr>
               <th>No</th>
-              <th>Username</th>
+              <th>Nama</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Dibuat</th>
               <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
-            {adminList.length > 0 ? (
-              adminList.map((admin, index) => (
-                <tr key={admin.id}>
-                  <td>{index + 1}</td>
-                  <td>{admin.username}</td>
-                  <td>{admin.email}</td>
-                  <td>{admin.role}</td>
+            {filteredAdmin.length ? (
+              filteredAdmin.map((a, i) => (
+                <tr key={a.id}>
+                  <td>{i + 1}</td>
+                  <td>{a.username}</td>
+                  <td>{a.email}</td>
+                  <td>{a.role}</td>
+                  <td>
+                    {a.created_at
+                      ? new Date(a.created_at).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </td>
                   <td className="action-buttons">
-                    <button
-                      className="btn-view"
-                      onClick={() => handlePreview(admin)}>
-                      <Eye size={16} />
-                    </button>
-                    <button
-                      className="btn-edit"
-                      onClick={() => handleEdit(admin)}>
+                    <button className="btn-edit" onClick={() => handleEdit(a)}>
                       <Edit size={16} />
                     </button>
                     <button
                       className="btn-delete"
-                      onClick={() => handleDelete(admin.id)}>
+                      onClick={() => handleDelete(a.id)}>
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -138,10 +311,8 @@ const ProfilAdminCRUD = () => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="6"
-                  style={{ textAlign: "center", padding: "20px" }}>
-                  Belum ada data admin
+                <td colSpan="6" className="empty-text">
+                  Tidak ada admin ditemukan.
                 </td>
               </tr>
             )}
@@ -149,72 +320,97 @@ const ProfilAdminCRUD = () => {
         </table>
       </div>
 
-      {/* Modal */}
+      {/* MODAL */}
       {modalMode && (
         <div className="modal-overlay">
           <div className="modal-content modal-large">
+            {/* =======================
+                EDIT / CREATE FORM
+            ======================= */}
             {modalMode === "edit" ? (
               <>
                 <h3>{formData.id ? "Edit Admin" : "Tambah Admin"}</h3>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                   <div className="form-grid">
                     <div>
-                      <label>Username</label>
+                      <label>
+                        Username <span className="required">*</span>
+                      </label>
                       <input
                         type="text"
                         value={formData.username}
-                        onChange={(e) =>
+                        onChange={(e) => {
                           setFormData({
                             ...formData,
                             username: e.target.value,
-                          })
-                        }
-                        required
+                          });
+                          if (errors.username)
+                            setErrors({ ...errors, username: "" });
+                        }}
+                        className={errors.username ? "is-invalid" : ""}
                       />
+                      {errors.username && (
+                        <div className="error-text">{errors.username}</div>
+                      )}
                     </div>
 
                     <div>
-                      <label>Email</label>
+                      <label>
+                        Email <span className="required">*</span>
+                      </label>
                       <input
                         type="email"
                         value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                        required
+                        onChange={(e) => {
+                          setFormData({ ...formData, email: e.target.value });
+                          if (errors.email) setErrors({ ...errors, email: "" });
+                        }}
+                        className={errors.email ? "is-invalid" : ""}
                       />
+                      {errors.email && (
+                        <div className="error-text">{errors.email}</div>
+                      )}
                     </div>
 
-                    {formData.id && (
-                      <div>
-                        <label>Password (opsional)</label>
-                        <input
-                          type="password"
-                          placeholder="Isi untuk ubah password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              password: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
-                    )}
+                    <div>
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        placeholder={
+                          formData.id
+                            ? "Isi untuk ubah password (opsional)"
+                            : "Kosongkan untuk default: 123456"
+                        }
+                        value={formData.password}
+                        onChange={(e) =>
+                          setFormData({ ...formData, password: e.target.value })
+                        }
+                        className={errors.password ? "is-invalid" : ""}
+                      />
+                      {errors.password && (
+                        <div className="error-text">{errors.password}</div>
+                      )}
+                    </div>
 
                     <div>
-                      <label>Role</label>
+                      <label>
+                        Role <span className="required">*</span>
+                      </label>
                       <select
                         value={formData.role}
-                        onChange={(e) =>
-                          setFormData({ ...formData, role: e.target.value })
-                        }
-                        required>
+                        onChange={(e) => {
+                          setFormData({ ...formData, role: e.target.value });
+                          if (errors.role) setErrors({ ...errors, role: "" });
+                        }}
+                        className={errors.role ? "is-invalid" : ""}>
                         <option value="">-- Pilih Role --</option>
                         <option value="superadmin">Super Admin</option>
                         <option value="admin">Admin</option>
                         <option value="editor">Editor</option>
                       </select>
+                      {errors.role && (
+                        <div className="error-text">{errors.role}</div>
+                      )}
                     </div>
                   </div>
 
@@ -232,8 +428,12 @@ const ProfilAdminCRUD = () => {
                 </form>
               </>
             ) : (
+              /* =======================
+                  PREVIEW MODE
+              ======================= */
               <>
                 <h3>Detail Admin</h3>
+
                 <p>
                   <strong>Username:</strong> {formData.username}
                 </p>
@@ -246,12 +446,17 @@ const ProfilAdminCRUD = () => {
                 <p>
                   <strong>Dibuat:</strong>{" "}
                   {formData.created_at
-                    ? new Date(formData.created_at).toLocaleString("id-ID")
+                    ? new Date(formData.created_at).toLocaleDateString("id-ID")
                     : "-"}
                 </p>
-                <button className="btn-cancel" onClick={closeModal}>
-                  Tutup
-                </button>
+
+                <div
+                  className="form-actions"
+                  style={{ justifyContent: "flex-end" }}>
+                  <button className="btn-cancel" onClick={closeModal}>
+                    Tutup
+                  </button>
+                </div>
               </>
             )}
           </div>

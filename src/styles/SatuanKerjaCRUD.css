@@ -1,263 +1,343 @@
-/* ====== WRAPPER UTAMA ====== */
+/* ==========================
+   🎯 WRAPPER & HEADER (namespaced)
+========================== */
 .satker-crud-container {
-  display: flex;
-  flex-direction: column;
-  background: #f4f6f8;
-  min-height: 100vh;
-  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
-/* ====== HEADER ====== */
-.crud-header {
+.satker-crud-container .crud-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
-.crud-header h2 {
-  font-size: 24px;
-  color: #2c3e50;
+.satker-crud-container .crud-header h2 {
+  margin: 0;
+  font-size: 22px;
   font-weight: 700;
+  color: #004d40;
 }
 
-.btn-add {
+.satker-crud-container .btn-add {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #1abc9c;
-  color: white;
+  gap: 6px;
+  background: #00695c;
+  color: #fff;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
-  font-weight: 600;
-  font-size: 15px;
   cursor: pointer;
   transition: background 0.3s;
+  font-weight: 500;
 }
 
-.btn-add:hover {
-  background: #16a085;
+.satker-crud-container .btn-add:hover {
+  background: #004d40;
 }
 
-/* ====== TABEL DATA ====== */
-.table-wrapper {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow-x: auto;
-}
-
-.satker-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-}
-
-.satker-table th,
-.satker-table td {
-  padding: 14px 16px;
-  text-align: left;
-  border-bottom: 1px solid #ecf0f1;
-}
-
-.satker-table th {
-  background: #f9fafb;
-  color: #34495e;
-  font-weight: 700;
-}
-
-.satker-table td {
-  color: #555;
-  vertical-align: top;
-}
-
-/* ====== AKSI TOMBOL ====== */
-.action-buttons {
+/* ==========================
+   🔍 FILTER SECTION (namespaced)
+========================== */
+.satker-crud-container .filter-bar {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
   display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Search box */
+.satker-crud-container .search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.satker-crud-container .search-box:hover,
+.satker-crud-container .search-box:focus-within {
+  border-color: #00695c;
+  box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
+}
+
+.satker-crud-container .search-box input {
+  border: none;
+  outline: none;
+  flex: 1;
+  background: transparent;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Inline filter row */
+.satker-crud-container .filter-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.satker-crud-container .filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.satker-crud-container .filter-item label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #004d40;
+}
+
+.satker-crud-container .filter-item select,
+.satker-crud-container .filter-item input[type="date"] {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.satker-crud-container .filter-item select:focus,
+.satker-crud-container .filter-item input[type="date"]:focus {
+  border-color: #00695c;
+}
+
+/* Date range */
+.satker-crud-container .date-range .date-inputs {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.btn-view,
-.btn-edit,
-.btn-delete {
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-view {
-  background: #3498db;
-  color: white;
-}
-
-.btn-edit {
-  background: #f1c40f;
-  color: white;
-}
-
-.btn-delete {
-  background: #e74c3c;
-  color: white;
-}
-
-.btn-view:hover {
-  background: #2980b9;
-}
-
-.btn-edit:hover {
-  background: #d4ac0d;
-}
-
-.btn-delete:hover {
-  background: #c0392b;
-}
-
-/* ====== MODAL ====== */
-.modal-overlay {
-  padding-bottom: 0 !important;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 20px;
-  height: fit-content;
-  padding: 30px;
-  width: 95%;
-  max-width: 850px;
-  margin: 30px ;
-  margin-bottom: 0;
-  /* biar gak nempel atas-bawah */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-content form {
-  max-height: 70vh;
-  /* batasi tinggi isi form agar scroll muncul di dalam modal */
-  overflow-y: auto;
-  padding-right: 5px;
-  /* biar scrollbar gak nutup teks */
-}
-
-/* tambahkan ini untuk editor agar tidak bikin layout melebar */
-.jodit-wysiwyg {
-  min-height: 160px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.modal-large {
-  max-width: 850px;
-}
-
-.modal-content h3 {
-  text-align: center;
-  font-size: 22px;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 15px;
-}
-
-.modal-content label {
-  display: block;
-  margin-top: 12px;
+.satker-crud-container .date-range span {
   font-weight: 600;
-  color: #34495e;
-  font-size: 15px;
+  color: #777;
 }
 
-.modal-content input {
+/* ==========================
+   📋 TABLE (namespaced)
+========================== */
+.satker-crud-container .table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.satker-crud-container .satker-table {
   width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #ccc;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.satker-crud-container .satker-table th,
+.satker-crud-container .satker-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.satker-crud-container .satker-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.satker-crud-container .satker-table tr:hover td {
+  background: #f9f9f9;
+}
+
+.satker-crud-container .satker-table td {
+  color: #444;
+}
+
+.satker-crud-container .preview-img {
+  width: 100%;
+  max-width: 24rem;
+  max-height: 13rem;
+  object-fit: cover;
   border-radius: 8px;
-  font-size: 15px;
-  transition: 0.3s;
 }
 
-.modal-content input:focus {
-  border-color: #1abc9c;
-  box-shadow: 0 0 6px rgba(26, 188, 156, 0.3);
-  outline: none;
+/* ==========================
+   ⚙️ ACTION BUTTONS (namespaced)
+========================== */
+.satker-crud-container .action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0px !important;
 }
 
-/* ====== JODIT EDITOR ====== */
-.jodit-wysiwyg {
-  min-height: 160px;
+.satker-crud-container .action-buttons button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
 }
 
-/* ====== FORM BUTTONS ====== */
-.form-actions {
+.satker-crud-container .action-buttons button:hover {
+  transform: scale(1.15);
+  background: none;
+}
+
+.satker-crud-container .btn-view {
+  color: #2e7d32;
+}
+
+.satker-crud-container .btn-edit {
+  color: #0277bd;
+}
+
+.satker-crud-container .btn-delete {
+  color: #d32f2f;
+}
+
+/* ==========================
+   🧩 MODAL (namespaced)
+========================== */
+.satker-crud-container .modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 999 !important;
+  overflow-y: auto !important;
+  padding: 30px !important;
+  box-sizing: border-box;
+}
+
+.satker-crud-container .modal-content {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  width: 100% !important;
+  max-width: 1400px !important;
+  overflow-y: auto !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  padding: 32px !important;
+  position: relative !important;
+  transition: all 0.3s ease !important;
+  animation: satkerFadeIn 0.25s ease !important;
+  margin-top: 60px;
+  margin-bottom: 0;
+  max-height: 80vh;
+}
+
+.satker-crud-container .modal-content h3 {
+  margin-bottom: 15px;
+  color: #004d40;
+}
+
+.satker-crud-container .modal-content label {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.satker-crud-container .modal-content input,
+.satker-crud-container .modal-content select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+.satker-crud-container .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.satker-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+  position: static;
+  bottom: 0;
+  background: none;
+  padding-top: 10px;
+  box-sizing: border-box;
 }
 
-.btn-save {
-  background: #1abc9c;
+.satker-crud-container .btn-save {
+  background: #00695c;
   color: white;
   border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.satker-crud-container .btn-save:hover {
+  background: #004d40;
+}
+
+.satker-crud-container .btn-cancel {
+  background: #ccc;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-.btn-save:hover {
-  background: #16a085;
+.satker-crud-container .btn-cancel:hover {
+  background: #b0b0b0;
 }
 
-.btn-cancel {
-  background: #bdc3c7;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
+.satker-crud-container .required {
+  color: red;
+  margin-left: 3px;
 }
 
-.btn-cancel:hover {
-  background: #95a5a6;
+/* ==========================
+   ✏️ JODIT EDITOR AREA (namespaced)
+========================== */
+.satker-crud-container .modal-content form .jodit-container {
+  min-height: 340px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 15px;
 }
 
-/* ====== PREVIEW ====== */
-.about-section {
-  margin-top: 18px;
+.satker-crud-container .jodit-wysiwyg {
+  padding: 12px !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
 }
 
-.about-section h4 {
-  font-size: 16px;
-  color: #2c3e50;
-  margin-bottom: 6px;
-  font-weight: 700;
-}
-
-.about-section div {
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 12px;
-  line-height: 1.6;
-}
-
-/* ====== ANIMASI ====== */
-@keyframes fadeIn {
+/* ==========================
+   🔔 ANIMATIONS (namespaced)
+========================== */
+@keyframes satkerFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-15px);
+    transform: translateY(-20px);
   }
 
   to {
@@ -266,24 +346,140 @@
   }
 }
 
-/* ====== RESPONSIVE ====== */
+/* ==========================
+   📱 RESPONSIVE (namespaced)
+========================== */
 @media (max-width: 768px) {
-  .modal-content {
-    padding: 20px;
+  .satker-crud-container .modal-content {
+    width: 95%;
+    height: 90vh;
+    padding: 24px;
   }
 
-  .crud-header h2 {
-    font-size: 20px;
+  .satker-crud-container .filter-inline {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .btn-add {
-    padding: 8px 12px;
+  .satker-crud-container .filter-item {
+    width: 100%;
+  }
+
+  .satker-crud-container {
+    padding: 15px;
+  }
+
+  .satker-crud-container .crud-header h2 {
+    font-size: 18px;
+  }
+
+  .satker-crud-container .btn-add {
+    padding: 8px 10px;
+  }
+
+  .satker-crud-container .satker-table th,
+  .satker-crud-container .satker-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+}
+
+/* Wrapper untuk preview + overlay teks (namespaced) */
+.satker-crud-container .preview-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+/* Overlay note di pojok kiri bawah gambar (namespaced) */
+.satker-crud-container .image-hint {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
+.satker-crud-container .image-hint-inline {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+@media (max-width: 1024px) {
+  .satker-crud-container .modal-content {
+    max-width: 95% !important;
+    height: 90vh !important;
+    padding: 28px !important;
+  }
+}
+
+/* Smartphone (≤600px) — namespaced mobile tweaks */
+@media (max-width: 600px) {
+  .satker-crud-container .modal-overlay {
+    padding: 0;
+  }
+
+  .satker-crud-container .modal-content {
+    margin: 0 !important;
+    width: 100% !important;
+    height: 80vh !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    padding: 16px !important;
+    box-shadow: none !important;
+    text-align: justify;
+  }
+
+  .satker-crud-container .modal-content h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .satker-crud-container .form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .satker-crud-container .modal-content input,
+  .satker-crud-container .modal-content select {
+    padding: 10px;
     font-size: 14px;
   }
 
-  .satker-table th,
-  .satker-table td {
-    font-size: 13px;
-    padding: 10px;
+  .satker-crud-container .modal-content form .jodit-container {
+    min-height: 400px !important;
+  }
+
+  .satker-crud-container .form-actions {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+
+  .satker-crud-container .btn-add {
+    padding: 8px 10px;
+  }
+
+  .satker-crud-container .satker-table th,
+  .satker-crud-container .satker-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .satker-crud-container .date-inputs {
+    gap: 6px;
+  }
+
+  .satker-crud-container .date-inputs input {
+    width: 46%;
   }
 }
