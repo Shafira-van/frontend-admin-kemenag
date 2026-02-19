@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { User, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import "./../styles/AdminNavbar.css";
+import React, { useState, useEffect } from 'react';
+import { User, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import './../styles/AdminNavbar.css';
+import Swal from 'sweetalert2';
 
 const AdminNavbar = () => {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     // Ambil nama user dari localStorage saat komponen dimount
-    const storedUsername = localStorage.getItem("username");
+    const storedUsername = localStorage.getItem('username');
     if (storedUsername) {
       setUsername(storedUsername);
     }
@@ -17,16 +18,25 @@ const AdminNavbar = () => {
 
   // Fungsi logout
   const handleLogout = () => {
-    if (window.confirm("Apakah Anda yakin ingin keluar?")) {
-      localStorage.removeItem("token"); // 🧹 hapus token login
-      localStorage.removeItem("username"); // 🧹 hapus juga username
-      navigate("/login"); // 🔁 arahkan ke halaman login
-    }
+    Swal.fire({
+      title: 'Apakah Anda yakin ingin keluar?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Keluar',
+      cancelButtonText: 'Batal',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('id');
+        navigate('/login');
+      }
+    });
   };
 
   // Fungsi menuju halaman profil
   const handleProfile = () => {
-    navigate("/login/profil"); // 🔗 ganti dengan route profil kamu
+    navigate('/login/profil'); // 🔗 ganti dengan route profil kamu
   };
 
   return (
@@ -49,10 +59,16 @@ const AdminNavbar = () => {
           onClick={handleProfile}
           title="Profil"
         />
-        <span className="admin-name clickable" onClick={handleProfile}>
-          {username || "Admin"}
+        <span
+          className="admin-name clickable"
+          onClick={handleProfile}>
+          {username || 'Admin'}
         </span>
-        <LogOut className="icon logout" onClick={handleLogout} title="Keluar" />
+        <LogOut
+          className="icon logout"
+          onClick={handleLogout}
+          title="Keluar"
+        />
       </div>
     </header>
   );

@@ -28,6 +28,12 @@ html {
   width: 60px;
   margin-bottom: 1rem;
 }
+button:disabled {
+  background-color: #bdbdbd; /* abu-abu */
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
 
 .login-card h2 {
   font-size: 1.2rem;

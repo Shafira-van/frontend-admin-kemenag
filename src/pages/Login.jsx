@@ -1,38 +1,61 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios"; // install dulu: npm install axios
-import "../styles/Login.css";
-import { ClockFading } from "lucide-react";
-import { API_URL } from "../config";
-import logoKemenag from "../assets/logoKemenag.png";
+import { useState } from 'react';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // install dulu: npm install axios
+import '../styles/Login.css';
+import { ClockFading } from 'lucide-react';
+import { API_URL } from '../config';
+import logoKemenag from '../assets/logoKemenag.png';
 
 function Login() {
-  const [user, setUser] = useState("");
-  const [pass, setPass] = useState("");
+  const [user, setUser] = useState('');
+  const [pass, setPass] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
       const res = await axios.post(
         `${API_URL}/profilAdmin/login`,
         { username: user, password: pass },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
+      if (res?.data?.token) {
+        localStorage.setItem('token', res?.data?.token);
+        localStorage.setItem('username', user);
+        localStorage.setItem('id', res?.data?.user?.id);
 
-      console.log("Login berhasil untuk:", user);
+        await Swal.fire({
+          icon: 'success',
+          title: 'Login Berhasil!',
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+        });
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("username", user);
-        navigate("/login/dashboard");
+        navigate('/login/dashboard');
       } else {
-        alert("Login gagal: token tidak diterima");
+        Swal.fire({
+          icon: 'error',
+          title: 'Login gagal: token tidak diterima',
+          showConfirmButton: true,
+          showCloseButton: true,
+        });
       }
     } catch (err) {
-      console.error("Login error:", err);
-      alert("Username atau Password salah!");
+      console.error('Login error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal Login',
+        text: err.response?.data?.message || 'Terjadi kesalahan saat login',
+        confirmButtonText: 'Silahkan Coba Lagi',
+        showCloseButton: true,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,11 +63,16 @@ function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img src={logoKemenag} alt="Logo Kemenag" />
+          <img
+            src={logoKemenag}
+            alt="Logo Kemenag"
+          />
           <h2>Kemenag Pematangsiantar</h2>
           <p>Login Admin Panel</p>
         </div>
-        <form onSubmit={handleLogin} className="login-form">
+        <form
+          onSubmit={handleLogin}
+          className="login-form">
           <input
             type="text"
             placeholder="Username"
@@ -57,7 +85,11 @@ function Login() {
             value={pass}
             onChange={(e) => setPass(e.target.value)}
           />
-          <button type="submit">Masuk</button>
+          <button
+            type="submit"
+            disabled={loading}>
+            {loading ? 'Loading' : 'Masuk'}
+          </button>
         </form>
       </div>
     </div>
