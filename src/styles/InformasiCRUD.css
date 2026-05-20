@@ -338,6 +338,66 @@
   line-height: 1.6 !important;
 }
 
+/* ================= PAGINATION ================= */
+
+.informasi-crud-container .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.informasi-crud-container .pagination-info {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.informasi-crud-container .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.informasi-crud-container .btn-page {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  background: #fff;
+  color: #00695c;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.informasi-crud-container .btn-page:hover:not(:disabled) {
+  background: #e0f2f1;
+  border-color: #00695c;
+}
+
+.informasi-crud-container .btn-page.active {
+  background: #00695c;
+  color: white;
+  border-color: #00695c;
+  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.2);
+}
+
+.informasi-crud-container .btn-page:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.informasi-crud-container .page-ellipsis {
+  min-width: 24px;
+  text-align: center;
+  color: #00695c;
+  font-weight: 700;
+}
+
 /* ==========================
    🔔 ANIMATIONS (namespaced)
 ========================== */

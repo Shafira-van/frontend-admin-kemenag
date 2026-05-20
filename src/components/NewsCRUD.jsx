@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   PlusCircle,
   Edit,
@@ -7,15 +7,15 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-} from 'lucide-react';
-import JoditEditor from 'jodit-react';
-import Swal from 'sweetalert2';
-import '../styles/NewsCRUD.css';
-import { API_URL, API_UPLOADS } from '../config';
+} from "lucide-react";
+import JoditEditor from "jodit-react";
+import Swal from "sweetalert2";
+import "../styles/NewsCRUD.css";
+import { API_URL, API_UPLOADS } from "../config";
 
 const NewsCRUD = () => {
   const [newsList, setNewsList] = useState([]);
-  const [tokenUser] = useState(localStorage.getItem('token'));
+  const [tokenUser] = useState(localStorage.getItem("token"));
   const [filteredNews, setFilteredNews] = useState([]);
   const [modalMode, setModalMode] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const NewsCRUD = () => {
 
   // Data user login
   const [currentUser, setCurrentUser] = useState(null);
-  const isEditor = currentUser?.role === 'editor';
+  const isEditor = currentUser?.role === "editor";
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,28 +31,28 @@ const NewsCRUD = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Filter
-  const [searchTerm, setSearchTerm] = useState('');
-  const [satkerFilter, setSatkerFilter] = useState('');
-  const [dateRange, setDateRange] = useState({ from: '', to: '' });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [satkerFilter, setSatkerFilter] = useState("");
+  const [dateRange, setDateRange] = useState({ from: "", to: "" });
 
   const [formData, setFormData] = useState({
     id: null,
-    title: '',
-    date: '',
-    id_satker: '',
-    editor: '',
-    content: '',
-    image: '',
+    title: "",
+    date: "",
+    id_satker: "",
+    editor: "",
+    content: "",
+    image: "",
   });
   const [imagePreview, setImagePreview] = useState(null);
 
   const [errors, setErrors] = useState({
-    title: '',
-    date: '',
-    id_satker: '',
-    editor: '',
-    content: '',
-    image: '',
+    title: "",
+    date: "",
+    id_satker: "",
+    editor: "",
+    content: "",
+    image: "",
   });
 
   /* ============================================================
@@ -60,8 +60,8 @@ const NewsCRUD = () => {
   ============================================================ */
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const userId = localStorage.getItem('id');
-      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem("id");
+      const token = localStorage.getItem("token");
       if (!userId || !token) return;
 
       try {
@@ -69,19 +69,19 @@ const NewsCRUD = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
+          credentials: "include",
         });
-        if (!res.ok) throw new Error('Gagal fetch profil user');
+        if (!res.ok) throw new Error("Gagal fetch profil user");
         const data = await res.json();
         setCurrentUser(data);
 
         // Jika role editor, langsung kunci satkerFilter & formData id_satker ke satker miliknya
-        if (data.role === 'editor') {
+        if (data.role === "editor") {
           setSatkerFilter(data.id_satker);
           setFormData((prev) => ({ ...prev, id_satker: data.id_satker }));
         }
       } catch (err) {
-        console.error('Error fetching profil user:', err);
+        console.error("Error fetching profil user:", err);
       }
     };
 
@@ -96,12 +96,12 @@ const NewsCRUD = () => {
       try {
         const res = await fetch(`${API_URL}/satuankerja/satker/all`, {
           headers: { Authorization: `Bearer ${tokenUser}` },
-          credentials: 'include',
+          credentials: "include",
         });
         const data = await res.json();
         setSatkerList(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error('Error fetching satker:', err);
+        console.error("Error fetching satker:", err);
       }
     };
     fetchSatker();
@@ -110,42 +110,42 @@ const NewsCRUD = () => {
   /* ============================================================
      📡 Fetch berita dengan pagination dari API
   ============================================================ */
-const fetchNews = async (
-  page = 1,
-  limit = itemsPerPage,
-  id_satker = satkerFilter,
-) => {
-  try {
-    let url = `${API_URL}/berita?page=${page}&limit=${limit}`;
+  const fetchNews = async (
+    page = 1,
+    limit = itemsPerPage,
+    id_satker = satkerFilter,
+  ) => {
+    try {
+      let url = `${API_URL}/berita?page=${page}&limit=${limit}`;
 
-    // Jika role editor atau admin, paksa filter ke id_satker miliknya
-    if (currentUser?.role === 'editor' || currentUser?.role === 'admin') {
-      url += `&id_satker=${currentUser.id_satker}`;
-    } else if (id_satker) {
-      // Superadmin: filter hanya jika dipilih manual
-      url += `&id_satker=${id_satker}`;
+      // Jika role editor atau admin, paksa filter ke id_satker miliknya
+      if (currentUser?.role === "editor" || currentUser?.role === "admin") {
+        url += `&id_satker=${currentUser.id_satker}`;
+      } else if (id_satker) {
+        // Superadmin: filter hanya jika dipilih manual
+        url += `&id_satker=${id_satker}`;
+      }
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${tokenUser}` },
+        credentials: "include",
+      });
+      const data = await res.json();
+
+      const allNews = Array.isArray(data.data) ? data.data : [];
+      setNewsList(allNews);
+      setFilteredNews(allNews);
+      setTotalData(data.total || 0);
+      setCurrentPage(data.page || 1);
+    } catch (err) {
+      console.error("Error fetching berita:", err);
     }
-
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${tokenUser}` },
-      credentials: 'include',
-    });
-    const data = await res.json();
-
-    const allNews = Array.isArray(data.data) ? data.data : [];
-    setNewsList(allNews);
-    setFilteredNews(allNews);
-    setTotalData(data.total || 0);
-    setCurrentPage(data.page || 1);
-  } catch (err) {
-    console.error('Error fetching berita:', err);
-  }
-};
+  };
 
   useEffect(() => {
     // Tunggu currentUser selesai di-fetch sebelum fetch berita
     // agar satkerFilter sudah ter-set untuk editor
-    if (currentUser === null && localStorage.getItem('id')) return;
+    if (currentUser === null && localStorage.getItem("id")) return;
     fetchNews(1, itemsPerPage, satkerFilter);
     setCurrentPage(1);
   }, [itemsPerPage, satkerFilter, currentUser]);
@@ -156,12 +156,12 @@ const fetchNews = async (
   useEffect(() => {
     let result = [...newsList];
 
-    if (searchTerm.trim() !== '') {
+    if (searchTerm.trim() !== "") {
       const keyword = searchTerm.toLowerCase();
       result = result.filter((item) => {
-        const title = item.title?.toLowerCase() || '';
-        const category = item.category?.toLowerCase() || '';
-        const editor = item.editor?.toLowerCase() || '';
+        const title = item.title?.toLowerCase() || "";
+        const category = item.category?.toLowerCase() || "";
+        const editor = item.editor?.toLowerCase() || "";
         return (
           title.includes(keyword) ||
           category.includes(keyword) ||
@@ -202,7 +202,7 @@ const fetchNews = async (
           (page >= currentPage - 2 && page <= currentPage + 2),
       )
       .reduce((acc, page, idx, arr) => {
-        if (idx > 0 && page - arr[idx - 1] > 1) acc.push('...');
+        if (idx > 0 && page - arr[idx - 1] > 1) acc.push("...");
         acc.push(page);
         return acc;
       }, []);
@@ -213,27 +213,27 @@ const fetchNews = async (
   ============================================================ */
   const validate = () => {
     const newErrors = {
-      title: '',
-      date: '',
-      id_satker: '',
-      editor: '',
-      content: '',
-      image: '',
+      title: "",
+      date: "",
+      id_satker: "",
+      editor: "",
+      content: "",
+      image: "",
     };
 
     if (!formData.title || !formData.title.trim())
-      newErrors.title = 'Judul wajib diisi.';
-    if (!formData.date) newErrors.date = 'Tanggal wajib diisi.';
+      newErrors.title = "Judul wajib diisi.";
+    if (!formData.date) newErrors.date = "Tanggal wajib diisi.";
     if (!formData.id_satker)
-      newErrors.id_satker = 'Satuan kerja wajib dipilih.';
+      newErrors.id_satker = "Satuan kerja wajib dipilih.";
     if (!formData.editor || !formData.editor.trim())
-      newErrors.editor = 'Editor wajib diisi.';
+      newErrors.editor = "Editor wajib diisi.";
 
-    const textContent = (formData.content || '')
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
+    const textContent = (formData.content || "")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
       .trim();
-    if (!textContent) newErrors.content = 'Isi berita wajib diisi.';
+    if (!textContent) newErrors.content = "Isi berita wajib diisi.";
 
     const isCreate = !formData.id;
     const hasExistingImage = !!imagePreview;
@@ -242,24 +242,24 @@ const fetchNews = async (
       (isCreate && !hasNewFile) ||
       (!isCreate && !hasExistingImage && !hasNewFile)
     ) {
-      newErrors.image = 'Gambar wajib diunggah (JPG/PNG/WebP maksimal 2MB).';
+      newErrors.image = "Gambar wajib diunggah (JPG/PNG/WebP maksimal 2MB).";
     }
 
     if (hasNewFile) {
       const f = formData.image;
       const isAllowedType =
-        f.type === 'image/jpeg' ||
-        f.type === 'image/png' ||
-        f.type === 'image/webp' ||
+        f.type === "image/jpeg" ||
+        f.type === "image/png" ||
+        f.type === "image/webp" ||
         /\.(jpe?g|png|webp)$/i.test(f.name);
       const isMax2Mb = f.size <= 2 * 1024 * 1024;
       if (!isAllowedType || !isMax2Mb) {
-        newErrors.image = 'Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.';
+        newErrors.image = "Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.";
       }
     }
 
     setErrors(newErrors);
-    return Object.values(newErrors).every((msg) => msg === '');
+    return Object.values(newErrors).every((msg) => msg === "");
   };
 
   /* ============================================================
@@ -271,28 +271,28 @@ const fetchNews = async (
 
     try {
       setLoading(true);
-      const method = formData.id ? 'PUT' : 'POST';
+      const method = formData.id ? "PUT" : "POST";
       const url = formData.id
         ? `${API_URL}/berita/${formData.id}`
         : `${API_URL}/berita`;
 
       const body = new FormData();
-      body.append('title', formData.title || '');
-      body.append('date', formData.date || '');
+      body.append("title", formData.title || "");
+      body.append("date", formData.date || "");
       // Editor hanya bisa pakai id_satker miliknya sendiri
       body.append(
-        'id_satker',
+        "id_satker",
         isEditor ? currentUser.id_satker : formData.id_satker,
       );
-      body.append('editor', formData.editor || '');
-      body.append('content', formData.content || '');
-      if (formData.image instanceof File) body.append('image', formData.image);
+      body.append("editor", formData.editor || "");
+      body.append("content", formData.content || "");
+      if (formData.image instanceof File) body.append("image", formData.image);
 
       const res = await fetch(url, {
         method,
         headers: { Authorization: `Bearer ${tokenUser}` },
         body,
-        credentials: 'include',
+        credentials: "include",
       });
 
       if (!res.ok) {
@@ -303,17 +303,17 @@ const fetchNews = async (
       await fetchNews(currentPage, itemsPerPage, satkerFilter);
       closeModal();
       Swal.fire({
-        icon: 'success',
-        title: 'Berita Berhasil Disimpan',
+        icon: "success",
+        title: "Berita Berhasil Disimpan",
         showConfirmButton: false,
         timer: 1500,
         timerProgressBar: true,
       });
     } catch (err) {
-      console.error('❌ Error saat submit berita:', err);
+      console.error("❌ Error saat submit berita:", err);
       Swal.fire({
-        icon: 'error',
-        title: 'Gagal menyimpan Berita, Server Error.',
+        icon: "error",
+        title: "Gagal menyimpan Berita, Server Error.",
         showConfirmButton: false,
         timer: 1500,
         timerProgressBar: true,
@@ -328,32 +328,32 @@ const fetchNews = async (
   ============================================================ */
   const handleEdit = (news) => {
     const dateValue = news.date
-      ? new Date(news.date).toISOString().split('T')[0]
-      : '';
+      ? new Date(news.date).toISOString().split("T")[0]
+      : "";
 
     setFormData({
       id: news.id ?? null,
-      title: news.title ?? '',
+      title: news.title ?? "",
       date: dateValue,
       // Editor: paksa id_satker miliknya, selain itu pakai data berita
-      id_satker: isEditor ? currentUser.id_satker : (news.id_satker ?? ''),
-      editor: news.editor ?? '',
-      content: news.content ?? '',
-      image: '',
+      id_satker: isEditor ? currentUser.id_satker : (news.id_satker ?? ""),
+      editor: news.editor ?? "",
+      content: news.content ?? "",
+      image: "",
     });
 
     setImagePreview(
       news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null,
     );
     setErrors({
-      title: '',
-      date: '',
-      id_satker: '',
-      editor: '',
-      content: '',
-      image: '',
+      title: "",
+      date: "",
+      id_satker: "",
+      editor: "",
+      content: "",
+      image: "",
     });
-    setModalMode('edit');
+    setModalMode("edit");
   };
 
   /* ============================================================
@@ -364,7 +364,7 @@ const fetchNews = async (
     setImagePreview(
       news.image ? `${API_UPLOADS}/uploads/berita/${news.image}` : null,
     );
-    setModalMode('preview');
+    setModalMode("preview");
   };
 
   /* ============================================================
@@ -372,24 +372,24 @@ const fetchNews = async (
   ============================================================ */
   const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: 'Yakin?',
-      text: 'Berita ini akan dihapus permanen!',
-      icon: 'warning',
+      title: "Yakin?",
+      text: "Berita ini akan dihapus permanen!",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal',
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
       showLoaderOnConfirm: true,
       allowOutsideClick: () => !Swal.isLoading(),
       preConfirm: async () => {
         try {
           const res = await fetch(`${API_URL}/berita/${id}`, {
-            method: 'DELETE',
+            method: "DELETE",
             headers: { Authorization: `Bearer ${tokenUser}` },
-            credentials: 'include',
+            credentials: "include",
           });
-          if (!res.ok) throw new Error('Gagal menghapus data');
+          if (!res.ok) throw new Error("Gagal menghapus data");
           return true;
         } catch (error) {
           Swal.showValidationMessage(error.message);
@@ -405,9 +405,9 @@ const fetchNews = async (
       await fetchNews(targetPage, itemsPerPage, satkerFilter);
 
       Swal.fire({
-        icon: 'success',
-        title: 'Berhasil',
-        text: 'Berita berhasil dihapus',
+        icon: "success",
+        title: "Berhasil",
+        text: "Berita berhasil dihapus",
         timer: 1500,
         showConfirmButton: false,
       });
@@ -422,25 +422,25 @@ const fetchNews = async (
     if (!file) return;
 
     const isAllowedType =
-      file.type === 'image/jpeg' ||
-      file.type === 'image/png' ||
-      file.type === 'image/webp' ||
+      file.type === "image/jpeg" ||
+      file.type === "image/png" ||
+      file.type === "image/webp" ||
       /\.(jpe?g|png|webp)$/i.test(file.name);
     const isMax2Mb = file.size <= 2 * 1024 * 1024;
 
     if (!isAllowedType || !isMax2Mb) {
       setErrors({
         ...errors,
-        image: 'Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.',
+        image: "Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.",
       });
-      setFormData({ ...formData, image: '' });
+      setFormData({ ...formData, image: "" });
       setImagePreview(null);
       return;
     }
 
     setFormData({ ...formData, image: file });
     setImagePreview(URL.createObjectURL(file));
-    if (errors.image) setErrors({ ...errors, image: '' });
+    if (errors.image) setErrors({ ...errors, image: "" });
   };
 
   /* ============================================================
@@ -450,22 +450,22 @@ const fetchNews = async (
     setModalMode(null);
     setFormData({
       id: null,
-      title: '',
-      date: '',
+      title: "",
+      date: "",
       // Editor: reset ke id_satker miliknya
-      id_satker: isEditor ? currentUser?.id_satker || '' : '',
-      editor: '',
-      content: '',
-      image: '',
+      id_satker: isEditor ? currentUser?.id_satker || "" : "",
+      editor: "",
+      content: "",
+      image: "",
     });
     setImagePreview(null);
     setErrors({
-      title: '',
-      date: '',
-      id_satker: '',
-      editor: '',
-      content: '',
-      image: '',
+      title: "",
+      date: "",
+      id_satker: "",
+      editor: "",
+      content: "",
+      image: "",
     });
   };
 
@@ -484,9 +484,7 @@ const fetchNews = async (
     <div className="news-crud-container">
       <div className="crud-header">
         <h2>Manajemen Berita</h2>
-        <button
-          className="btn-add"
-          onClick={() => setModalMode('edit')}>
+        <button className="btn-add" onClick={() => setModalMode("edit")}>
           <PlusCircle size={18} /> Tambah Berita
         </button>
       </div>
@@ -521,9 +519,7 @@ const fetchNews = async (
                   onChange={(e) => setSatkerFilter(e.target.value)}>
                   <option value="">Semua</option>
                   {satkerList.map((s) => (
-                    <option
-                      key={s.id_satker}
-                      value={s.id_satker}>
+                    <option key={s.id_satker} value={s.id_satker}>
                       {s.name}
                     </option>
                   ))}
@@ -597,12 +593,12 @@ const fetchNews = async (
                   <td>{news.category}</td>
                   <td>
                     {news.date
-                      ? new Date(news.date).toLocaleDateString('id-ID', {
-                          day: '2-digit',
-                          month: 'long',
-                          year: 'numeric',
+                      ? new Date(news.date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
                         })
-                      : '-'}
+                      : "-"}
                   </td>
                   <td>{news.editor}</td>
                   <td className="action-cell">
@@ -628,9 +624,7 @@ const fetchNews = async (
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={6}
-                  className="empty-text">
+                <td colSpan={6} className="empty-text">
                   Tidak ada berita ditemukan.
                 </td>
               </tr>
@@ -644,7 +638,7 @@ const fetchNews = async (
         <div className="pagination">
           <span className="pagination-info">
             {(currentPage - 1) * itemsPerPage + 1}–
-            {Math.min(currentPage * itemsPerPage, totalData)} dari {totalData}{' '}
+            {Math.min(currentPage * itemsPerPage, totalData)} dari {totalData}{" "}
             berita
           </span>
 
@@ -657,16 +651,14 @@ const fetchNews = async (
             </button>
 
             {getPageNumbers().map((item, idx) =>
-              item === '...' ? (
-                <span
-                  key={`ellipsis-${idx}`}
-                  className="page-ellipsis">
+              item === "..." ? (
+                <span key={`ellipsis-${idx}`} className="page-ellipsis">
                   ...
                 </span>
               ) : (
                 <button
                   key={item}
-                  className={`btn-page ${currentPage === item ? 'active' : ''}`}
+                  className={`btn-page ${currentPage === item ? "active" : ""}`}
                   onClick={() => handlePageChange(item)}>
                   {item}
                 </button>
@@ -687,12 +679,10 @@ const fetchNews = async (
       {modalMode && (
         <div className="modal-overlay">
           <div className="modal-content modal-large">
-            {modalMode === 'edit' ? (
+            {modalMode === "edit" ? (
               <>
-                <h3>{formData.id ? 'Edit Berita' : 'Tambah Berita'}</h3>
-                <form
-                  onSubmit={handleSubmit}
-                  noValidate>
+                <h3>{formData.id ? "Edit Berita" : "Tambah Berita"}</h3>
+                <form onSubmit={handleSubmit} noValidate>
                   <div>
                     <label>
                       Judul Berita<span className="required">*</span>
@@ -702,11 +692,11 @@ const fetchNews = async (
                       value={formData.title}
                       onChange={(e) => {
                         setFormData({ ...formData, title: e.target.value });
-                        if (errors.title) setErrors({ ...errors, title: '' });
+                        if (errors.title) setErrors({ ...errors, title: "" });
                       }}
                       required
                       aria-invalid={!!errors.title}
-                      className={errors.title ? 'is-invalid' : ''}
+                      className={errors.title ? "is-invalid" : ""}
                     />
                     {errors.title && (
                       <div className="error-text">{errors.title}</div>
@@ -720,14 +710,14 @@ const fetchNews = async (
                       </label>
                       <input
                         type="date"
-                        value={formData.date || ''}
+                        value={formData.date || ""}
                         onChange={(e) => {
                           setFormData({ ...formData, date: e.target.value });
-                          if (errors.date) setErrors({ ...errors, date: '' });
+                          if (errors.date) setErrors({ ...errors, date: "" });
                         }}
                         required
                         aria-invalid={!!errors.date}
-                        className={errors.date ? 'is-invalid' : ''}
+                        className={errors.date ? "is-invalid" : ""}
                       />
                       {errors.date && (
                         <div className="error-text">{errors.date}</div>
@@ -750,7 +740,7 @@ const fetchNews = async (
                           {/* Hidden input tetap kirim id_satker yang benar */}
                           <input
                             type="hidden"
-                            value={currentUser?.id_satker || ''}
+                            value={currentUser?.id_satker || ""}
                           />
                         </>
                       ) : (
@@ -762,16 +752,14 @@ const fetchNews = async (
                               id_satker: e.target.value,
                             });
                             if (errors.id_satker)
-                              setErrors({ ...errors, id_satker: '' });
+                              setErrors({ ...errors, id_satker: "" });
                           }}
                           required
                           aria-invalid={!!errors.id_satker}
-                          className={errors.id_satker ? 'is-invalid' : ''}>
+                          className={errors.id_satker ? "is-invalid" : ""}>
                           <option value="">-- Pilih Satuan Kerja --</option>
                           {satkerList.map((s) => (
-                            <option
-                              key={s.id_satker}
-                              value={s.id_satker}>
+                            <option key={s.id_satker} value={s.id_satker}>
                               {s.name}
                             </option>
                           ))}
@@ -792,11 +780,11 @@ const fetchNews = async (
                         onChange={(e) => {
                           setFormData({ ...formData, editor: e.target.value });
                           if (errors.editor)
-                            setErrors({ ...errors, editor: '' });
+                            setErrors({ ...errors, editor: "" });
                         }}
                         required
                         aria-invalid={!!errors.editor}
-                        className={errors.editor ? 'is-invalid' : ''}
+                        className={errors.editor ? "is-invalid" : ""}
                       />
                       {errors.editor && (
                         <div className="error-text">{errors.editor}</div>
@@ -812,7 +800,7 @@ const fetchNews = async (
                         accept="image/jpeg,image/png,image/webp"
                         onChange={handleImageChange}
                         aria-invalid={!!errors.image}
-                        className={errors.image ? 'is-invalid' : ''}
+                        className={errors.image ? "is-invalid" : ""}
                       />
                       {imagePreview && (
                         <div className="preview-wrap">
@@ -848,34 +836,34 @@ const fetchNews = async (
                       readonly: false,
                       askBeforePasteHTML: false,
                       askBeforePasteFromWord: false,
-                      disablePlugins: ['pasteStorage'],
-                      defaultActionOnPaste: 'insert_as_html',
+                      disablePlugins: ["pasteStorage"],
+                      defaultActionOnPaste: "insert_as_html",
                       pasteHTMLActionList: [
-                        'insert_as_html',
-                        'insert_clear_html',
+                        "insert_as_html",
+                        "insert_clear_html",
                       ],
                       buttons: [
-                        'bold',
-                        'italic',
-                        'underline',
-                        '|',
-                        'ul',
-                        'ol',
-                        'indent',
-                        'outdent',
-                        '|',
-                        'align',
-                        '|',
-                        'link',
-                        'image',
-                        '|',
-                        'undo',
-                        'redo',
+                        "bold",
+                        "italic",
+                        "underline",
+                        "|",
+                        "ul",
+                        "ol",
+                        "indent",
+                        "outdent",
+                        "|",
+                        "align",
+                        "|",
+                        "link",
+                        "image",
+                        "|",
+                        "undo",
+                        "redo",
                       ],
                     }}
                     onBlur={(newContent) => {
                       setFormData({ ...formData, content: newContent });
-                      if (errors.content) setErrors({ ...errors, content: '' });
+                      if (errors.content) setErrors({ ...errors, content: "" });
                     }}
                   />
                   {errors.content && (
@@ -887,7 +875,7 @@ const fetchNews = async (
                       type="submit"
                       className="btn-save"
                       disabled={loading}>
-                      {loading ? 'Menyimpan...' : 'Simpan'}
+                      {loading ? "Menyimpan..." : "Simpan"}
                     </button>
                     <button
                       type="button"
@@ -918,9 +906,7 @@ const fetchNews = async (
                   className="news-content"
                   dangerouslySetInnerHTML={{ __html: formData.content }}
                 />
-                <button
-                  className="btn-cancel"
-                  onClick={closeModal}>
+                <button className="btn-cancel" onClick={closeModal}>
                   Tutup
                 </button>
               </>

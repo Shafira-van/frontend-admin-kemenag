@@ -34,7 +34,7 @@ const LayananCRUD = () => {
   });
 
   /* ============================================================
-     📡 Fetch layanan (support limit bila ada di backend)
+    📡 Fetch layanan (support limit bila ada di backend)
   ============================================================ */
   useEffect(() => {
     const fetchLayanan = async () => {
@@ -76,7 +76,7 @@ const LayananCRUD = () => {
       result = result.filter(
         (n) =>
           n.category &&
-          n.category.toLowerCase() === categoryFilter.toLowerCase()
+          n.category.toLowerCase() === categoryFilter.toLowerCase(),
       );
     }
 
@@ -153,7 +153,7 @@ const LayananCRUD = () => {
         itemsPerPage && Number(itemsPerPage) > 0
           ? `${API_URL}/layanan?limit=${itemsPerPage}`
           : `${API_URL}/layanan`,
-        { credentials: "include" }
+        { credentials: "include" },
       ).then((r) => r.json());
 
       const list = Array.isArray(updated.data) ? updated.data : updated;
@@ -468,7 +468,6 @@ const LayananCRUD = () => {
                           "|",
                           "undo",
                           "redo",
-               
                         ],
                       }}
                       onBlur={(content) => {
@@ -517,7 +516,6 @@ const LayananCRUD = () => {
                           "|",
                           "undo",
                           "redo",
-                  
                         ],
                       }}
                       onBlur={(content) => {

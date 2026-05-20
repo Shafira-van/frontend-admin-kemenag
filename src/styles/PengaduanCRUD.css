@@ -177,6 +177,84 @@
 }
 
 /* ==========================
+   🔔 PAGINATION
+========================== */
+.pengaduan-crud-container .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.pengaduan-crud-container .pagination-info {
+  font-size: 17px;
+  color: #222;
+  font-weight: 500;
+}
+
+/* WRAPPER BUTTON */
+.pengaduan-crud-container .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* BUTTON PAGINATION */
+.pengaduan-crud-container .btn-page {
+  min-width: 42px;
+  height: 42px;
+  border: 1.5px solid #cfd8dc;
+  background: #ffffff;
+  color: #00695c;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* HOVER */
+.pengaduan-crud-container .btn-page:hover:not(:disabled) {
+  background: #e0f2f1;
+  border-color: #00695c;
+  transform: translateY(-1px);
+}
+
+/* ACTIVE PAGE */
+.pengaduan-crud-container .btn-page.active {
+  background: #00695c;
+  color: #fff;
+  border-color: #00695c;
+  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.25);
+}
+
+/* DISABLED */
+.pengaduan-crud-container .btn-page:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+/* ELLIPSIS */
+.pengaduan-crud-container .page-ellipsis {
+  min-width: 30px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #00695c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================
    ⚙️ ACTION BUTTONS (namespaced)
 ========================== */
 .pengaduan-crud-container .action-buttons {
@@ -318,6 +396,91 @@
   margin-left: 3px;
 }
 
+/* ================= STATUS SELECT ================= */
+
+.pengaduan-crud-container .status-select {
+  min-width: 130px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #d0d7de;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 14px;
+
+  padding-right: 38px;
+}
+
+
+
+
+/* ================= MENUNGGU ================= */
+
+.pengaduan-crud-container .status-select.menunggu {
+  background-color: #fff8e1;
+  color: #f57f17;
+  border-color: #fbc02d;
+}
+
+/* ================= PROSES ================= */
+
+.pengaduan-crud-container .status-select.proses {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border-color: #64b5f6;
+}
+
+/* ================= SELESAI ================= */
+
+.pengaduan-crud-container .status-select.selesai {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #81c784;
+}
+
+/* OPTION */
+.pengaduan-crud-container .status-select option {
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+}
+
+/* ================= STATUS BADGE MODAL ================= */
+
+.pengaduan-crud-container .status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.pengaduan-crud-container .status-badge.menunggu {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.pengaduan-crud-container .status-badge.proses {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.pengaduan-crud-container .status-badge.selesai {
+  background: #dcfce7;
+  color: #15803d;
+}
 /* ==========================
    ✏️ JODIT EDITOR AREA (namespaced)
 ========================== */
