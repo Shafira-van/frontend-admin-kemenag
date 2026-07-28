@@ -20,6 +20,7 @@ import SatuanKerja from './pages/SatuanKerja';
 import Kua from './pages/Kua';
 import ProfilKetua from './pages/ProfilKetua';
 import ProfilAdmin from './pages/ProfilAdmin';
+import ProfilPegawai from "./pages/ProfilPegawai";
 import Profile from './pages/Profile';
 import { API_URL } from './config';
 
@@ -69,10 +70,7 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={<Login />}
-      />
+      <Route path="/login" element={<Login />} />
 
       <Route
         path="/login/dashboard"
@@ -155,6 +153,14 @@ function AppContent() {
         }
       />
       <Route
+        path="/login/pegawai"
+        element={
+          <PrivateRoute>
+            <ProfilPegawai/>
+          </PrivateRoute>
+        }
+      />
+      <Route
         path="/login/profil"
         element={
           <PrivateRoute>
@@ -162,10 +168,7 @@ function AppContent() {
           </PrivateRoute>
         }
       />
-      <Route
-        path="*"
-        element={<Navigate to="/login" />}
-      />
+      <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );
 }
