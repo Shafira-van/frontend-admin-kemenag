@@ -87,7 +87,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
+  row-gap: 14px;
+    column-gap: 20px;
+    padding-top: 14px;
 }
 
 .profiladmin-container .filter-item {

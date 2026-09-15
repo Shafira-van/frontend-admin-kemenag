@@ -87,7 +87,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
+  row-gap: 14px;
+    column-gap: 20px;
+    padding-top: 14px;
 }
 
 .profilketua-container .filter-item {
@@ -174,6 +176,18 @@
   max-height: 13rem;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.profilketua-container .empty-text {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 45px 20px !important;
+  color: #888 !important;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fafafa;
+  border-bottom: none !important;
+
 }
 
 /* ==========================

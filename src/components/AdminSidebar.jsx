@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -7,66 +7,161 @@ import {
   Users,
   Menu,
   X,
-  LogOut,
   Headset,
   MessageSquareText,
   House,
   ShieldUser,
-} from 'lucide-react';
-import './../styles/AdminSidebar.css';
-import { API_URL } from '../config';
+} from "lucide-react";
+import "./../styles/AdminSidebar.css";
+import { API_URL } from "../config";
 
 const AdminSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [satkerList, setSatkerList] = useState([]);
+
   const navigate = useNavigate();
 
   /* ============================================================
-     👤 Fetch profil user dari localStorage id + token
+     👤 FETCH PROFIL USER
   ============================================================ */
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const userId = localStorage.getItem('id');
-      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem("id");
+      const token = localStorage.getItem("token");
+
       if (!userId || !token) return;
 
       try {
         const res = await fetch(`${API_URL}/profilAdmin/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
         });
-        if (!res.ok) throw new Error('Gagal fetch profil');
-        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error("Gagal fetch profil");
+        }
+
+        const responseData = await res.json();
+
+        // Support:
+        // 1. response langsung { id, role, id_satker }
+        // 2. response { data: { id, role, id_satker } }
+        const data = responseData?.data || responseData;
+
+        console.log("Profil Sidebar:", data);
+
         setCurrentUser(data);
       } catch (err) {
-        console.error('Error fetching user sidebar:', err);
+        console.error("Error fetching user sidebar:", err);
+
+        setCurrentUser(null);
       }
     };
 
     fetchCurrentUser();
   }, []);
 
-  const role = currentUser?.role;
+  /* ============================================================
+     🏢 FETCH DATA SATUAN KERJA
+     
+     Digunakan khusus untuk mengecek apakah
+     id_satker Editor benar-benar ada di tabel satuankerja.
+  ============================================================ */
+  useEffect(() => {
+    const fetchSatker = async () => {
+      const token = localStorage.getItem("token");
 
-  // Tutup sidebar otomatis saat klik link (di HP/tablet)
+      if (!token) return;
+
+      try {
+        const res = await fetch(`${API_URL}/satuankerja`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error("Gagal mengambil data satuan kerja");
+        }
+
+        const responseData = await res.json();
+
+        // Support beberapa kemungkinan response API
+        const data = Array.isArray(responseData)
+          ? responseData
+          : Array.isArray(responseData?.data)
+            ? responseData.data
+            : [];
+
+        console.log("Data Satuan Kerja Sidebar:", data);
+
+        setSatkerList(data);
+      } catch (err) {
+        console.error("Error fetching satuan kerja sidebar:", err);
+
+        setSatkerList([]);
+      }
+    };
+
+    fetchSatker();
+  }, []);
+
+  /* ============================================================
+     🔐 ROLE USER
+  ============================================================ */
+  const role = String(currentUser?.role || "")
+    .trim()
+    .toLowerCase();
+
+  const isAdmin = role === "admin";
+  const isSuperadmin = role === "superadmin";
+  const isEditor = role === "editor";
+
+  /* ============================================================
+     🏢 CEK ID SATKER EDITOR
+     
+     Editor hanya boleh mendapatkan menu Layanan apabila
+     id_satker pada profilAdmin ditemukan di tabel satuankerja.
+  ============================================================ */
+  const editorSatkerValid =
+    isEditor &&
+    !!currentUser?.id_satker &&
+    satkerList.some((satker) => {
+      return (
+        String(satker?.id_satker || "")
+          .trim()
+          .toLowerCase() === String(currentUser.id_satker).trim().toLowerCase()
+      );
+    });
+
+  console.log("Role:", role);
+  console.log("ID Satker User:", currentUser?.id_satker);
+  console.log("Editor Satker Valid:", editorSatkerValid);
+
+  // Tutup sidebar otomatis saat klik link
   const handleLinkClick = () => {
-    if (window.innerWidth <= 1000) setIsOpen(false);
+    if (window.innerWidth <= 1000) {
+      setIsOpen(false);
+    }
   };
 
   // Fungsi logout
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('id');
-    localStorage.removeItem('username');
+    localStorage.removeItem("token");
+    localStorage.removeItem("id");
+    localStorage.removeItem("username");
+
     handleLinkClick();
-    navigate('/login');
+
+    navigate("/login");
   };
 
   /* ============================================================
-     🔐 Konfigurasi menu berdasarkan role
-     - superadmin : semua menu
-     - admin      : dashboard, berita, informasi, layanan, pengaduan, infografis, profil ketua
-     - editor     : dashboard, berita
+     📋 KONFIGURASI MENU
   ============================================================ */
   const menuItems = [
     {
@@ -75,60 +170,80 @@ const AdminSidebar = () => {
       label: "Dashboard",
       roles: ["superadmin", "admin", "editor"],
     },
+
     {
       to: "/login/berita",
       icon: <FileText size={18} />,
       label: "Berita",
       roles: ["superadmin", "admin", "editor"],
     },
+
     {
       to: "/login/informasi",
       icon: <Info size={18} />,
       label: "Informasi",
-      roles: ["superadmin"],
+      roles: ["superadmin", "admin", "editor"],
     },
+
+    /* ========================================================
+       LAYANAN
+
+       Admin & Superadmin:
+       -> selalu boleh melihat
+
+       Editor:
+       -> hanya jika id_satker terdaftar di satuankerja
+    ======================================================== */
     {
       to: "/login/layanan",
       icon: <Headset size={18} />,
       label: "Layanan",
-      roles: ["superadmin"],
+      roles: ["superadmin", "admin", "editor"],
+      requiresEditorSatker: true,
     },
+
     {
       to: "/login/pengaduan",
       icon: <MessageSquareText size={18} />,
       label: "Pengaduan",
-      roles: ["superadmin"],
+      roles: ["superadmin", "admin"],
     },
+
     {
       to: "/login/infografis",
       icon: <House size={18} />,
       label: "Infografis",
-      roles: ["superadmin"],
+      roles: ["superadmin", "admin"],
     },
+
     {
       to: "/login/satuan-kerja",
       icon: <House size={18} />,
       label: "Satuan Kerja",
       roles: ["superadmin"],
     },
+
     {
       to: "/login/kua",
       icon: <House size={18} />,
       label: "KUA",
       roles: ["superadmin"],
     },
+
+    {
+      to: "/login/madrasah",
+      icon: <House size={18} />,
+      label: "Madrasah",
+      roles: ["superadmin"],
+    },
+
     {
       to: "/login/profil-ketua",
       icon: <ShieldUser size={18} />,
       label: "Profil Ketua",
       roles: ["superadmin"],
     },
-    {
-      to: "/login/pegawai",
-      icon: <Users size={18} />,
-      label: "Profil Pegawai",
-      roles: ["superadmin"],
-    },
+
     {
       to: "/login/admin",
       icon: <Users size={18} />,
@@ -137,67 +252,63 @@ const AdminSidebar = () => {
     },
   ];
 
-  // Filter menu sesuai role, tampilkan semua saat user belum di-fetch
+  /* ============================================================
+     🔎 FILTER MENU
+  ============================================================ */
   const visibleMenus = role
-    ? menuItems.filter((item) => item.roles.includes(role))
+    ? menuItems.filter((item) => {
+        // Role tidak memiliki akses
+        if (!item.roles.includes(role)) {
+          return false;
+        }
+
+        // ======================================================
+        // KHUSUS MENU LAYANAN
+        // ======================================================
+        if (item.requiresEditorSatker && role === "editor") {
+          return editorSatkerValid;
+        }
+
+        // Admin & Superadmin langsung boleh
+        return true;
+      })
     : [];
 
+  /* ============================================================
+     🎨 RENDER
+  ============================================================ */
   return (
     <>
-      {/* Tombol toggle di tablet/HP */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setIsOpen(!isOpen)}>
+      {/* ======================================================
+          Tombol toggle tablet / HP
+      ====================================================== */}
+      <button className="sidebar-toggle" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      {/* Sidebar */}
-      <aside className={`admin-sidebar ${isOpen ? 'open' : ''}`}>
-        {/* Info user yang login */}
-        {/* {currentUser && (
-          <div className="sidebar-user-info">
-            <div className="sidebar-user-avatar">
-              {currentUser.username?.charAt(0).toUpperCase()}
-            </div>
-            <div className="sidebar-user-detail">
-              <span className="sidebar-user-name">{currentUser.username}</span>
-              <span className="sidebar-user-role">{currentUser.role}</span>
-            </div>
-          </div>
-        )} */}
-
+      {/* ======================================================
+          Sidebar
+      ====================================================== */}
+      <aside className={`admin-sidebar ${isOpen ? "open" : ""}`}>
         <ul className="sidebar-menu">
           {visibleMenus.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
-                className={({ isActive }) => (isActive ? 'active' : '')}
+                className={({ isActive }) => (isActive ? "active" : "")}
                 onClick={handleLinkClick}>
                 {item.icon}
                 <span>{item.label}</span>
               </NavLink>
             </li>
           ))}
-
-          {/* Tombol logout selalu tampil */}
-          {/* <li>
-            <button
-              className="logout-btn"
-              onClick={handleLogout}>
-              <LogOut size={18} />
-              <span>Keluar</span>
-            </button>
-          </li> */}
         </ul>
       </aside>
 
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="overlay"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      {/* ======================================================
+          Overlay
+      ====================================================== */}
+      {isOpen && <div className="overlay" onClick={() => setIsOpen(false)} />}
     </>
   );
 };

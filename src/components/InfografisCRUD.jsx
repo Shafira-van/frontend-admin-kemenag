@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
 import "../styles/InfografisCRUD.css";
 import { API_URL, API_UPLOADS } from "../config";
+import Swal from "sweetalert2";
 
 const InfografisCRUD = () => {
   const [infografisList, setInfografisList] = useState([]);
@@ -56,7 +57,7 @@ const InfografisCRUD = () => {
     if (searchTerm.trim() !== "") {
       const q = searchTerm.toLowerCase();
       result = result.filter((item) =>
-        (item.desc || "").toLowerCase().includes(q)
+        (item.desc || "").toLowerCase().includes(q),
       );
     }
     setFilteredList(result);
@@ -134,39 +135,80 @@ const InfografisCRUD = () => {
   /* ============================================================
      📝 Submit
   ============================================================ */
+  /* ============================================================
+   📝 Submit
+============================================================ */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validate()) return;
 
+    // Simpan status sebelum closeModal
+    const isEdit = !!formData.id;
+
     try {
-      const method = formData.id ? "PUT" : "POST";
-      const url = formData.id
+      const method = isEdit ? "PUT" : "POST";
+
+      const url = isEdit
         ? `${API_URL}/infografis/${formData.id}`
         : `${API_URL}/infografis`;
 
       const body = new FormData();
+
       body.append("desc", formData.desc || "");
-      if (formData.image instanceof File) body.append("image", formData.image);
 
-      const res = await fetch(url, { method, body, credentials: "include" });
-      if (!res.ok) throw new Error(`HTTP ${res.status} – ${await res.text()}`);
+      if (formData.image instanceof File) {
+        body.append("image", formData.image);
+      }
 
-      // Refresh list
+      const res = await fetch(url, {
+        method,
+        body,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP ${res.status} – ${errorText}`);
+      }
+
+      // Refresh list setelah berhasil
       const updated = await fetch(
         itemsPerPage && Number(itemsPerPage) > 0
           ? `${API_URL}/infografis?limit=${itemsPerPage}`
           : `${API_URL}/infografis`,
-        { credentials: "include" }
+        {
+          credentials: "include",
+        },
       ).then((r) => r.json());
 
       const list = Array.isArray(updated?.data) ? updated.data : updated;
+
       setInfografisList(list);
       setFilteredList(list);
+
+      // Tutup modal
       closeModal();
-      alert("✅ Infografis berhasil disimpan!");
+
+      // Popup sukses
+      Swal.fire({
+        icon: "success",
+        title: isEdit
+          ? "Infografis Berhasil Diperbarui"
+          : "Infografis Berhasil Disimpan",
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
     } catch (err) {
       console.error("❌ Error submit infografis:", err);
-      alert("Gagal menyimpan infografis. Cek console/log backend.");
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Menyimpan Infografis",
+        text: "Terjadi kesalahan saat menyimpan data. Cek console/log backend.",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -180,7 +222,7 @@ const InfografisCRUD = () => {
       image: "", // jika tak ganti, backend tetap pakai image lama
     });
     setImagePreview(
-      item.image ? `${API_UPLOADS}/uploads/infografis/${item.image}` : null
+      item.image ? `${API_UPLOADS}/uploads/infografis/${item.image}` : null,
     );
     setErrors({ desc: "", image: "" });
     setModalMode("edit");
@@ -193,19 +235,74 @@ const InfografisCRUD = () => {
       image: "",
     });
     setImagePreview(
-      item.image ? `${API_UPLOADS}/uploads/infografis/${item.image}` : null
+      item.image ? `${API_UPLOADS}/uploads/infografis/${item.image}` : null,
     );
     setModalMode("preview");
   };
 
+  /* ============================================================
+   🗑️ Hapus Infografis
+============================================================ */
   const handleDelete = async (id) => {
-    if (!window.confirm("Hapus infografis ini?")) return;
-    await fetch(`${API_URL}/infografis/${id}`, {
-      method: "DELETE",
-      credentials: "include",
+    const result = await Swal.fire({
+      title: "Yakin?",
+      text: "Infografis ini akan dihapus permanen!",
+      icon: "warning",
+
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+
+      showLoaderOnConfirm: true,
+
+      allowOutsideClick: () => !Swal.isLoading(),
+
+      preConfirm: async () => {
+        try {
+          const res = await fetch(`${API_URL}/infografis/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+
+          if (!res.ok) {
+            const errorText = await res.text();
+
+            throw new Error(`HTTP ${res.status} – ${errorText}`);
+          }
+
+          return true;
+        } catch (error) {
+          console.error("❌ Error hapus infografis:", error);
+
+          Swal.showValidationMessage(
+            error.message || "Gagal menghapus infografis",
+          );
+
+          return false;
+        }
+      },
     });
-    setInfografisList((prev) => prev.filter((n) => n.id !== id));
-    setFilteredList((prev) => prev.filter((n) => n.id !== id));
+
+    // User berhasil mengkonfirmasi hapus
+    if (result.isConfirmed) {
+      // Langsung hapus dari tampilan
+      setInfografisList((prev) => prev.filter((item) => item.id !== id));
+
+      setFilteredList((prev) => prev.filter((item) => item.id !== id));
+
+      // Popup berhasil
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Infografis berhasil dihapus",
+        timer: 1500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+    }
   };
 
   /* ============================================================
@@ -424,6 +521,6 @@ const InfografisCRUD = () => {
       )}
     </div>
   );
-};
+};;;
 
 export default InfografisCRUD;

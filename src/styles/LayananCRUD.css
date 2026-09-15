@@ -1,6 +1,7 @@
-/* ==========================
-   🎯 WRAPPER & HEADER (namespaced)
-========================== */
+/* ============================================================
+   🎯 WRAPPER & HEADER
+   ============================================================ */
+
 .layanan-crud-container {
   background: #fff;
   border-radius: 12px;
@@ -23,6 +24,10 @@
   color: #004d40;
 }
 
+/* ============================================================
+   ➕ BUTTON TAMBAH
+   ============================================================ */
+
 .layanan-crud-container .btn-add {
   display: flex;
   align-items: center;
@@ -41,9 +46,10 @@
   background: #004d40;
 }
 
-/* ==========================
-   🔍 FILTER SECTION (namespaced)
-========================== */
+/* ============================================================
+   🔍 FILTER SECTION
+   ============================================================ */
+
 .layanan-crud-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
@@ -55,7 +61,10 @@
   gap: 16px;
 }
 
-/* Search box */
+/* ============================================================
+   🔎 SEARCH BOX
+   ============================================================ */
+
 .layanan-crud-container .search-box {
   display: flex;
   align-items: center;
@@ -82,15 +91,18 @@
   color: #333;
 }
 
-/* Inline filter row */
+/* ============================================================
+   🔒 FILTER INLINE
+   ============================================================ */
+
 .layanan-crud-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
-  padding-top: 4px;
+  row-gap: 14px;
+  column-gap: 20px;
+  padding-top: 14px;
 }
-
 
 .layanan-crud-container .filter-item {
   display: flex;
@@ -116,13 +128,15 @@
   transition: border-color 0.2s ease;
 }
 
-
 .layanan-crud-container .filter-item select:focus,
 .layanan-crud-container .filter-item input[type="date"]:focus {
   border-color: #00695c;
 }
 
-/* Date range */
+/* ============================================================
+   📅 DATE RANGE
+   ============================================================ */
+
 .layanan-crud-container .date-range .date-inputs {
   display: flex;
   align-items: center;
@@ -134,9 +148,10 @@
   color: #777;
 }
 
-/* ==========================
-   📋 TABLE (namespaced)
-========================== */
+/* ============================================================
+   📋 TABLE
+   ============================================================ */
+
 .layanan-crud-container .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
@@ -168,8 +183,41 @@
 }
 
 .layanan-crud-container .layanan-table td {
-  color: #444;
+  color: #444 !important;
 }
+
+.layanan-crud-container .layanan-table td a {
+  text-decoration: none !important;
+}
+
+.layanan-crud-container .empty-text {
+
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 45px 20px !important;
+      color: #888 !important;
+      font-size: 14px;
+      font-weight: 500;
+      background: #fafafa;
+      border-bottom: none !important;
+
+}
+
+
+/* ============================================================
+   📐 KOLOM STATUS
+   ============================================================ */
+
+.layanan-crud-container .layanan-table th:nth-child(6),
+.layanan-crud-container .layanan-table td:nth-child(6) {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   🖼️ PREVIEW
+   ============================================================ */
 
 .layanan-crud-container .preview-img {
   width: 100%;
@@ -179,13 +227,38 @@
   border-radius: 8px;
 }
 
-/* ==========================
-   ⚙️ ACTION BUTTONS (namespaced)
-========================== */
+.layanan-crud-container .preview-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.layanan-crud-container .image-hint {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.layanan-crud-container .image-hint-inline {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* ============================================================
+   ⚙️ ACTION BUTTONS
+   ============================================================ */
+
 .layanan-crud-container .action-buttons {
   display: flex;
   align-items: center;
-  gap: 0px !important;
+  gap: 0 !important;
 }
 
 .layanan-crud-container .action-buttons button {
@@ -214,9 +287,121 @@
   color: #d32f2f;
 }
 
-/* ==========================
-   🧩 MODAL (namespaced)
-========================== */
+/* ============================================================
+   🔐 STATUS VALIDASI LAYANAN
+   ============================================================ */
+
+.layanan-crud-container .status-badge {
+  display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 100px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   🟡 MENUNGGU
+   ============================================================ */
+
+.layanan-crud-container .status-pending {
+  color: #b7791f;
+  background: #fff8e1;
+  border-color: #f6d365;
+}
+
+/* ============================================================
+   🟡 MENUNGGU - ADMIN / SUPERADMIN
+   Bisa diklik untuk validasi
+   ============================================================ */
+
+.layanan-crud-container .status-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.layanan-crud-container .status-clickable:hover {
+  background: #fff3cd;
+  border-color: #e5b93d;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(133, 100, 4, 0.12);
+}
+
+.layanan-crud-container .status-clickable:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   🟢 DISETUJUI
+   ============================================================ */
+
+.layanan-crud-container .status-approved {
+  color: #146c43;
+    background: #e8f5e9;
+    border-color: #a5d6a7;
+}
+
+/* ============================================================
+   🔴 DITOLAK
+   ============================================================ */
+
+.layanan-crud-container .status-rejected {
+  color: #c62828;
+  background: #fdecec;
+  border-color: #f1a1a1;
+}
+
+/* ============================================================
+   🔴 DITOLAK - BISA DIKLIK
+   Untuk melihat alasan penolakan
+   ============================================================ */
+
+.layanan-crud-container .status-rejected-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.layanan-crud-container .status-rejected-clickable:hover {
+  background: #fce0e0;
+  border-color: #dc7f7f;
+  transform: translateY(-1px);
+}
+
+.layanan-crud-container .status-rejected-clickable:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   📝 ALASAN PENOLAKAN
+   ============================================================ */
+
+.layanan-crud-container .rejection-reason-btn {
+  display: block;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #d32f2f;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.layanan-crud-container .rejection-reason-btn:hover {
+  color: #b71c1c;
+}
+
+/* ============================================================
+   🧩 MODAL
+   ============================================================ */
+
 .layanan-crud-container .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -241,9 +426,9 @@
   position: relative !important;
   transition: all 0.3s ease !important;
   animation: layananFadeIn 0.25s ease !important;
-  margin-top: 60px;
-  margin-bottom: 0;
+  margin-top: 70px;
   max-height: 80vh;
+  box-sizing: border-box;
 }
 
 .layanan-crud-container .modal-content h3 {
@@ -267,7 +452,17 @@
   border: 1px solid #ccc;
   margin-top: 6px;
   box-sizing: border-box;
+  outline: none;
 }
+
+.layanan-crud-container .modal-content input:focus,
+.layanan-crud-container .modal-content select:focus {
+  border-color: #00695c;
+}
+
+/* ============================================================
+   📐 FORM GRID
+   ============================================================ */
 
 .layanan-crud-container .form-grid {
   display: grid;
@@ -275,16 +470,21 @@
   gap: 15px;
 }
 
+/* ============================================================
+   💾 FORM ACTIONS
+   ============================================================ */
+
 .layanan-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
-  position: static;
+  position: sticky;
   bottom: 0;
-  /* background: white; */
+  background: white;
   padding-top: 10px;
   box-sizing: border-box;
+  z-index: 5;
 }
 
 .layanan-crud-container .btn-save {
@@ -296,8 +496,8 @@
   cursor: pointer;
   font-weight: 500;
   width: fit-content;
-    display: flex;
-    margin-top: 6px;
+  display: flex;
+  margin-top: 6px;
 }
 
 .layanan-crud-container .btn-save:hover {
@@ -310,9 +510,8 @@
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  display: flex;
-    margin-top: 6px;
-    align-self: flex-end;
+  margin-top: 6px;
+  align-self: flex-end;
 }
 
 .layanan-crud-container .btn-cancel:hover {
@@ -324,9 +523,10 @@
   margin-left: 3px;
 }
 
-/* ==========================
-   ✏️ JODIT EDITOR AREA (namespaced)
-========================== */
+/* ============================================================
+   ✏️ JODIT EDITOR
+   ============================================================ */
+
 .layanan-crud-container .modal-content form .jodit-container {
   min-height: 340px !important;
   width: 100% !important;
@@ -340,9 +540,27 @@
   line-height: 1.6 !important;
 }
 
-/* ==========================
-   🔔 ANIMATIONS (namespaced)
-========================== */
+/* ============================================================
+   📄 DESKRIPSI / PROCEDURE / REQUIREMENTS
+   ============================================================ */
+
+.layanan-crud-container .form-full-width {
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-column: 1 / -1 !important;
+  box-sizing: border-box;
+}
+
+.layanan-crud-container .form-full-width textarea {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   🔔 ANIMATION
+   ============================================================ */
+
 @keyframes layananFadeIn {
   from {
     opacity: 0;
@@ -355,16 +573,96 @@
   }
 }
 
-/* ==========================
-   📱 RESPONSIVE (namespaced)
-========================== */
+/* ============================================================
+   📊 PAGINATION
+   ============================================================ */
+
+.layanan-crud-container .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.layanan-crud-container .pagination-info {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.layanan-crud-container .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layanan-crud-container .btn-page {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  background: #fff;
+  color: #00695c;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.layanan-crud-container .btn-page:hover:not(:disabled) {
+  background: #e0f2f1;
+  border-color: #00695c;
+}
+
+.layanan-crud-container .btn-page.active {
+  background: #00695c;
+  color: white;
+  border-color: #00695c;
+  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.2);
+}
+
+.layanan-crud-container .btn-page:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.layanan-crud-container .page-ellipsis {
+  min-width: 24px;
+  text-align: center;
+  color: #00695c;
+  font-weight: 700;
+}
+
+/* ============================================================
+   📱 RESPONSIVE TABLET
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  .layanan-crud-container .modal-content {
+    max-width: 95% !important;
+    height: 90vh !important;
+    padding: 28px !important;
+  }
+}
+
+/* ============================================================
+   📱 RESPONSIVE
+   ============================================================ */
+
 @media (max-width: 768px) {
+  .layanan-crud-container {
+    padding: 15px;
+  }
+
   .layanan-crud-container .modal-content {
     width: 95%;
     height: 90vh;
     padding: 24px;
   }
 
+  /* FILTER INLINE TETAP MENGIKUTI INFORMASI */
   .layanan-crud-container .filter-inline {
     flex-direction: column;
     align-items: stretch;
@@ -372,10 +670,6 @@
 
   .layanan-crud-container .filter-item {
     width: 100%;
-  }
-
-  .layanan-crud-container {
-    padding: 15px;
   }
 
   .layanan-crud-container .crud-header h2 {
@@ -391,47 +685,43 @@
     font-size: 12px;
     padding: 8px;
   }
-}
 
-/* Wrapper untuk preview + overlay teks (namespaced) */
-.layanan-crud-container .preview-wrap {
-  position: relative;
-  display: inline-block;
-  margin-top: 8px;
-}
+  .layanan-crud-container .status-badge {
+    min-width: 85px;
+    padding: 5px 9px;
+    font-size: 11px;
+  }
 
-/* Overlay note di pojok kiri bawah gambar (namespaced) */
-.layanan-crud-container .image-hint {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 6px;
-  pointer-events: none;
-}
-
-/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
-.layanan-crud-container .image-hint-inline {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #666;
-}
-
-@media (max-width: 1024px) {
-  .layanan-crud-container .modal-content {
-    max-width: 95% !important;
-    height: 90vh !important;
-    padding: 28px !important;
+  .layanan-crud-container .rejection-reason-btn {
+    font-size: 10px;
   }
 }
 
-/* Smartphone (≤600px) — namespaced mobile tweaks */
+/* ============================================================
+   📱 STATUS RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .layanan-crud-container .status-badge {
+    min-width: auto;
+    padding: 5px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .layanan-crud-container .status-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* ============================================================
+   📱 SMARTPHONE
+   ============================================================ */
+
 @media (max-width: 600px) {
   .layanan-crud-container .modal-overlay {
-    padding: 0;
+    padding: 0 !important;
   }
 
   .layanan-crud-container .modal-content {
@@ -483,6 +773,8 @@
     font-size: 12px;
     padding: 8px;
   }
+
+
 
   .layanan-crud-container .date-inputs {
     gap: 6px;

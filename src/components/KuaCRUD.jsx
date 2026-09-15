@@ -3,6 +3,7 @@ import { PlusCircle, Edit, Trash2, Eye } from "lucide-react";
 import JoditEditor from "jodit-react";
 import "../styles/KuaCRUD.css";
 import { API_URL, API_UPLOADS } from "../config";
+import Swal from "sweetalert2";
 
 const KuaCRUD = () => {
   const [kuaList, setKuaList] = useState([]);
@@ -11,6 +12,7 @@ const KuaCRUD = () => {
     id: null,
     name: "",
     address: "",
+    map: "",
     phone: "",
     desc: "",
     img: "",
@@ -22,6 +24,7 @@ const KuaCRUD = () => {
   const [errors, setErrors] = useState({
     name: "",
     address: "",
+    map: "",
     phone: "",
     desc: "",
     img: "",
@@ -61,7 +64,14 @@ const KuaCRUD = () => {
      ✅ Validasi
   ============================ */
   const validate = () => {
-    const newErr = { name: "", address: "", phone: "", desc: "", img: "" };
+    const newErr = {
+      name: "",
+      address: "",
+      map: "",
+      phone: "",
+      desc: "",
+      img: "",
+    };
 
     if (!formData.name.trim()) newErr.name = "Nama wajib diisi.";
     if (!formData.address.trim()) newErr.address = "Alamat wajib diisi.";
@@ -83,7 +93,7 @@ const KuaCRUD = () => {
       (isCreate && !hasNewFile) ||
       (!isCreate && !hasExistingImg && !hasNewFile)
     ) {
-      newErr.img = "Gambar wajib diunggah (JPG/PNG/WebP minimal 2MB).";
+      newErr.img = "Gambar wajib diunggah (JPG/PNG/WebP minimal 1MB).";
     }
 
     if (hasNewFile) {
@@ -93,10 +103,10 @@ const KuaCRUD = () => {
         f.type === "image/png" ||
         f.type === "image/webp" ||
         /\.(jpe?g|png|webp)$/i.test(f.name);
-      const isMin2Mb = f.size >= 2 * 1024 * 1024;
+      const isMin2Mb = f.size <= 1 * 1024 * 1024;
 
       if (!isAllowed || !isMin2Mb) {
-        newErr.img = "Format harus JPG/PNG/WebP dan ukuran minimal 2MB.";
+        newErr.img = "Format harus JPG/PNG/WebP dan ukuran minimal 1MB.";
       }
     }
 
@@ -107,40 +117,78 @@ const KuaCRUD = () => {
   /* ============================
      📝 Submit (create / update)
   ============================ */
+  /* ============================
+   📝 Submit (create / update)
+============================ */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validate()) return;
 
     try {
       const method = formData.id ? "PUT" : "POST";
+
       const url = formData.id
         ? `${API_URL}/kua/${formData.id}`
         : `${API_URL}/kua`;
 
       const body = new FormData();
+
       body.append("name", formData.name);
       body.append("address", formData.address);
+      body.append("map", formData.map);
       body.append("phone", formData.phone);
       body.append("desc", formData.desc);
       body.append("socialMedia", JSON.stringify(formData.socialMedia));
-      if (formData.img instanceof File) body.append("img", formData.img);
 
-      const res = await fetch(url, { method, body, credentials: "include" });
-      if (!res.ok) throw new Error(`HTTP ${res.status} – ${await res.text()}`);
+      if (formData.img instanceof File) {
+        body.append("img", formData.img);
+      }
 
+      const res = await fetch(url, {
+        method,
+        body,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP ${res.status} – ${errorText}`);
+      }
+
+      // Ambil data terbaru setelah berhasil
       const updated = await fetch(`${API_URL}/kua`, {
         credentials: "include",
       }).then((r) => r.json());
+
       const list = Array.isArray(updated.data) ? updated.data : updated;
+
       setKuaList(list);
+
+      // Tutup modal
       closeModal();
-      alert("✅ Data KUA berhasil disimpan!");
+
+      // Popup berhasil
+      Swal.fire({
+        icon: "success",
+        title: formData.id
+          ? "KUA Berhasil Diperbarui"
+          : "KUA Berhasil Disimpan",
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
     } catch (err) {
       console.error("❌ Error submit KUA:", err);
-      alert("Gagal menyimpan data. Cek console/log backend.");
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Menyimpan Data",
+        text: "Terjadi kesalahan saat menyimpan data KUA.",
+        confirmButtonText: "OK",
+      });
     }
   };
-
   /* ============================
      ✏️ Edit / 👁️ Preview / 🗑️ Hapus
   ============================ */
@@ -149,6 +197,7 @@ const KuaCRUD = () => {
       id: kua.id ?? null,
       name: kua.name ?? "",
       address: kua.address ?? "",
+      map: kua.map ?? "",
       phone: kua.phone ?? "",
       desc: kua.desc ?? "",
       img: "",
@@ -159,7 +208,14 @@ const KuaCRUD = () => {
       },
     });
     setImgPreview(kua.img ? `${API_UPLOADS}/${kua.img}` : null);
-    setErrors({ name: "", address: "", phone: "", desc: "", img: "" });
+    setErrors({
+      name: "",
+      address: "",
+      map: "",
+      phone: "",
+      desc: "",
+      img: "",
+    });
     setModalMode("edit");
   };
 
@@ -176,13 +232,66 @@ const KuaCRUD = () => {
     setModalMode("preview");
   };
 
+  /* ============================
+   🗑️ Hapus KUA
+============================ */
   const handleDelete = async (id) => {
-    if (!window.confirm("Yakin ingin menghapus data ini?")) return;
-    await fetch(`${API_URL}/kua/${id}`, {
-      method: "DELETE",
-      credentials: "include",
+    const result = await Swal.fire({
+      title: "Yakin?",
+      text: "Data KUA ini akan dihapus permanen!",
+      icon: "warning",
+
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+
+      showLoaderOnConfirm: true,
+
+      allowOutsideClick: () => !Swal.isLoading(),
+
+      preConfirm: async () => {
+        try {
+          const res = await fetch(`${API_URL}/kua/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+
+          if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`HTTP ${res.status} – ${errorText}`);
+          }
+
+          return true;
+        } catch (error) {
+          console.error("❌ Error hapus KUA:", error);
+
+          Swal.showValidationMessage(
+            error.message || "Gagal menghapus data KUA",
+          );
+
+          return false;
+        }
+      },
     });
-    setKuaList((prev) => prev.filter((n) => n.id !== id));
+
+    // Jika user menekan "Ya, hapus!"
+    if (result.isConfirmed) {
+      // Hapus langsung dari state agar tabel langsung berubah
+      setKuaList((prev) => prev.filter((item) => item.id !== id));
+
+      // Popup sukses
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Data KUA berhasil dihapus",
+        timer: 1500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+    }
   };
 
   /* ============================
@@ -197,12 +306,12 @@ const KuaCRUD = () => {
       file.type === "image/png" ||
       file.type === "image/webp" ||
       /\.(jpe?g|png|webp)$/i.test(file.name);
-    const isMin2Mb = file.size >= 2 * 1024 * 1024;
+    const isMin2Mb = file.size <= 1 * 1024 * 1024;
 
     if (!isAllowed || !isMin2Mb) {
       setErrors((prev) => ({
         ...prev,
-        img: "Format harus JPG/PNG/WebP dan ukuran minimal 2MB.",
+        img: "Format harus JPG/PNG/WebP dan ukuran minimal 1MB.",
       }));
       setFormData((prev) => ({ ...prev, img: "" }));
       setImgPreview(null);
@@ -223,6 +332,7 @@ const KuaCRUD = () => {
       id: null,
       name: "",
       address: "",
+      map: "",
       phone: "",
       desc: "",
       img: "",
@@ -368,6 +478,22 @@ const KuaCRUD = () => {
                   {errors.phone && (
                     <div className="error-text">{errors.phone}</div>
                   )}
+                  <div></div>
+                  <label>
+                    Google Map<span className="required">*</span>
+                  </label>
+                  <input
+                    placeholder="Link Google Map"
+                    type="text"
+                    value={formData.map}
+                    onChange={(e) => {
+                      setFormData({ ...formData, map: e.target.value });
+                      if (errors.map) setErrors({ ...errors, map: "" });
+                    }}
+                    required
+                    aria-invalid={!!errors.map}
+                    className={errors.map ? "is-invalid" : ""}
+                  />
 
                   <label>
                     Deskripsi<span className="required">*</span>
@@ -433,12 +559,12 @@ const KuaCRUD = () => {
                         className="preview-img"
                       />
                       <div className="image-hint">
-                        Format JPG/PNG/WebP, minimal 2MB
+                        Format JPG/PNG/WebP, minimal 1MB
                       </div>
                     </div>
                   ) : (
                     <div className="image-hint-inline">
-                      Format JPG/PNG/WebP, minimal 2MB
+                      Format JPG/PNG/WebP, minimal 1MB
                     </div>
                   )}
                   {errors.img && <div className="error-text">{errors.img}</div>}
@@ -505,44 +631,107 @@ const KuaCRUD = () => {
               </>
             ) : (
               <>
-                <h3>{formData.name}</h3>
-                <p>
-                  <strong>Alamat:</strong> {formData.address}
-                </p>
-                <p>
-                  <strong>Telepon:</strong> {formData.phone}
-                </p>
-
-                {imgPreview && (
-                  <img src={imgPreview} alt="KUA" className="preview-img" />
-                )}
-
-                <div className="about-section">
-                  <h4>Deskripsi:</h4>
-                  <div dangerouslySetInnerHTML={{ __html: formData.desc }} />
-                </div>
-
-                <div className="about-section">
-                  <h4>Media Sosial:</h4>
-                  <div>
-                    <div>
-                      <strong>Facebook:</strong>{" "}
-                      {formData.socialMedia.facebook || "-"}
+                <div className="kua-detail-container">
+                  <div className="kua-header">
+                    <div className="kua-image">
+                      {imgPreview && (
+                        <img src={imgPreview} alt={formData.name} />
+                      )}
                     </div>
-                    <div>
-                      <strong>WhatsApp:</strong>{" "}
-                      {formData.socialMedia.whatsapp || "-"}
-                    </div>
-                    <div>
-                      <strong>Instagram:</strong>{" "}
-                      {formData.socialMedia.instagram || "-"}
+
+                    <div className="kua-header-info">
+                      <h2>{formData.name}</h2>
+
+                      <div className="info-grid">
+                        <div className="info-box">
+                          <div>
+                            <h5>Alamat</h5>
+                            <p>{formData.address}</p>
+                          </div>
+                        </div>
+
+                        <div className="info-box">
+                          <div>
+                            <h5>Telepon</h5>
+                            <p>{formData.phone || "Belum tersedia"}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button className="btn-cancel" onClick={closeModal}>
-                  Tutup
-                </button>
+                  {/* MAP */}
+
+                  {formData.map && (
+                    <div className="kua-card">
+                      <h4>Lokasi KUA</h4>
+
+                      <iframe
+                        className="kua-map"
+                        src={formData.map}
+                        loading="lazy"
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
+                    </div>
+                  )}
+
+                  {/* DESKRIPSI */}
+
+                  <div className="kua-card">
+                    <h4>Deskripsi</h4>
+
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: formData.desc,
+                      }}
+                    />
+                  </div>
+
+                  {/* SOSMED */}
+
+                  <div className="kua-card">
+                    <h4>Media Sosial</h4>
+
+                    <div className="social-buttons">
+                      {formData.socialMedia.facebook && (
+                        <a
+                          href={formData.socialMedia.facebook}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="facebook">
+                          Facebook
+                        </a>
+                      )}
+
+                      {formData.socialMedia.whatsapp && (
+                        <a
+                          href={`https://wa.me/${formData.socialMedia.whatsapp.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="whatsapp">
+                          WhatsApp
+                        </a>
+                      )}
+
+                      {formData.socialMedia.instagram && (
+                        <a
+                          href={formData.socialMedia.instagram}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="instagram">
+                          Instagram
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="form-actions">
+                    <button className="btn-cancel" onClick={closeModal}>
+                      Tutup
+                    </button>
+                  </div>
+                </div>
               </>
             )}
           </div>

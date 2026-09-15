@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
 import "../styles/ProfilKetuaCRUD.css";
 import { API_URL } from "../config";
+import Swal from "sweetalert2";
 
 const ProfilKetuaCRUD = () => {
   const [profilList, setProfilList] = useState([]);
@@ -98,17 +99,51 @@ const ProfilKetuaCRUD = () => {
   ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validate()) return;
 
+    const isEdit = !!formData.id;
+
+    // Popup konfirmasi
+    const result = await Swal.fire({
+      title: isEdit ? "Simpan Perubahan?" : "Tambah Profil Ketua?",
+      text: isEdit
+        ? "Data profil ketua akan diperbarui."
+        : "Data profil ketua akan ditambahkan.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: isEdit ? "Ya, Simpan" : "Ya, Tambahkan",
+      cancelButtonText: "Batal",
+      reverseButtons: true,
+      confirmButtonColor: "#0b8043",
+      cancelButtonColor: "#6c757d",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
-      const method = formData.id ? "PUT" : "POST";
-      const url = formData.id
+      // Popup loading
+      Swal.fire({
+        title: isEdit ? "Menyimpan perubahan..." : "Menambahkan data...",
+        text: "Mohon tunggu sebentar.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const method = isEdit ? "PUT" : "POST";
+
+      const url = isEdit
         ? `${API_URL}/profilketua/${formData.id}`
         : `${API_URL}/profilketua`;
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           name: formData.name,
           year: formData.year,
@@ -122,26 +157,56 @@ const ProfilKetuaCRUD = () => {
         throw new Error(`HTTP ${res.status} — ${txt}`);
       }
 
-      // refresh list
+      // Refresh data
       const updatedRes = await fetch(
         itemsPerPage && Number(itemsPerPage) > 0
           ? `${API_URL}/profilketua?limit=${itemsPerPage}`
           : `${API_URL}/profilketua`,
-        { credentials: "include" }
+        {
+          credentials: "include",
+        },
       );
+
+      if (!updatedRes.ok) {
+        throw new Error("Gagal mengambil data terbaru.");
+      }
+
       const updatedData = await updatedRes.json();
+
       const list = Array.isArray(updatedData.data)
         ? updatedData.data
         : Array.isArray(updatedData)
-        ? updatedData
-        : updatedData;
+          ? updatedData
+          : [];
+
       setProfilList(list);
       setFilteredList(list);
+
       closeModal();
-      alert("✅ Data profil ketua berhasil disimpan!");
+
+      // Popup berhasil
+      await Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: isEdit
+          ? "Data profil ketua berhasil diperbarui."
+          : "Data profil ketua berhasil ditambahkan.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0b8043",
+        timer: 2000,
+        timerProgressBar: true,
+      });
     } catch (err) {
       console.error("Error submit profil ketua:", err);
-      alert("Gagal menyimpan. Cek console untuk detail.");
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text:
+          err.message || "Terjadi kesalahan saat menyimpan data profil ketua.",
+        confirmButtonText: "Tutup",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -164,17 +229,72 @@ const ProfilKetuaCRUD = () => {
 
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Hapus data ketua ini?")) return;
+    // Cari data yang akan dihapus
+    const profil = profilList.find((p) => p.id === id);
+
+    const result = await Swal.fire({
+      title: "Hapus Data?",
+      html: profil
+        ? `Apakah Anda yakin ingin menghapus profil ketua <strong>${profil.name}</strong>?`
+        : "Apakah Anda yakin ingin menghapus data ketua ini?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Hapus",
+      cancelButtonText: "Batal",
+      reverseButtons: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
-      await fetch(`${API_URL}/profilketua/${id}`, {
+      // Loading
+      Swal.fire({
+        title: "Menghapus data...",
+        text: "Mohon tunggu sebentar.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const res = await fetch(`${API_URL}/profilketua/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`HTTP ${res.status} — ${txt}`);
+      }
+
+      // Hapus dari state
       setProfilList((prev) => prev.filter((p) => p.id !== id));
       setFilteredList((prev) => prev.filter((p) => p.id !== id));
+
+      // Popup berhasil
+      await Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Data profil ketua berhasil dihapus.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#0b8043",
+        timer: 2000,
+        timerProgressBar: true,
+      });
     } catch (err) {
       console.error("Gagal menghapus:", err);
-      alert("Gagal menghapus data. Cek console.");
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text:
+          err.message || "Terjadi kesalahan saat menghapus data profil ketua.",
+        confirmButtonText: "Tutup",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 

@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/PengaduanCRUD.css";
-import { Eye, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Eye,
+  Trash2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle,
+  Clock3,
+  LoaderCircle,
+} from "lucide-react";
 import { API_URL } from "../config";
-
+import Swal from "sweetalert2";
 const PengaduanCRUD = () => {
   const [pengaduanList, setPengaduanList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
@@ -84,22 +93,67 @@ const PengaduanCRUD = () => {
   }, [searchTerm, statusFilter, dateRange, pengaduanList]);
 
   // DELETE
-  const handleDelete = async (id) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus pengaduan ini?"))
-      return;
+const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "Yakin?",
+    text: "Pengaduan ini akan dihapus permanen!",
+    icon: "warning",
 
-    try {
-      await fetch(`${API_URL}/pengaduan/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+    showCancelButton: true,
+    confirmButtonText: "Ya, hapus!",
+    cancelButtonText: "Batal",
 
-      setPengaduanList((prev) => prev.filter((n) => n.id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
 
+    showLoaderOnConfirm: true,
+
+    allowOutsideClick: () => !Swal.isLoading(),
+
+    preConfirm: async () => {
+      try {
+        const res = await fetch(`${API_URL}/pengaduan/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+
+          throw new Error(`HTTP ${res.status} – ${errorText}`);
+        }
+
+        return true;
+      } catch (error) {
+        console.error("❌ Error hapus pengaduan:", error);
+
+        Swal.showValidationMessage(
+          error.message || "Gagal menghapus pengaduan",
+        );
+
+        return false;
+      }
+    },
+  });
+
+  // User berhasil mengkonfirmasi hapus
+  if (result.isConfirmed) {
+    // Hapus langsung dari tampilan
+    setPengaduanList((prev) => prev.filter((item) => item.id !== id));
+
+    setFilteredList((prev) => prev.filter((item) => item.id !== id));
+
+    // Popup berhasil
+    Swal.fire({
+      icon: "success",
+      title: "Berhasil",
+      text: "Pengaduan berhasil dihapus",
+      timer: 1500,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+  }
+};
   // VIEW DETAIL
   const handleView = (data) => setModalData(data);
 
@@ -190,6 +244,40 @@ const PengaduanCRUD = () => {
     }
 
     return pages;
+  };
+
+  const handleStatusClick = async (pengaduan) => {
+    const currentStatus = String(pengaduan.status || "MENUNGGU").toUpperCase();
+
+    const result = await Swal.fire({
+      title: "Ubah Status Pengaduan",
+      html: `
+      <div style="text-align:left">
+        <p><strong>${pengaduan.nama}</strong></p>
+        <p>Status saat ini:
+          <strong>${currentStatus}</strong>
+        </p>
+        <p>Pilih status pengaduan.</p>
+      </div>
+    `,
+      icon: "question",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "✓ Selesai",
+      denyButtonText: "⏳ Proses",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#198754",
+      denyButtonColor: "#0d6efd",
+    });
+
+    if (result.isConfirmed) {
+      await handleStatusChange(pengaduan.id, "SELESAI");
+      return;
+    }
+
+    if (result.isDenied) {
+      await handleStatusChange(pengaduan.id, "PROSES");
+    }
   };
 
   return (
@@ -315,19 +403,38 @@ const PengaduanCRUD = () => {
                     : "-"}
                 </td>
 
-                <td>
-                  <select
-                    value={(p.status || "MENUNGGU").toUpperCase()}
-                    onChange={(e) => handleStatusChange(p.id, e.target.value)}
-                    className={`status-select ${(
-                      p.status || "MENUNGGU"
-                    ).toLowerCase()}`}>
-                    <option value="MENUNGGU">Menunggu</option>
+                <td className="status-cell">
+                  <div className="status-wrapper">
+                    {String(p.status || "MENUNGGU").toUpperCase() ===
+                      "MENUNGGU" && (
+                      <button
+                        type="button"
+                        className="status-badge status-pending status-clickable"
+                        onClick={() => handleStatusClick(p)}
+                        title="Ubah status pengaduan">
+                        <Clock3 size={15} />
+                        <span>Menunggu</span>
+                      </button>
+                    )}
 
-                    <option value="PROSES">Proses</option>
+                    {String(p.status || "").toUpperCase() === "PROSES" && (
+                      <button
+                        type="button"
+                        className="status-badge status-process status-clickable"
+                        onClick={() => handleStatusClick(p)}
+                        title="Ubah status pengaduan">
+                        <LoaderCircle size={15} />
+                        <span>Proses</span>
+                      </button>
+                    )}
 
-                    <option value="SELESAI">Selesai</option>
-                  </select>
+                    {String(p.status || "").toUpperCase() === "SELESAI" && (
+                      <span className="status-badge status-approved">
+                        <CheckCircle size={15} />
+                        <span>Selesai</span>
+                      </span>
+                    )}
+                  </div>
                 </td>
 
                 <td className="action-cell">

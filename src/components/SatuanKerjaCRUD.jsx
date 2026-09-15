@@ -3,6 +3,7 @@ import { PlusCircle, Edit, Trash2, Eye, Search } from "lucide-react";
 import JoditEditor from "jodit-react";
 import "../styles/SatuanKerjaCRUD.css";
 import { API_URL } from "../config";
+import Swal from "sweetalert2";
 
 const SatuanKerjaCRUD = () => {
   const [satkerList, setSatkerList] = useState([]);
@@ -117,55 +118,80 @@ const SatuanKerjaCRUD = () => {
   /* ============================================================
      📝 Submit tambah / edit (JSON body)
   ============================================================ */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const method = formData.id ? "PUT" : "POST";
-      const url = formData.id
-        ? `${API_URL}/satuankerja/${formData.id}`
-        : `${API_URL}/satuankerja`;
+  if (!validate()) return;
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          nama: formData.nama,
-          singkatan: formData.singkatan,
-          tugas: formData.tugas,
-          fungsi: formData.fungsi,
-          created_at: formData.created_at || undefined,
-        }),
-      });
+  // Simpan status sebelum closeModal
+  const isEdit = !!formData.id;
 
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`HTTP ${res.status} — ${txt}`);
-      }
+  try {
+    const method = isEdit ? "PUT" : "POST";
 
-      // refresh data
-      const updated = await fetch(
-        itemsPerPage && Number(itemsPerPage) > 0
-          ? `${API_URL}/satuankerja?limit=${itemsPerPage}`
-          : `${API_URL}/satuankerja`,
-        { credentials: "include" }
-      ).then((r) => r.json());
-      const list = Array.isArray(updated.data)
-        ? updated.data
-        : Array.isArray(updated)
+    const url = isEdit
+      ? `${API_URL}/satuankerja/${formData.id}`
+      : `${API_URL}/satuankerja`;
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        nama: formData.nama,
+        singkatan: formData.singkatan,
+        tugas: formData.tugas,
+        fungsi: formData.fungsi,
+        created_at: formData.created_at || undefined,
+      }),
+    });
+
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`HTTP ${res.status} — ${txt}`);
+    }
+
+    // Refresh data setelah berhasil
+    const updated = await fetch(
+      itemsPerPage && Number(itemsPerPage) > 0
+        ? `${API_URL}/satuankerja?limit=${itemsPerPage}`
+        : `${API_URL}/satuankerja`,
+      { credentials: "include" },
+    ).then((r) => r.json());
+
+    const list = Array.isArray(updated.data)
+      ? updated.data
+      : Array.isArray(updated)
         ? updated
         : updated;
-      setSatkerList(list);
-      setFilteredSatker(list);
-      closeModal();
-      alert("✅ Data satuan kerja tersimpan.");
-    } catch (err) {
-      console.error("Error submit satuan kerja:", err);
-      alert("Gagal menyimpan. Cek console/backend.");
-    }
-  };
+
+    setSatkerList(list);
+    setFilteredSatker(list);
+
+    // Tutup modal
+    closeModal();
+
+    // Popup sukses
+    Swal.fire({
+      icon: "success",
+      title: isEdit
+        ? "Satuan Kerja Berhasil Diperbarui"
+        : "Satuan Kerja Berhasil Disimpan",
+      showConfirmButton: false,
+      timer: 1500,
+      timerProgressBar: true,
+    });
+  } catch (err) {
+    console.error("Error submit satuan kerja:", err);
+
+    Swal.fire({
+      icon: "error",
+      title: "Gagal Menyimpan Satuan Kerja",
+      text: "Terjadi kesalahan saat menyimpan data. Cek console/log backend.",
+      confirmButtonText: "OK",
+    });
+  }
+};
 
   /* ============================================================
      ✏️ Edit / 👁 Preview / 🗑 Delete
@@ -188,21 +214,67 @@ const SatuanKerjaCRUD = () => {
     setModalMode("preview");
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Hapus satuan kerja ini?")) {
+const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "Yakin?",
+    text: "Satuan kerja ini akan dihapus permanen!",
+    icon: "warning",
+
+    showCancelButton: true,
+    confirmButtonText: "Ya, hapus!",
+    cancelButtonText: "Batal",
+
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+
+    showLoaderOnConfirm: true,
+
+    allowOutsideClick: () => !Swal.isLoading(),
+
+    preConfirm: async () => {
       try {
-        await fetch(`${API_URL}/satuankerja/${id}`, {
+        const res = await fetch(`${API_URL}/satuankerja/${id}`, {
           method: "DELETE",
           credentials: "include",
         });
-        setSatkerList((prev) => prev.filter((s) => s.id !== id));
-        setFilteredSatker((prev) => prev.filter((s) => s.id !== id));
-      } catch (err) {
-        console.error("Gagal menghapus:", err);
-        alert("Gagal menghapus. Cek console.");
+
+        if (!res.ok) {
+          const errorText = await res.text();
+
+          throw new Error(`HTTP ${res.status} – ${errorText}`);
+        }
+
+        return true;
+      } catch (error) {
+        console.error("❌ Error hapus satuan kerja:", error);
+
+        Swal.showValidationMessage(
+          error.message || "Gagal menghapus satuan kerja",
+        );
+
+        return false;
       }
-    }
-  };
+    },
+  });
+
+  // User berhasil mengkonfirmasi hapus
+  if (result.isConfirmed) {
+    // Langsung hapus dari tampilan
+    setSatkerList((prev) => prev.filter((s) => s.id !== id));
+
+    setFilteredSatker((prev) => prev.filter((s) => s.id !== id));
+
+    // Popup berhasil
+    Swal.fire({
+      icon: "success",
+      title: "Berhasil",
+      text: "Satuan kerja berhasil dihapus",
+      timer: 1500,
+      showConfirmButton: false,
+      timerProgressBar: true,
+    });
+  }
+};
 
   /* ============================================================
      ❌ Tutup modal (reset)
@@ -297,7 +369,7 @@ const SatuanKerjaCRUD = () => {
 
       {/* TABLE */}
       <div className="table-wrapper">
-        <table className="news-table">
+        <table className="satker-table">
           <thead>
             <tr>
               <th>No</th>

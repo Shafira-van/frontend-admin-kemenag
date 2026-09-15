@@ -87,7 +87,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
+  row-gap: 14px;
+    column-gap: 20px;
+    padding-top: 14px;
 }
 
 .infografis-crud-container .filter-item {
@@ -332,6 +334,23 @@
   line-height: 1.6 !important;
 }
 
+.infografis-crud-container .modal-content form>div:nth-of-type(1) textarea {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.infografis-crud-container .empty-text {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 45px 20px !important;
+  color: #888 !important;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fafafa;
+  border-bottom: none !important;
+
+}
 /* ==========================
    🔔 ANIMATIONS (namespaced)
 ========================== */

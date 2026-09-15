@@ -1,6 +1,8 @@
-/* ==========================
-   🎯 WRAPPER & HEADER (namespaced)
-========================== */
+/* ============================================================
+   WRAPPER & HEADER
+   SAMA SEPERTI PROFIL KETUA
+============================================================ */
+
 .profiladmin-container {
   background: #fff;
   border-radius: 12px;
@@ -8,6 +10,11 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
 }
+
+
+/* ============================================================
+   HEADER
+============================================================ */
 
 .profiladmin-container .crud-header {
   display: flex;
@@ -22,6 +29,11 @@
   font-weight: 700;
   color: #004d40;
 }
+
+
+/* ============================================================
+   BUTTON TAMBAH
+============================================================ */
 
 .profiladmin-container .btn-add {
   display: flex;
@@ -41,29 +53,39 @@
   background: #004d40;
 }
 
-/* ==========================
-   🔍 FILTER SECTION (namespaced)
-========================== */
+
+/* ============================================================
+   FILTER SECTION
+============================================================ */
+
 .profiladmin-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   padding: 18px 22px;
   margin-bottom: 24px;
+
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Search box */
+
+/* ============================================================
+   SEARCH BOX
+============================================================ */
+
 .profiladmin-container .search-box {
   display: flex;
   align-items: center;
   gap: 10px;
+
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
+
   padding: 8px 12px;
+
   transition: all 0.2s ease;
 }
 
@@ -76,24 +98,38 @@
 .profiladmin-container .search-box input {
   border: none;
   outline: none;
+
   flex: 1;
+
   background: transparent;
+
   font-size: 14px;
   color: #333;
 }
 
-/* Inline filter row */
+
+/* ============================================================
+   INLINE FILTER
+============================================================ */
+
 .profiladmin-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
+
   align-items: flex-end;
-  gap: 20px;
+
+  row-gap: 14px;
+  column-gap: 20px;
+
+  padding-top: 14px;
 }
 
 .profiladmin-container .filter-item {
   display: flex;
   flex-direction: column;
+
   gap: 6px;
+
   min-width: 180px;
 }
 
@@ -104,22 +140,30 @@
 }
 
 .profiladmin-container .filter-item select,
-.profiladmin-container .filter-item input[type="date"] {
+.profiladmin-container .filter-item input[type='date'] {
   padding: 8px 10px;
+
   border: 1px solid #ccc;
   border-radius: 6px;
+
   font-size: 14px;
+
   background: #fff;
   outline: none;
+
   transition: border-color 0.2s ease;
 }
 
 .profiladmin-container .filter-item select:focus,
-.profiladmin-container .filter-item input[type="date"]:focus {
+.profiladmin-container .filter-item input[type='date']:focus {
   border-color: #00695c;
 }
 
-/* Date range */
+
+/* ============================================================
+   DATE RANGE
+============================================================ */
+
 .profiladmin-container .date-range .date-inputs {
   display: flex;
   align-items: center;
@@ -131,31 +175,52 @@
   color: #777;
 }
 
-/* ==========================
-   📋 TABLE (namespaced)
-========================== */
+
+/* ============================================================
+   TABLE
+============================================================ */
+
 .profiladmin-container .table-wrapper {
   overflow-x: auto;
+
   border-radius: 10px;
   border: 1px solid #eee;
 }
 
 .profiladmin-container .news-table {
   width: 100%;
+
   border-collapse: collapse;
+
   font-size: 14px;
 }
 
-.profiladmin-container .news-table th,
+.profiladmin-container .action-cell {
+  padding: 12px;
+
+  border-bottom: none !important;
+  text-align: left;
+  vertical-align: middle;
+}
+
 .profiladmin-container .news-table td {
   padding: 12px;
+
   border-bottom: 1px solid #e0e0e0;
+
   text-align: left;
   vertical-align: middle;
 }
 
 .profiladmin-container .news-table th {
+  padding: 12px;
+  
+    border-bottom: 1px solid #e0e0e0;
+  
+    text-align: left;
+    vertical-align: middle;
   background: #f5f5f5;
+
   font-weight: 600;
   color: #333;
 }
@@ -168,17 +233,47 @@
   color: #444;
 }
 
+
+/* ============================================================
+   NIP
+============================================================ */
+
+.profiladmin-container .news-table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.profiladmin-container .empty-text {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 45px 20px !important;
+  color: #888 !important;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fafafa;
+  border-bottom: none !important;
+
+}
+
+
+/* ============================================================
+   PREVIEW IMAGE
+============================================================ */
+
 .profiladmin-container .preview-img {
   width: 100%;
   max-width: 24rem;
   max-height: 13rem;
+
   object-fit: cover;
+
   border-radius: 8px;
 }
 
-/* ==========================
-   ⚙️ ACTION BUTTONS (namespaced)
-========================== */
+
+/* ============================================================
+   ACTION BUTTONS
+============================================================ */
+
 .profiladmin-container .action-buttons {
   display: flex;
   align-items: center;
@@ -187,11 +282,11 @@
 
 .profiladmin-container .action-buttons button {
   border: none;
-  background: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: transform 0.2s;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
 }
 
 .profiladmin-container .action-buttons button:hover {
@@ -199,96 +294,227 @@
   background: none;
 }
 
-.profiladmin-container .btn-view {
+
+/* Tombol Lihat */
+.profiladmin-container .btn-view,
+.profiladmin-container .btn-preview {
   color: #2e7d32;
 }
 
+
+/* Tombol Edit */
 .profiladmin-container .btn-edit {
   color: #0277bd;
 }
 
+
+/* Tombol Hapus */
 .profiladmin-container .btn-delete {
   color: #d32f2f;
 }
 
-/* ==========================
-   🧩 MODAL (namespaced)
-========================== */
+
+/* ============================================================
+   MODAL
+   SAMA DENGAN PROFIL KETUA
+============================================================ */
+
 .profiladmin-container .modal-overlay {
   position: fixed !important;
+
   inset: 0 !important;
+
   background: rgba(0, 0, 0, 0.45) !important;
+
   display: flex !important;
+
   justify-content: center !important;
   align-items: center !important;
+
   z-index: 999 !important;
+
   overflow-y: auto !important;
+
   padding: 30px !important;
+
   box-sizing: border-box;
 }
 
 .profiladmin-container .modal-content {
   background: #ffffff !important;
+
   border-radius: 16px !important;
+
   width: 100% !important;
+
   max-width: 1400px !important;
+
   overflow-y: auto !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.3) !important;
+
   padding: 32px !important;
+
   position: relative !important;
+
   transition: all 0.3s ease !important;
-  animation: newsFadeIn 0.25s ease !important;
+
+  animation: profilAdminFadeIn 0.25s ease !important;
+
   margin-top: 70px;
 }
 
 .profiladmin-container .modal-content h3 {
   margin-bottom: 15px;
+
   color: #004d40;
 }
 
+
+/* ============================================================
+   FORM LABEL
+============================================================ */
+
 .profiladmin-container .modal-content label {
   display: block;
+
   margin-top: 10px;
+
   font-size: 14px;
+
   font-weight: 600;
+
   color: #333;
 }
+
+
+/* ============================================================
+   FORM INPUT & SELECT
+============================================================ */
 
 .profiladmin-container .modal-content input,
 .profiladmin-container .modal-content select {
   width: 100%;
+
   padding: 10px;
+
   border-radius: 6px;
+
   border: 1px solid #ccc;
+
   margin-top: 6px;
+
   box-sizing: border-box;
+
+  font-size: 14px;
+
+  background: #fff;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
+.profiladmin-container .modal-content input:focus,
+.profiladmin-container .modal-content select:focus {
+  border-color: #00695c;
+
+  box-shadow:
+    0 0 0 2px rgba(0, 105, 92, 0.08);
+}
+
+
+/* ============================================================
+   FORM GRID
+============================================================ */
 
 .profiladmin-container .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
+  grid-template-columns:
+    repeat(auto-fit,
+      minmax(250px, 1fr));
+
   gap: 15px;
 }
 
+
+/* ============================================================
+   REQUIRED
+============================================================ */
+
+.profiladmin-container .required {
+  color: red;
+
+  margin-left: 3px;
+}
+
+
+/* ============================================================
+   VALIDATION ERROR
+============================================================ */
+
+.profiladmin-container .is-invalid {
+  border-color: #d32f2f !important;
+
+  box-shadow:
+    0 0 0 2px rgba(211, 47, 47, 0.08) !important;
+}
+
+.profiladmin-container .error-text {
+  margin-top: 5px;
+
+  font-size: 12px;
+
+  color: #d32f2f;
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+============================================================ */
+
 .profiladmin-container .form-actions {
   display: flex;
+
   justify-content: flex-end;
+
   gap: 10px;
+
   margin-top: 20px;
+
   position: sticky;
+
   bottom: 0;
+
   background: white;
+
   padding-top: 10px;
+
   box-sizing: border-box;
 }
 
+
+/* ============================================================
+   BUTTON SIMPAN
+============================================================ */
+
 .profiladmin-container .btn-save {
   background: #00695c;
+
   color: white;
+
   border: none;
+
   padding: 8px 14px;
+
   border-radius: 6px;
+
   cursor: pointer;
+
   font-weight: 500;
 }
 
@@ -296,11 +522,20 @@
   background: #004d40;
 }
 
+
+/* ============================================================
+   BUTTON BATAL
+============================================================ */
+
 .profiladmin-container .btn-cancel {
   background: #ccc;
+
   border: none;
+
   padding: 8px 14px;
+
   border-radius: 6px;
+
   cursor: pointer;
 }
 
@@ -308,54 +543,64 @@
   background: #b0b0b0;
 }
 
-.profiladmin-container .required {
-  color: red;
-  margin-left: 3px;
+
+/* ============================================================
+   DETAIL ADMIN
+============================================================ */
+
+.profiladmin-container .modal-content p {
+  margin: 10px 0;
+
+  font-size: 14px;
+
+  color: #444;
+
+  line-height: 1.6;
 }
 
-/* ==========================
-   ✏️ JODIT EDITOR AREA (namespaced)
-========================== */
-.profiladmin-container .modal-content form .jodit-container {
-  min-height: 340px !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  font-size: 15px;
+.profiladmin-container .modal-content p strong {
+  color: #004d40;
 }
 
-.profiladmin-container .jodit-wysiwyg {
-  padding: 12px !important;
-  font-size: 15px !important;
-  line-height: 1.6 !important;
-}
 
-/* ==========================
-   🔔 ANIMATIONS (namespaced)
-========================== */
-@keyframes newsFadeIn {
+/* ============================================================
+   ANIMATION
+============================================================ */
+
+@keyframes profilAdminFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+
+    transform:
+      translateY(-20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+
+    transform:
+      translateY(0);
   }
 }
 
-/* ==========================
-   📱 RESPONSIVE (namespaced)
-========================== */
+
+/* ============================================================
+   RESPONSIVE ≤ 768px
+============================================================ */
+
 @media (max-width: 768px) {
+
   .profiladmin-container .modal-content {
     width: 95%;
+
     height: 90vh;
+
     padding: 24px;
   }
 
   .profiladmin-container .filter-inline {
     flex-direction: column;
+
     align-items: stretch;
   }
 
@@ -378,88 +623,137 @@
   .profiladmin-container .news-table th,
   .profiladmin-container .news-table td {
     font-size: 12px;
+
     padding: 8px;
   }
 }
 
-/* Wrapper untuk preview + overlay teks (namespaced) */
+
+/* ============================================================
+   PREVIEW WRAPPER
+============================================================ */
+
 .profiladmin-container .preview-wrap {
   position: relative;
+
   display: inline-block;
+
   margin-top: 8px;
 }
 
-/* Overlay note di pojok kiri bawah gambar (namespaced) */
+
+/* ============================================================
+   IMAGE HINT
+============================================================ */
+
 .profiladmin-container .image-hint {
   position: absolute;
+
   left: 8px;
+
   bottom: 8px;
+
   padding: 4px 8px;
+
   font-size: 12px;
+
   color: #fff;
+
   background: rgba(0, 0, 0, 0.6);
+
   border-radius: 6px;
+
   pointer-events: none;
 }
 
-/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
+
+/* ============================================================
+   IMAGE HINT INLINE
+============================================================ */
+
 .profiladmin-container .image-hint-inline {
   margin-top: 6px;
+
   font-size: 12px;
+
   color: #666;
 }
 
+
+/* ============================================================
+   RESPONSIVE ≤ 1024px
+============================================================ */
+
 @media (max-width: 1024px) {
+
   .profiladmin-container .modal-content {
     max-width: 95% !important;
+
     height: 90vh !important;
+
     padding: 28px !important;
   }
 }
 
-/* Smartphone (≤600px) — namespaced mobile tweaks */
+
+/* ============================================================
+   SMARTPHONE ≤ 600px
+============================================================ */
+
 @media (max-width: 600px) {
+
   .profiladmin-container .modal-overlay {
     padding: 0;
   }
 
   .profiladmin-container .modal-content {
     margin: 0 !important;
+
     width: 100% !important;
+
     height: 80vh !important;
+
     max-width: none !important;
+
     border-radius: 0 !important;
+
     padding: 16px !important;
+
     box-shadow: none !important;
+
     text-align: justify;
   }
 
   .profiladmin-container .modal-content h3 {
     font-size: 18px;
+
     margin-bottom: 10px;
   }
 
   .profiladmin-container .form-grid {
     grid-template-columns: 1fr;
+
     gap: 12px;
   }
 
   .profiladmin-container .modal-content input,
   .profiladmin-container .modal-content select {
     padding: 10px;
-    font-size: 14px;
-  }
 
-  .profiladmin-container .modal-content form .jodit-container {
-    min-height: 400px !important;
+    font-size: 14px;
   }
 
   .profiladmin-container .form-actions {
     position: sticky;
+
     bottom: 0;
+
     background: #fff;
+
     padding-top: 10px;
+
     padding-bottom: 10px;
+
     gap: 10px;
   }
 
@@ -470,6 +764,7 @@
   .profiladmin-container .news-table th,
   .profiladmin-container .news-table td {
     font-size: 12px;
+
     padding: 8px;
   }
 

@@ -1,7 +1,9 @@
+
 /* ==========================
    🎯 WRAPPER & HEADER (namespaced)
 ========================== */
-.kua-crud-container {
+
+.sekolah-crud-container {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
@@ -9,21 +11,21 @@
   box-sizing: border-box;
 }
 
-.kua-crud-container .crud-header {
+.sekolah-crud-container .crud-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.kua-crud-container .crud-header h2 {
+.sekolah-crud-container .crud-header h2 {
   margin: 0;
   font-size: 22px;
   font-weight: 700;
   color: #004d40;
 }
 
-.kua-crud-container .btn-add {
+.sekolah-crud-container .btn-add {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -37,14 +39,16 @@
   font-weight: 500;
 }
 
-.kua-crud-container .btn-add:hover {
+.sekolah-crud-container .btn-add:hover {
   background: #004d40;
 }
+
 
 /* ==========================
    🔍 FILTER SECTION (namespaced)
 ========================== */
-.kua-crud-container .filter-bar {
+
+.sekolah-crud-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
@@ -56,7 +60,8 @@
 }
 
 /* Search box */
-.kua-crud-container .search-box {
+
+.sekolah-crud-container .search-box {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -67,13 +72,13 @@
   transition: all 0.2s ease;
 }
 
-.kua-crud-container .search-box:hover,
-.kua-crud-container .search-box:focus-within {
+.sekolah-crud-container .search-box:hover,
+.sekolah-crud-container .search-box:focus-within {
   border-color: #00695c;
   box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
 }
 
-.kua-crud-container .search-box input {
+.sekolah-crud-container .search-box input {
   border: none;
   outline: none;
   flex: 1;
@@ -82,31 +87,34 @@
   color: #333;
 }
 
+
 /* Inline filter row */
-.kua-crud-container .filter-inline {
+/* Disamakan dengan KUA */
+
+.sekolah-crud-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   row-gap: 14px;
-    column-gap: 20px;
-    padding-top: 14px;
+  column-gap: 20px;
+  padding-top: 14px;
 }
 
-.kua-crud-container .filter-item {
+.sekolah-crud-container .filter-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 180px;
 }
 
-.kua-crud-container .filter-item label {
+.sekolah-crud-container .filter-item label {
   font-size: 13px;
   font-weight: 600;
   color: #004d40;
 }
 
-.kua-crud-container .filter-item select,
-.kua-crud-container .filter-item input[type="date"] {
+.sekolah-crud-container .filter-item select,
+.sekolah-crud-container .filter-item input[type="date"] {
   padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -116,78 +124,84 @@
   transition: border-color 0.2s ease;
 }
 
-.kua-crud-container .filter-item select:focus,
-.kua-crud-container .filter-item input[type="date"]:focus {
+.sekolah-crud-container .filter-item select:focus,
+.sekolah-crud-container .filter-item input[type="date"]:focus {
   border-color: #00695c;
 }
 
+
 /* Date range */
-.kua-crud-container .date-range .date-inputs {
+
+.sekolah-crud-container .date-range .date-inputs {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.kua-crud-container .date-range span {
+.sekolah-crud-container .date-range span {
   font-weight: 600;
   color: #777;
 }
 
+
 /* ==========================
    📋 TABLE (namespaced)
 ========================== */
-.kua-crud-container .table-wrapper {
+
+.sekolah-crud-container .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
   border: 1px solid #eee;
 }
 
-.kua-crud-container .kua-table {
+.sekolah-crud-container .sekolah-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.kua-crud-container .kua-table th,
-.kua-crud-container .kua-table td {
+.sekolah-crud-container .sekolah-table th,
+.sekolah-crud-container .sekolah-table td {
   padding: 12px;
   border-bottom: 1px solid #e0e0e0;
   text-align: left;
   vertical-align: middle;
 }
 
-.kua-crud-container .kua-table th {
+.sekolah-crud-container .sekolah-table th {
   background: #f5f5f5;
   font-weight: 600;
   color: #333;
 }
 
-.kua-crud-container .kua-table tr:hover td {
+.sekolah-crud-container .sekolah-table tr:hover td {
   background: #f9f9f9;
 }
 
-.kua-crud-container .kua-table td {
+.sekolah-crud-container .sekolah-table td {
   color: #444;
 }
 
-.kua-crud-container .preview-img {
+.sekolah-crud-container .preview-img {
   width: 100%;
-  max-width: 24rem;
+  max-width: 1rem;
   max-height: 13rem;
   object-fit: cover;
   border-radius: 8px;
 }
 
+
 /* ==========================
    ⚙️ ACTION BUTTONS (namespaced)
 ========================== */
-.kua-crud-container .action-buttons {
+
+.sekolah-crud-container .action-buttons {
   display: flex;
   align-items: center;
   gap: 0px !important;
 }
 
-.kua-crud-container .action-buttons button {
+.sekolah-crud-container .action-buttons button {
   border: none;
   background: none;
   cursor: pointer;
@@ -196,27 +210,29 @@
   transition: transform 0.2s;
 }
 
-.kua-crud-container .action-buttons button:hover {
+.sekolah-crud-container .action-buttons button:hover {
   transform: scale(1.15);
   background: none;
 }
 
-.kua-crud-container .btn-view {
+.sekolah-crud-container .btn-view {
   color: #2e7d32;
 }
 
-.kua-crud-container .btn-edit {
+.sekolah-crud-container .btn-edit {
   color: #0277bd;
 }
 
-.kua-crud-container .btn-delete {
+.sekolah-crud-container .btn-delete {
   color: #d32f2f;
 }
+
 
 /* ==========================
    🧩 MODAL (namespaced)
 ========================== */
-.kua-crud-container .modal-overlay {
+
+.sekolah-crud-container .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
   background: rgba(0, 0, 0, 0.45) !important;
@@ -229,7 +245,7 @@
   box-sizing: border-box;
 }
 
-.kua-crud-container .modal-content {
+.sekolah-crud-container .modal-content {
   background: #ffffff !important;
   border-radius: 16px !important;
   width: 100% !important;
@@ -239,18 +255,18 @@
   padding: 32px !important;
   position: relative !important;
   transition: all 0.3s ease !important;
-  animation: kuaFadeIn 0.25s ease !important;
+  animation: sekolahFadeIn 0.25s ease !important;
   margin-top: 60px;
   margin-bottom: 0;
   max-height: 80vh;
 }
 
-.kua-crud-container .modal-content h3 {
+.sekolah-crud-container .modal-content h3 {
   margin-bottom: 15px;
   color: #004d40;
 }
 
-.kua-crud-container .modal-content label {
+.sekolah-crud-container .modal-content label {
   display: block;
   margin-top: 10px;
   font-size: 14px;
@@ -258,8 +274,8 @@
   color: #333;
 }
 
-.kua-crud-container .modal-content input,
-.kua-crud-container .modal-content select {
+.sekolah-crud-container .modal-content input,
+.sekolah-crud-container .modal-content select {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
@@ -268,13 +284,13 @@
   box-sizing: border-box;
 }
 
-.kua-crud-container .form-grid {
+.sekolah-crud-container .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
 }
 
-.kua-crud-container .form-actions {
+.sekolah-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -286,7 +302,7 @@
   box-sizing: border-box;
 }
 
-.kua-crud-container .btn-save {
+.sekolah-crud-container .btn-save {
   background: #00695c;
   color: white;
   border: none;
@@ -296,11 +312,11 @@
   font-weight: 500;
 }
 
-.kua-crud-container .btn-save:hover {
+.sekolah-crud-container .btn-save:hover {
   background: #004d40;
 }
 
-.kua-crud-container .btn-cancel {
+.sekolah-crud-container .btn-cancel {
   background: #ccc;
   border: none;
   padding: 8px 14px;
@@ -308,35 +324,39 @@
   cursor: pointer;
 }
 
-.kua-crud-container .btn-cancel:hover {
+.sekolah-crud-container .btn-cancel:hover {
   background: #b0b0b0;
 }
 
-.kua-crud-container .required {
+.sekolah-crud-container .required {
   color: red;
   margin-left: 3px;
 }
 
+
 /* ==========================
    ✏️ JODIT EDITOR AREA (namespaced)
 ========================== */
-.kua-crud-container .modal-content form .jodit-container {
+
+.sekolah-crud-container .modal-content form .jodit-container {
   min-height: 340px !important;
   width: 100% !important;
   max-width: 100% !important;
   font-size: 15px;
 }
 
-.kua-crud-container .jodit-wysiwyg {
+.sekolah-crud-container .jodit-wysiwyg {
   padding: 12px !important;
   font-size: 15px !important;
   line-height: 1.6 !important;
 }
 
+
 /* ==========================
    🔔 ANIMATIONS (namespaced)
 ========================== */
-@keyframes kuaFadeIn {
+
+@keyframes sekolahFadeIn {
   from {
     opacity: 0;
     transform: translateY(-20px);
@@ -348,53 +368,68 @@
   }
 }
 
+
 /* ==========================
    📱 RESPONSIVE (namespaced)
 ========================== */
+
 @media (max-width: 768px) {
-  .kua-crud-container .modal-content {
+
+  .sekolah-crud-container .modal-content {
     width: 95%;
     height: 90vh;
     padding: 24px;
   }
 
-  .kua-crud-container .filter-inline {
+  .sekolah-crud-container .filter-inline {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .kua-crud-container .filter-item {
+  .sekolah-crud-container .filter-item {
     width: 100%;
   }
 
-  .kua-crud-container {
+  .sekolah-crud-container {
     padding: 15px;
   }
 
-  .kua-crud-container .crud-header h2 {
+  .sekolah-crud-container .crud-header h2 {
     font-size: 18px;
   }
 
-  .kua-crud-container .btn-add {
+  .sekolah-crud-container .btn-add {
     padding: 8px 10px;
   }
 
-  .kua-crud-container .kua-table th,
-  .kua-crud-container .kua-table td {
+  .sekolah-crud-container .sekolah-table th,
+  .sekolah-crud-container .sekolah-table td {
     font-size: 12px;
     padding: 8px;
   }
 }
 
-/* Wrapper untuk preview + overlay teks (namespaced) */
-.kua-crud-container .preview-wrap {
+
+/* ==========================
+   🖼️ IMAGE PREVIEW
+========================== */
+
+.sekolah-crud-container .preview-wrap {
   position: relative;
   display: inline-block;
   margin-top: 8px;
 }
 
-/* Overlay note di pojok kiri bawah gambar (namespaced) */
-.kua-crud-container .image-hint {
+.sekolah-crud-container .preview-wrap .preview-img {
+  width: 100%;
+  max-width: 24rem;
+  max-height: 13rem;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.sekolah-crud-container .image-hint {
   position: absolute;
   left: 8px;
   bottom: 8px;
@@ -406,265 +441,197 @@
   pointer-events: none;
 }
 
-/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
-.kua-crud-container .image-hint-inline {
+/* Bila belum ada preview */
+.sekolah-crud-container .image-hint-inline {
   margin-top: 6px;
   font-size: 12px;
   color: #666;
 }
 
-/* view */
-/* ===========================
-   DETAIL KUA
-===========================*/
 
-.kua-detail-container {
+/* ==========================
+   👁️ DETAIL SEKOLAH
+========================== */
+
+.sekolah-detail-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.kua-header {
-
+.sekolah-header {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 22px;
-
 }
 
-.kua-image img {
-
+.sekolah-image img {
   width: 100%;
   height: 280px;
   object-fit: cover;
   border-radius: 14px;
-
   border: 5px solid white;
-
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
-
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
-.kua-header-info h2 {
+.sekolah-header-info h2 {
   color: #00695c;
-
   margin-bottom: 18px;
-
   font-size: 30px;
-
   font-weight: 700;
-
 }
 
 .info-grid {
-
   display: grid;
-
   gap: 15px;
-
 }
 
 .info-box {
-
   display: flex;
-
   gap: 15px;
-
   align-items: flex-start;
-
   background: #f8faf9;
-
   border: 1px solid #e5ece8;
-
   border-radius: 12px;
-
   padding: 14px 16px;
-
 }
 
 .info-box span {
-
   font-size: 25px;
-
 }
 
 .info-box label {
-
   display: block;
-
   color: #00695c;
-
   font-weight: 700;
-
   margin-bottom: 5px;
-
 }
 
 .info-box p {
-
   margin: 0;
-
   color: #555;
-
   line-height: 1.6;
-
 }
 
-.kua-card {
-
+.sekolah-card {
   background: white;
-
   border-radius: 14px;
-
   padding: 20px;
-
   border: 1px solid #ececec;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, .05);
-
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.kua-card h4 {
-
+.sekolah-card h4 {
   margin-bottom: 15px;
-
   color: #00695c;
-
   font-size: 20px;
-
 }
 
-.kua-map {
-
+.sekolah-map {
   width: 100%;
-
   height: 230px;
-
   border: none;
-
   border-radius: 12px;
-
 }
 
 .social-buttons {
-
   display: flex;
-
   gap: 12px;
-
   flex-wrap: wrap;
-
 }
 
 .social-buttons a {
-
   text-decoration: none;
-
   color: white;
-
   padding: 11px 18px;
-
   border-radius: 10px;
-
   font-weight: 600;
-
-  transition: .25s;
-
+  transition: 0.25s;
 }
 
 .facebook {
-
   background: #1877F2;
-
 }
 
 .facebook:hover {
-
   background: #135ec7;
-
 }
 
 .whatsapp {
-
   background: #25D366;
-
 }
 
 .whatsapp:hover {
-
   background: #18a851;
-
 }
 
 .instagram {
-
   background: #E1306C;
-
 }
 
 .instagram:hover {
-
   background: #c11d59;
-
 }
 
-@media(max-width:900px) {
 
-  .kua-header {
+/* ==========================
+   📱 RESPONSIVE DETAIL
+========================== */
 
+@media (max-width: 900px) {
+
+  .sekolah-header {
     grid-template-columns: 1fr;
-
   }
 
-  .kua-image {
-
+  .sekolah-image {
     text-align: center;
-
   }
 
-  .kua-image img {
-
+  .sekolah-image img {
     max-width: 420px;
-
   }
 
-  .kua-header-info h2 {
-
+  .sekolah-header-info h2 {
     text-align: center;
-
     font-size: 24px;
-
   }
 
   .social-buttons {
-
     justify-content: center;
-
   }
 
-  .kua-map {
-
+  .sekolah-map {
     height: 200px;
-
   }
-
 }
 
+
+/* ==========================
+   💻 TABLET / LAPTOP
+========================== */
+
 @media (max-width: 1024px) {
-  .kua-crud-container .modal-content {
+
+  .sekolah-crud-container .modal-content {
     max-width: 95% !important;
     height: 90vh !important;
     padding: 28px !important;
   }
 }
 
-/* Smartphone (≤600px) — namespaced mobile tweaks */
+
+/* ==========================
+   📱 SMARTPHONE (≤600px)
+========================== */
+
 @media (max-width: 600px) {
-  .kua-crud-container .modal-overlay {
+
+  .sekolah-crud-container .modal-overlay {
     padding: 0;
   }
 
-  .kua-crud-container .modal-content {
+  .sekolah-crud-container .modal-content {
     margin: 0 !important;
     width: 100% !important;
     height: 80vh !important;
@@ -675,27 +642,27 @@
     text-align: justify;
   }
 
-  .kua-crud-container .modal-content h3 {
+  .sekolah-crud-container .modal-content h3 {
     font-size: 18px;
     margin-bottom: 10px;
   }
 
-  .kua-crud-container .form-grid {
+  .sekolah-crud-container .form-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .kua-crud-container .modal-content input,
-  .kua-crud-container .modal-content select {
+  .sekolah-crud-container .modal-content input,
+  .sekolah-crud-container .modal-content select {
     padding: 10px;
     font-size: 14px;
   }
 
-  .kua-crud-container .modal-content form .jodit-container {
+  .sekolah-crud-container .modal-content form .jodit-container {
     min-height: 400px !important;
   }
 
-  .kua-crud-container .form-actions {
+  .sekolah-crud-container .form-actions {
     position: sticky;
     bottom: 0;
     background: #fff;
@@ -704,21 +671,22 @@
     gap: 10px;
   }
 
-  .kua-crud-container .btn-add {
+  .sekolah-crud-container .btn-add {
     padding: 8px 10px;
   }
 
-  .kua-crud-container .kua-table th,
-  .kua-crud-container .kua-table td {
+  .sekolah-crud-container .sekolah-table th,
+  .sekolah-crud-container .sekolah-table td {
     font-size: 12px;
     padding: 8px;
   }
 
-  .kua-crud-container .date-inputs {
+  .sekolah-crud-container .date-inputs {
     gap: 6px;
   }
 
-  .kua-crud-container .date-inputs input {
+  .sekolah-crud-container .date-inputs input {
     width: 46%;
   }
 }
+

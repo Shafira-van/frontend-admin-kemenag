@@ -1,6 +1,8 @@
-/* ==========================
-   🎯 WRAPPER & HEADER (namespaced)
-========================== */
+
+/* =========================================================
+   🎯 WRAPPER & HEADER
+   ========================================================= */
+
 .pengaduan-crud-container {
   background: #fff;
   border-radius: 12px;
@@ -23,6 +25,11 @@
   color: #004d40;
 }
 
+
+/* =========================================================
+   ➕ BUTTON TAMBAH
+   ========================================================= */
+
 .pengaduan-crud-container .btn-add {
   display: flex;
   align-items: center;
@@ -41,9 +48,11 @@
   background: #004d40;
 }
 
-/* ==========================
-   🔍 FILTER SECTION (namespaced)
-========================== */
+
+/* =========================================================
+   🔍 FILTER SECTION
+   ========================================================= */
+
 .pengaduan-crud-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
@@ -55,7 +64,16 @@
   gap: 16px;
 }
 
-/* Search box */
+.pengaduan-crud-container .filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =========================================================
+   🔎 SEARCH
+   ========================================================= */
+
 .pengaduan-crud-container .search-box {
   display: flex;
   align-items: center;
@@ -73,6 +91,11 @@
   box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.1);
 }
 
+.pengaduan-crud-container .search-box svg {
+  flex-shrink: 0;
+  color: #666;
+}
+
 .pengaduan-crud-container .search-box input {
   border: none;
   outline: none;
@@ -82,12 +105,18 @@
   color: #333;
 }
 
-/* Inline filter row */
+
+/* =========================================================
+   📌 INLINE FILTER
+   ========================================================= */
+
 .pengaduan-crud-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
+  row-gap: 14px;
+  column-gap: 20px;
+  padding-top: 14px;
 }
 
 .pengaduan-crud-container .filter-item {
@@ -119,7 +148,11 @@
   border-color: #00695c;
 }
 
-/* Date range */
+
+/* =========================================================
+   📅 DATE RANGE
+   ========================================================= */
+
 .pengaduan-crud-container .date-range .date-inputs {
   display: flex;
   align-items: center;
@@ -131,9 +164,11 @@
   color: #777;
 }
 
-/* ==========================
-   📋 TABLE (namespaced)
-========================== */
+
+/* =========================================================
+   📋 TABLE
+   ========================================================= */
+
 .pengaduan-crud-container .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
@@ -168,99 +203,32 @@
   color: #444;
 }
 
-.pengaduan-crud-container .preview-img {
-  width: 100%;
-  max-width: 24rem;
-  max-height: 13rem;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-/* ==========================
-   🔔 PAGINATION
-========================== */
-.pengaduan-crud-container .pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 18px;
-  flex-wrap: wrap;
-}
-
-.pengaduan-crud-container .pagination-info {
-  font-size: 17px;
-  color: #222;
+.pengaduan-crud-container .empty-text {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 45px 20px !important;
+  color: #888 !important;
+  font-size: 14px;
   font-weight: 500;
+  background: #fafafa;
+  border-bottom: none !important;
 }
 
-/* WRAPPER BUTTON */
-.pengaduan-crud-container .pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+
+/* =========================================================
+   ⚙️ ACTION BUTTONS
+   ========================================================= */
+
+.pengaduan-crud-container .action-cell {
+  width: 120px;
+  min-width: 120px;
+  white-space: nowrap;
 }
 
-/* BUTTON PAGINATION */
-.pengaduan-crud-container .btn-page {
-  min-width: 42px;
-  height: 42px;
-  border: 1.5px solid #cfd8dc;
-  background: #ffffff;
-  color: #00695c;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-/* HOVER */
-.pengaduan-crud-container .btn-page:hover:not(:disabled) {
-  background: #e0f2f1;
-  border-color: #00695c;
-  transform: translateY(-1px);
-}
-
-/* ACTIVE PAGE */
-.pengaduan-crud-container .btn-page.active {
-  background: #00695c;
-  color: #fff;
-  border-color: #00695c;
-  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.25);
-}
-
-/* DISABLED */
-.pengaduan-crud-container .btn-page:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  background: #f5f5f5;
-}
-
-/* ELLIPSIS */
-.pengaduan-crud-container .page-ellipsis {
-  min-width: 30px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #00695c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ==========================
-   ⚙️ ACTION BUTTONS (namespaced)
-========================== */
 .pengaduan-crud-container .action-buttons {
   display: flex;
   align-items: center;
-  gap: 0px !important;
+  gap: 0 !important;
 }
 
 .pengaduan-crud-container .action-buttons button {
@@ -289,35 +257,224 @@
   color: #d32f2f;
 }
 
-/* ==========================
-   🧩 MODAL (namespaced)
-========================== */
+
+/* =========================================================
+   🔐 STATUS
+   ========================================================= */
+
+.pengaduan-crud-container .status-cell {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.pengaduan-crud-container .status-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pengaduan-crud-container .status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 100px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   🟡 MENUNGGU
+   ========================================================= */
+
+.pengaduan-crud-container .status-pending {
+  color: #856404;
+  background: #fff8e1;
+  border-color: #ffe082;
+}
+
+
+/* Menunggu dapat diklik */
+
+.pengaduan-crud-container .status-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pengaduan-crud-container .status-clickable:hover {
+  background: #ffecb3;
+  border-color: #ffc107;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(133, 100, 4, 0.12);
+}
+
+.pengaduan-crud-container .status-clickable:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   🔵 PROSES
+   ========================================================= */
+
+.pengaduan-crud-container .status-process {
+  color: #2563eb;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.pengaduan-crud-container .status-process.status-clickable {
+  cursor: pointer;
+}
+
+.pengaduan-crud-container .status-process.status-clickable:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.pengaduan-crud-container .status-process.status-clickable:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   🟢 SELESAI
+   ========================================================= */
+
+.pengaduan-crud-container .status-approved,
+.pengaduan-crud-container .status-completed {
+  color: #146c43;
+  background: #e8f5e9;
+  border-color: #a5d6a7;
+}
+
+
+/* Tidak ada perubahan ketika hover */
+
+.pengaduan-crud-container .status-approved:hover,
+.pengaduan-crud-container .status-completed:hover {
+  color: #146c43;
+  background: #e8f5e9;
+  border-color: #a5d6a7;
+}
+
+
+/* =========================================================
+   ⚪ STATUS KOSONG
+   ========================================================= */
+
+.pengaduan-crud-container .status-empty {
+  min-width: 70px;
+  color: #777;
+  background: #f5f5f5;
+  border-color: #ddd;
+}
+
+
+/* =========================================================
+   🔔 PAGINATION
+   ========================================================= */
+
+.pengaduan-crud-container .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.pengaduan-crud-container .pagination-info {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.pengaduan-crud-container .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pengaduan-crud-container .btn-page {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  background: #fff;
+  color: #00695c;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pengaduan-crud-container .btn-page:hover:not(:disabled) {
+  background: #e0f2f1;
+  border-color: #00695c;
+}
+
+.pengaduan-crud-container .btn-page.active {
+  background: #00695c;
+  color: #fff;
+  border-color: #00695c;
+  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.2);
+}
+
+.pengaduan-crud-container .btn-page:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pengaduan-crud-container .page-ellipsis {
+  min-width: 24px;
+  text-align: center;
+  color: #00695c;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   🧩 MODAL
+   ⚠️ MENGIKUTI STYLE NEWS
+   ========================================================= */
+
 .pengaduan-crud-container .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0, 0, 0, 0.45) !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  padding: 30px !important;
+  background: rgba(0, 0, 0, 0.45) !important;
   z-index: 999 !important;
   overflow-y: auto !important;
-  padding: 30px !important;
   box-sizing: border-box;
 }
 
 .pengaduan-crud-container .modal-content {
-  background: #ffffff !important;
-  border-radius: 16px !important;
-  width: 40% !important;
+  position: relative !important;
+  width: 100% !important;
   max-width: 1400px !important;
+  max-height: 80vh;
+  margin-top: 10vh;
+  margin-bottom: 0;
+  padding: 32px !important;
+  background: #fff !important;
+  border-radius: 16px !important;
   overflow-y: auto !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
-  padding: 32px !important;
-  position: relative !important;
   transition: all 0.3s ease !important;
   animation: pengaduanFadeIn 0.25s ease !important;
-  margin-top: 70px;
-  max-height: 80vh;
+  box-sizing: border-box;
 }
 
 .pengaduan-crud-container .modal-content h3 {
@@ -337,11 +494,16 @@
 .pengaduan-crud-container .modal-content select {
   width: 100%;
   padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
   margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   box-sizing: border-box;
 }
+
+
+/* =========================================================
+   📝 FORM GRID
+   ========================================================= */
 
 .pengaduan-crud-container .form-grid {
   display: grid;
@@ -349,42 +511,58 @@
   gap: 15px;
 }
 
+
+/* =========================================================
+   🔘 FORM ACTIONS
+   ========================================================= */
+
 .pengaduan-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 10px;
   margin-top: 20px;
-  position: sticky;
-  bottom: 0;
-  background: white;
   padding-top: 10px;
   box-sizing: border-box;
 }
 
+
+/* =========================================================
+   💾 SAVE
+   ========================================================= */
+
 .pengaduan-crud-container .btn-save {
-  background: #00695c;
-  color: white;
-  border: none;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 6px;
   padding: 8px 14px;
+  background: #00695c;
+  color: #fff;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
 }
 
 .pengaduan-crud-container .btn-save:hover {
   background: #004d40;
 }
 
+
+/* =========================================================
+   ❌ CANCEL
+   ========================================================= */
+
 .pengaduan-crud-container .btn-cancel {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 6px;
+  padding: 8px 14px;
   background: #ccc;
   border: none;
-  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-    width: fit-content;
-    display: flex;
-    margin-top: 6px;
-    align-self: flex-end;
 }
 
 .pengaduan-crud-container .btn-cancel:hover {
@@ -392,102 +570,19 @@
 }
 
 .pengaduan-crud-container .required {
-  color: red;
   margin-left: 3px;
-}
-
-/* ================= STATUS SELECT ================= */
-
-.pengaduan-crud-container .status-select {
-  min-width: 130px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1.5px solid #d0d7de;
-  font-size: 14px;
-  font-weight: 600;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  background-position: right 12px center;
-  background-repeat: no-repeat;
-  background-size: 14px;
-
-  padding-right: 38px;
+  color: red;
 }
 
 
+/* =========================================================
+   ✏️ JODIT EDITOR
+   ========================================================= */
 
-
-/* ================= MENUNGGU ================= */
-
-.pengaduan-crud-container .status-select.menunggu {
-  background-color: #fff8e1;
-  color: #f57f17;
-  border-color: #fbc02d;
-}
-
-/* ================= PROSES ================= */
-
-.pengaduan-crud-container .status-select.proses {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border-color: #64b5f6;
-}
-
-/* ================= SELESAI ================= */
-
-.pengaduan-crud-container .status-select.selesai {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border-color: #81c784;
-}
-
-/* OPTION */
-.pengaduan-crud-container .status-select option {
-  background: #fff;
-  color: #222;
-  font-weight: 500;
-}
-
-/* ================= STATUS BADGE MODAL ================= */
-
-.pengaduan-crud-container .status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.pengaduan-crud-container .status-badge.menunggu {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.pengaduan-crud-container .status-badge.proses {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.pengaduan-crud-container .status-badge.selesai {
-  background: #dcfce7;
-  color: #15803d;
-}
-/* ==========================
-   ✏️ JODIT EDITOR AREA (namespaced)
-========================== */
 .pengaduan-crud-container .modal-content form .jodit-container {
-  min-height: 340px !important;
   width: 100% !important;
   max-width: 100% !important;
+  min-height: 340px !important;
   font-size: 15px;
 }
 
@@ -497,9 +592,40 @@
   line-height: 1.6 !important;
 }
 
-/* ==========================
-   🔔 ANIMATIONS (namespaced)
-========================== */
+
+/* =========================================================
+   🖼️ IMAGE PREVIEW
+   ========================================================= */
+
+.pengaduan-crud-container .preview-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.pengaduan-crud-container .image-hint {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.pengaduan-crud-container .image-hint-inline {
+  margin-top: 6px;
+  color: #666;
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   🔔 ANIMATION
+   ========================================================= */
+
 @keyframes pengaduanFadeIn {
   from {
     opacity: 0;
@@ -512,25 +638,26 @@
   }
 }
 
-/* ==========================
-   📱 RESPONSIVE (namespaced)
-========================== */
-@media (max-width: 768px) {
+
+/* =========================================================
+   📱 RESPONSIVE TABLET
+   ========================================================= */
+
+@media (max-width: 1024px) {
   .pengaduan-crud-container .modal-content {
-    width: 95%;
-    height: 90vh;
-    padding: 24px;
+    width: 95% !important;
+    max-width: 95% !important;
+    height: 90vh !important;
+    padding: 28px !important;
   }
+}
 
-  .pengaduan-crud-container .filter-inline {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
-  .pengaduan-crud-container .filter-item {
-    width: 100%;
-  }
+/* =========================================================
+   📱 RESPONSIVE ≤ 768px
+   ========================================================= */
 
+@media (max-width: 768px) {
   .pengaduan-crud-container {
     padding: 15px;
   }
@@ -543,68 +670,58 @@
     padding: 8px 10px;
   }
 
+  .pengaduan-crud-container .filter-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pengaduan-crud-container .filter-item {
+    width: 100%;
+  }
+
   .pengaduan-crud-container .pengaduan-table th,
   .pengaduan-crud-container .pengaduan-table td {
     font-size: 12px;
     padding: 8px;
   }
-}
 
-/* Wrapper untuk preview + overlay teks (namespaced) */
-.pengaduan-crud-container .preview-wrap {
-  position: relative;
-  display: inline-block;
-  margin-top: 8px;
-}
-
-/* Overlay note di pojok kiri bawah gambar (namespaced) */
-.pengaduan-crud-container .image-hint {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 6px;
-  pointer-events: none;
-}
-
-/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
-.pengaduan-crud-container .image-hint-inline {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #666;
-}
-
-@media (max-width: 1024px) {
   .pengaduan-crud-container .modal-content {
-    max-width: 95% !important;
-    height: 90vh !important;
-    padding: 28px !important;
+    width: 95%;
+    height: 90vh;
+    padding: 24px;
+  }
+
+  .pengaduan-crud-container .status-badge {
+    min-width: 85px;
+    padding: 5px 9px;
+    font-size: 11px;
   }
 }
 
-/* Smartphone (≤600px) — namespaced mobile tweaks */
+
+/* =========================================================
+   📱 SMARTPHONE ≤ 600px
+   ========================================================= */
+
 @media (max-width: 600px) {
   .pengaduan-crud-container .modal-overlay {
     padding: 0;
   }
 
   .pengaduan-crud-container .modal-content {
-    margin: 0 !important;
     width: 100% !important;
-    height: 80vh !important;
     max-width: none !important;
-    border-radius: 0 !important;
+    height: 80vh !important;
+    margin: 0 !important;
     padding: 16px !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
     text-align: justify;
   }
 
   .pengaduan-crud-container .modal-content h3 {
-    font-size: 18px;
     margin-bottom: 10px;
+    font-size: 18px;
   }
 
   .pengaduan-crud-container .form-grid {
@@ -625,10 +742,10 @@
   .pengaduan-crud-container .form-actions {
     position: sticky;
     bottom: 0;
-    background: #fff;
+    gap: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
-    gap: 10px;
+    background: #fff;
   }
 
   .pengaduan-crud-container .btn-add {
@@ -637,8 +754,8 @@
 
   .pengaduan-crud-container .pengaduan-table th,
   .pengaduan-crud-container .pengaduan-table td {
-    font-size: 12px;
     padding: 8px;
+    font-size: 12px;
   }
 
   .pengaduan-crud-container .date-inputs {
@@ -648,4 +765,17 @@
   .pengaduan-crud-container .date-inputs input {
     width: 46%;
   }
+
+  .pengaduan-crud-container .status-badge {
+    min-width: auto;
+    padding: 5px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .pengaduan-crud-container .status-badge svg {
+    width: 12px;
+    height: 12px;
+  }
 }
+

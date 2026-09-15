@@ -7,6 +7,9 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  CheckCircle,
+  XCircle,
+  Clock3,
 } from "lucide-react";
 import JoditEditor from "jodit-react";
 import Swal from "sweetalert2";
@@ -23,7 +26,17 @@ const NewsCRUD = () => {
 
   // Data user login
   const [currentUser, setCurrentUser] = useState(null);
-  const isEditor = currentUser?.role === "editor";
+  const userRole = String(
+    currentUser?.role || currentUser?.level || currentUser?.user_role || "",
+  )
+    .trim()
+    .toLowerCase();
+
+  const isEditor = userRole === "editor";
+  const isSuperadmin = userRole === "superadmin";
+  const isAdmin = userRole === "admin";
+
+  const canValidate = ["admin", "superadmin"].includes(userRole);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,6 +46,7 @@ const NewsCRUD = () => {
   // Filter
   const [searchTerm, setSearchTerm] = useState("");
   const [satkerFilter, setSatkerFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
 
   const [formData, setFormData] = useState({
@@ -72,13 +86,27 @@ const NewsCRUD = () => {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Gagal fetch profil user");
-        const data = await res.json();
+        const responseData = await res.json();
+        const data = responseData?.data || responseData;
+
+        console.log("=== DATA USER LOGIN ===");
+        console.log("Response profil:", responseData);
+        console.log("User:", data);
+        console.log("Role:", data?.role);
+
         setCurrentUser(data);
 
-        // Jika role editor, langsung kunci satkerFilter & formData id_satker ke satker miliknya
-        if (data.role === "editor") {
+        // Jika role editor, kunci satker
+        if (
+          String(data?.role || "")
+            .trim()
+            .toLowerCase() === "editor"
+        ) {
           setSatkerFilter(data.id_satker);
-          setFormData((prev) => ({ ...prev, id_satker: data.id_satker }));
+          setFormData((prev) => ({
+            ...prev,
+            id_satker: data.id_satker,
+          }));
         }
       } catch (err) {
         console.error("Error fetching profil user:", err);
@@ -116,39 +144,61 @@ const NewsCRUD = () => {
     id_satker = satkerFilter,
   ) => {
     try {
-      let url = `${API_URL}/berita?page=${page}&limit=${limit}`;
-
-      // Jika role editor atau admin, paksa filter ke id_satker miliknya
-      if (currentUser?.role === "editor" || currentUser?.role === "admin") {
+      let url = `${API_URL}/berita/admin/list?page=${page}&limit=${limit}`;
+      // EDITOR → hanya berita satkernya sendiri
+      if (isEditor && currentUser?.id_satker) {
         url += `&id_satker=${currentUser.id_satker}`;
-      } else if (id_satker) {
-        // Superadmin: filter hanya jika dipilih manual
+      }
+
+      // ADMIN & SUPERADMIN → semua satker
+      else if ((isAdmin || isSuperadmin) && id_satker) {
         url += `&id_satker=${id_satker}`;
       }
 
+      // Filter status
+      if (statusFilter) {
+        url += `&status=${statusFilter}`;
+      }
+
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${tokenUser}` },
+        headers: {
+          Authorization: `Bearer ${tokenUser}`,
+        },
         credentials: "include",
       });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Gagal mengambil data berita");
+      }
+
       const data = await res.json();
 
+      console.log("=================================");
+      console.log("DATA BERITA DARI API");
+      console.log("URL:", url);
+      console.log("RESPONSE:", data);
+      console.log("DATA BERITA:", data.data);
+      console.log("DATA BERITA PERTAMA:", data.data?.[0]);
+      console.log("=================================");
+
       const allNews = Array.isArray(data.data) ? data.data : [];
+
       setNewsList(allNews);
       setFilteredNews(allNews);
       setTotalData(data.total || 0);
-      setCurrentPage(data.page || 1);
+      setCurrentPage(data.page || page);
     } catch (err) {
       console.error("Error fetching berita:", err);
     }
   };
 
   useEffect(() => {
-    // Tunggu currentUser selesai di-fetch sebelum fetch berita
-    // agar satkerFilter sudah ter-set untuk editor
     if (currentUser === null && localStorage.getItem("id")) return;
+
     fetchNews(1, itemsPerPage, satkerFilter);
     setCurrentPage(1);
-  }, [itemsPerPage, satkerFilter, currentUser]);
+  }, [itemsPerPage, satkerFilter, statusFilter, currentUser]);
 
   /* ============================================================
      🔍 Filter lokal: search teks & tanggal
@@ -162,6 +212,7 @@ const NewsCRUD = () => {
         const title = item.title?.toLowerCase() || "";
         const category = item.category?.toLowerCase() || "";
         const editor = item.editor?.toLowerCase() || "";
+      
         return (
           title.includes(keyword) ||
           category.includes(keyword) ||
@@ -209,8 +260,8 @@ const NewsCRUD = () => {
   };
 
   /* ============================================================
-     ✅ Validasi
-  ============================================================ */
+   ✅ VALIDASI FORM
+============================================================ */
   const validate = () => {
     const newErrors = {
       title: "",
@@ -221,45 +272,92 @@ const NewsCRUD = () => {
       image: "",
     };
 
-    if (!formData.title || !formData.title.trim())
+    // =========================
+    // JUDUL
+    // =========================
+    if (!formData.title || !formData.title.trim()) {
       newErrors.title = "Judul wajib diisi.";
-    if (!formData.date) newErrors.date = "Tanggal wajib diisi.";
-    if (!formData.id_satker)
-      newErrors.id_satker = "Satuan kerja wajib dipilih.";
-    if (!formData.editor || !formData.editor.trim())
-      newErrors.editor = "Editor wajib diisi.";
+    }
 
+    // =========================
+    // TANGGAL
+    // =========================
+    if (!formData.date) {
+      newErrors.date = "Tanggal wajib diisi.";
+    }
+
+    // =========================
+    // SATUAN KERJA
+    // =========================
+    if (!formData.id_satker) {
+      newErrors.id_satker = "Satuan kerja wajib dipilih.";
+    }
+
+    // =========================
+    // EDITOR
+    // =========================
+    if (!formData.editor || !formData.editor.trim()) {
+      newErrors.editor = "Editor wajib diisi.";
+    }
+
+    // =========================
+    // ISI BERITA
+    // =========================
     const textContent = (formData.content || "")
       .replace(/<[^>]*>/g, "")
-      .replace(/&nbsp;/g, " ")
+      .replace(/&nbsp;/gi, " ")
       .trim();
-    if (!textContent) newErrors.content = "Isi berita wajib diisi.";
 
+    if (!textContent) {
+      newErrors.content = "Isi berita wajib diisi.";
+    }
+
+    // =========================
+    // VALIDASI GAMBAR
+    // =========================
     const isCreate = !formData.id;
     const hasExistingImage = !!imagePreview;
     const hasNewFile = formData.image instanceof File;
-    if (
-      (isCreate && !hasNewFile) ||
-      (!isCreate && !hasExistingImage && !hasNewFile)
-    ) {
-      newErrors.image = "Gambar wajib diunggah (JPG/PNG/WebP maksimal 2MB).";
+
+    // Saat tambah → gambar wajib
+    if (isCreate && !hasNewFile) {
+      newErrors.image =
+        "Gambar wajib diunggah (JPG/JPEG/PNG/WebP, maksimal 1 MB).";
     }
 
+    // Saat edit → gambar baru tidak wajib
+    // selama gambar lama masih tersedia
+    if (!isCreate && !hasExistingImage && !hasNewFile) {
+      newErrors.image =
+        "Gambar wajib tersedia. Upload gambar baru jika gambar lama tidak ada.";
+    }
+
+    // =========================
+    // VALIDASI FILE BARU
+    // =========================
     if (hasNewFile) {
-      const f = formData.image;
-      const isAllowedType =
-        f.type === "image/jpeg" ||
-        f.type === "image/png" ||
-        f.type === "image/webp" ||
-        /\.(jpe?g|png|webp)$/i.test(f.name);
-      const isMax2Mb = f.size <= 2 * 1024 * 1024;
-      if (!isAllowedType || !isMax2Mb) {
-        newErrors.image = "Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.";
+      const file = formData.image;
+
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+
+      const allowedExtensions = /\.(jpe?g|png|webp)$/i;
+
+      const isValidMime = allowedMimeTypes.includes(file.type);
+      const isValidExtension = allowedExtensions.test(file.name);
+
+      const maxSize = 1 * 1024 * 1024;
+      const isValidSize = file.size <= maxSize;
+
+      if (!isValidMime || !isValidExtension) {
+        newErrors.image = "Format gambar harus JPG/JPEG, PNG, atau WebP.";
+      } else if (!isValidSize) {
+        newErrors.image = "Ukuran gambar maksimal 1 MB.";
       }
     }
 
     setErrors(newErrors);
-    return Object.values(newErrors).every((msg) => msg === "");
+
+    return Object.values(newErrors).every((message) => message === "");
   };
 
   /* ============================================================
@@ -286,6 +384,7 @@ const NewsCRUD = () => {
       );
       body.append("editor", formData.editor || "");
       body.append("content", formData.content || "");
+
       if (formData.image instanceof File) body.append("image", formData.image);
 
       const res = await fetch(url, {
@@ -296,8 +395,20 @@ const NewsCRUD = () => {
       });
 
       if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`HTTP ${res.status} – ${errText}`);
+        let errorMessage = "Gagal menyimpan berita.";
+
+        try {
+          const errorData = await res.json();
+
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+          const errorText = await res.text();
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
       await fetchNews(currentPage, itemsPerPage, satkerFilter);
@@ -311,12 +422,12 @@ const NewsCRUD = () => {
       });
     } catch (err) {
       console.error("❌ Error saat submit berita:", err);
+
       Swal.fire({
         icon: "error",
-        title: "Gagal menyimpan Berita, Server Error.",
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true,
+        title: "Gagal Menyimpan Berita",
+        text: err.message || "Terjadi kesalahan pada server.",
+        confirmButtonText: "OK",
       });
     } finally {
       setLoading(false);
@@ -367,6 +478,149 @@ const NewsCRUD = () => {
     setModalMode("preview");
   };
 
+  const handleValidate = async (news) => {
+      if (String(news?.status || "").toLowerCase() !== "pending") {
+        Swal.fire({
+          icon: "info",
+          title: "Tidak dapat divalidasi",
+          text: "Hanya berita dengan status pending yang dapat diubah statusnya.",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+    const currentStatus = String(news.status || "").toLowerCase();
+
+    const result = await Swal.fire({
+      title: "Ubah Status Berita",
+      html: `
+      <div style="text-align:left">
+        <p><strong>${news.title}</strong></p>
+        <p>Status saat ini:
+          <strong>${currentStatus || "-"}</strong>
+        </p>
+        <p>Pilih tindakan untuk berita ini.</p>
+      </div>
+    `,
+      icon: "question",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "✓ Setujui",
+      denyButtonText: "✕ Tolak",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#198754",
+      denyButtonColor: "#dc3545",
+    });
+
+    if (result.isConfirmed) {
+      await updateNewsStatus(news.id, "approved");
+      return;
+    }
+
+    if (result.isDenied) {
+      const rejectResult = await Swal.fire({
+        title: "Tolak Berita",
+        input: "textarea",
+        inputLabel: "Alasan penolakan",
+        inputPlaceholder: "Masukkan alasan penolakan...",
+        inputAttributes: {
+          "aria-label": "Alasan penolakan",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Tolak Berita",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#dc3545",
+        inputValidator: (value) => {
+          if (!value || !value.trim()) {
+            return "Alasan penolakan wajib diisi.";
+          }
+
+          if (value.trim().length < 5) {
+            return "Alasan penolakan minimal 5 karakter.";
+          }
+
+          return null;
+        },
+      });
+
+      if (rejectResult.isConfirmed) {
+        await updateNewsStatus(news.id, "rejected", rejectResult.value.trim());
+      }
+    }
+  };
+
+  const updateNewsStatus = async (id, status, rejectionReason = "") => {
+    try {
+      setLoading(true);
+
+      const isApprove = status === "approved";
+
+      const endpoint = isApprove
+        ? `${API_URL}/berita/validation/${id}/approve`
+        : `${API_URL}/berita/validation/${id}/reject`;
+
+      const options = {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${tokenUser}`,
+        },
+        credentials: "include",
+      };
+
+      if (!isApprove) {
+        options.headers["Content-Type"] = "application/json";
+
+        options.body = JSON.stringify({
+          rejection_reason: rejectionReason.trim(),
+        });
+      }
+
+      const res = await fetch(endpoint, options);
+
+      const text = await res.text();
+
+      let data = {};
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {
+          message: text,
+        };
+      }
+
+      if (!res.ok) {
+        throw new Error(
+          data.message ||
+            data.error ||
+            `Gagal memperbarui status berita. HTTP ${res.status}`,
+        );
+      }
+
+      await fetchNews(currentPage, itemsPerPage, satkerFilter);
+
+      await Swal.fire({
+        icon: "success",
+        title: isApprove ? "Berita Disetujui" : "Berita Ditolak",
+        text: isApprove
+          ? "Berita berhasil disetujui."
+          : "Berita berhasil ditolak.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("❌ Error update status:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: error.message || "Gagal memperbarui status berita.",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   /* ============================================================
      🗑️ Hapus berita
   ============================================================ */
@@ -415,32 +669,73 @@ const NewsCRUD = () => {
   };
 
   /* ============================================================
-     🖼️ OnChange Gambar
-  ============================================================ */
+   🖼️ VALIDASI & PREVIEW GAMBAR
+============================================================ */
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
-    const isAllowedType =
-      file.type === "image/jpeg" ||
-      file.type === "image/png" ||
-      file.type === "image/webp" ||
-      /\.(jpe?g|png|webp)$/i.test(file.name);
-    const isMax2Mb = file.size <= 2 * 1024 * 1024;
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
 
-    if (!isAllowedType || !isMax2Mb) {
-      setErrors({
-        ...errors,
-        image: "Format harus JPG/PNG/WebP dan ukuran maksimal 2MB.",
-      });
-      setFormData({ ...formData, image: "" });
-      setImagePreview(null);
+    const allowedExtensions = /\.(jpe?g|png|webp)$/i;
+
+    const isValidMime = allowedMimeTypes.includes(file.type);
+    const isValidExtension = allowedExtensions.test(file.name);
+
+    const maxSize = 1 * 1024 * 1024;
+    const isValidSize = file.size <= maxSize;
+
+    // =========================
+    // FORMAT SALAH
+    // =========================
+    if (!isValidMime || !isValidExtension) {
+      setErrors((prev) => ({
+        ...prev,
+        image: "Format gambar harus JPG/JPEG, PNG, atau WebP.",
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+
+      e.target.value = "";
       return;
     }
 
-    setFormData({ ...formData, image: file });
+    // =========================
+    // UKURAN TERLALU BESAR
+    // =========================
+    if (!isValidSize) {
+      setErrors((prev) => ({
+        ...prev,
+        image: "Ukuran gambar maksimal 1 MB.",
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+
+      e.target.value = "";
+      return;
+    }
+
+    // =========================
+    // FILE VALID
+    // =========================
+    setFormData((prev) => ({
+      ...prev,
+      image: file,
+    }));
+
     setImagePreview(URL.createObjectURL(file));
-    if (errors.image) setErrors({ ...errors, image: "" });
+
+    setErrors((prev) => ({
+      ...prev,
+      image: "",
+    }));
   };
 
   /* ============================================================
@@ -492,20 +787,25 @@ const NewsCRUD = () => {
       {/* === FILTER BAR === */}
       <div className="filter-bar">
         <div className="filter-group">
+          {/* SEARCH */}
           <div className="search-box">
             <Search size={16} />
             <input
               type="text"
-              placeholder="Cari judul, kategori, atau editor..."
+              placeholder="Cari judul, kategori, atau deskripsi..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
             />
           </div>
 
           <div className="filter-inline">
-            {/* Filter satker: editor terkunci, selain itu bebas pilih */}
+            {/* SATUAN KERJA */}
             <div className="filter-item">
               <label>Satuan Kerja</label>
+
               {isEditor ? (
                 <input
                   type="text"
@@ -516,8 +816,12 @@ const NewsCRUD = () => {
               ) : (
                 <select
                   value={satkerFilter}
-                  onChange={(e) => setSatkerFilter(e.target.value)}>
+                  onChange={(e) => {
+                    setSatkerFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}>
                   <option value="">Semua</option>
+
                   {satkerList.map((s) => (
                     <option key={s.id_satker} value={s.id_satker}>
                       {s.name}
@@ -527,8 +831,10 @@ const NewsCRUD = () => {
               )}
             </div>
 
+            {/* TAMPILKAN */}
             <div className="filter-item">
-              <label>Per Halaman</label>
+              <label>Tampilkan</label>
+
               <select
                 value={itemsPerPage}
                 onChange={(e) => {
@@ -543,22 +849,49 @@ const NewsCRUD = () => {
               </select>
             </div>
 
+            {/* STATUS */}
+            <div className="filter-item">
+              <label>Status</label>
+
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}>
+                <option value="">Semua Status</option>
+                <option value="pending">Validasi</option>
+                <option value="approved">Disetujui</option>
+                <option value="rejected">Ditolak</option>
+              </select>
+            </div>
+
+            {/* PERIODE */}
             <div className="filter-item date-range">
               <label>Periode</label>
+
               <div className="date-inputs">
                 <input
                   type="date"
                   value={dateRange.from}
                   onChange={(e) =>
-                    setDateRange({ ...dateRange, from: e.target.value })
+                    setDateRange({
+                      ...dateRange,
+                      from: e.target.value,
+                    })
                   }
                 />
+
                 <span>–</span>
+
                 <input
                   type="date"
                   value={dateRange.to}
                   onChange={(e) =>
-                    setDateRange({ ...dateRange, to: e.target.value })
+                    setDateRange({
+                      ...dateRange,
+                      to: e.target.value,
+                    })
                   }
                 />
               </div>
@@ -574,9 +907,10 @@ const NewsCRUD = () => {
             <tr>
               <th>No</th>
               <th>Judul</th>
-              <th>Kategori</th>
+              <th>Satuan Kerja</th>
               <th>Tanggal</th>
               <th>Editor</th>
+              <th>Status</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -601,21 +935,88 @@ const NewsCRUD = () => {
                       : "-"}
                   </td>
                   <td>{news.editor}</td>
+                  <td className="status-cell">
+                    <div className="status-wrapper">
+                      {/* PENDING */}
+                      {String(news.status).toLowerCase() === "pending" ? (
+                        canValidate ? (
+                          <button
+                            type="button"
+                            className="status-badge status-pending status-clickable"
+                            onClick={() => handleValidate(news)}
+                            title="Validasi berita"
+                            disabled={loading}>
+                            <CheckCircle size={15} />
+                            <span>Validasi</span>
+                          </button>
+                        ) : (
+                          <span className="status-badge status-pending">
+                            <Clock3 size={15} />
+                            <span>Menunggu</span>
+                          </span>
+                        )
+                      ) : null}
+
+                      {/* APPROVED */}
+                      {/* APPROVED */}
+                      {String(news.status).toLowerCase() === "approved" && (
+                        <span className="status-badge status-approved">
+                          <CheckCircle size={15} />
+                          <span>Disetujui</span>
+                        </span>
+                      )}
+
+                      {/* REJECTED */}
+                      {String(news.status).toLowerCase() === "rejected" && (
+                        <button
+                          type="button"
+                          className="status-badge status-rejected status-rejected-clickable"
+                          onClick={() =>
+                            Swal.fire({
+                              icon: "error",
+                              title: "Alasan Penolakan",
+                              text:
+                                news?.rejection_reason ||
+                                "Tidak ada alasan penolakan.",
+                              confirmButtonText: "Tutup",
+                              confirmButtonColor: "#6c757d",
+                            })
+                          }
+                          title="Klik untuk melihat alasan penolakan">
+                          <XCircle size={15} />
+                          <span>Ditolak</span>
+                        </button>
+                      )}
+
+                      {/* STATUS KOSONG */}
+                      {!news.status && (
+                        <span className="status-badge status-empty">-</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="action-cell">
                     <div className="action-buttons">
+                      {/* Preview */}
                       <button
                         className="btn-view"
-                        onClick={() => handlePreview(news)}>
+                        onClick={() => handlePreview(news)}
+                        title="Lihat berita">
                         <Eye size={16} />
                       </button>
+
+                      {/* Edit */}
                       <button
                         className="btn-edit"
-                        onClick={() => handleEdit(news)}>
+                        onClick={() => handleEdit(news)}
+                        title="Edit berita">
                         <Edit size={16} />
                       </button>
+
+                      {/* Delete */}
                       <button
                         className="btn-delete"
-                        onClick={() => handleDelete(news.id)}>
+                        onClick={() => handleDelete(news.id)}
+                        title="Hapus berita">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -624,7 +1025,7 @@ const NewsCRUD = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="empty-text">
+                <td colSpan={7} className="empty-text">
                   Tidak ada berita ditemukan.
                 </td>
               </tr>
@@ -810,13 +1211,13 @@ const NewsCRUD = () => {
                             className="preview-img"
                           />
                           <div className="image-hint">
-                            Format JPG/PNG/WebP, maksimal 2MB
+                            Format JPG/JPEG/PNG/WebP, maksimal 1 MB
                           </div>
                         </div>
                       )}
                       {!imagePreview && (
                         <div className="image-hint-inline">
-                          Format JPG/PNG/WebP, maksimal 2MB
+                          Format JPG/JPEG/PNG/WebP, maksimal 1 MB
                         </div>
                       )}
                       {errors.image && (

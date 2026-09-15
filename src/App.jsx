@@ -18,6 +18,7 @@ import Pengaduan from './pages/Pengaduan';
 import Infografis from './pages/Infografis';
 import SatuanKerja from './pages/SatuanKerja';
 import Kua from './pages/Kua';
+import Sekolah from "./pages/Sekolah";
 import ProfilKetua from './pages/ProfilKetua';
 import ProfilAdmin from './pages/ProfilAdmin';
 import ProfilPegawai from "./pages/ProfilPegawai";
@@ -137,6 +138,14 @@ function AppContent() {
         }
       />
       <Route
+        path="/login/madrasah"
+        element={
+          <PrivateRoute>
+            <Sekolah />
+          </PrivateRoute>
+        }
+      />
+      <Route
         path="/login/profil-ketua"
         element={
           <PrivateRoute>
@@ -156,7 +165,7 @@ function AppContent() {
         path="/login/pegawai"
         element={
           <PrivateRoute>
-            <ProfilPegawai/>
+            <ProfilPegawai />
           </PrivateRoute>
         }
       />

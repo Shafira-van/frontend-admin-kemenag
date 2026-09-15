@@ -87,7 +87,9 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
+  row-gap: 14px;
+    column-gap: 20px;
+    padding-top: 14px;
 }
 
 .informasi-crud-container .filter-item {
@@ -178,6 +180,18 @@
   max-height: 13rem;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.informasi-crud-container .empty-text{
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 45px 20px !important;
+      color: #888 !important;
+      font-size: 14px;
+      font-weight: 500;
+      background: #fafafa;
+      border-bottom: none !important;
+
 }
 
 /* ==========================
@@ -411,6 +425,208 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ============================================================
+   🔐 STATUS VALIDASI INFORMASI
+   ============================================================ */
+
+/* Wrapper status */
+.informasi-crud-container .status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 100px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   🟡 MENUNGGU
+   ============================================================ */
+
+.informasi-crud-container .status-pending {
+  color: #856404;
+  background: #fff8e1;
+  border-color: #ffe082;
+}
+
+/* Pending khusus Admin & Superadmin
+   Bisa diklik untuk membuka validasi */
+.informasi-crud-container .status-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.informasi-crud-container .status-clickable:hover {
+  background: #ffecb3;
+  border-color: #ffc107;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(133, 100, 4, 0.12);
+}
+
+.informasi-crud-container .status-clickable:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   🟢 DISETUJUI
+   ============================================================ */
+
+.informasi-crud-container .status-approved {
+  color: #146c43;
+  background: #e8f5e9;
+  border-color: #a5d6a7;
+}
+
+/* ============================================================
+   🔴 DITOLAK
+   ============================================================ */
+
+.informasi-crud-container .status-rejected {
+  color: #b02a37;
+  background: #fdecec;
+  border-color: #f1aeb5;
+}
+
+
+/* ============================================================
+   📝 ALASAN PENOLAKAN
+   ============================================================ */
+
+.informasi-crud-container .rejection-reason-btn {
+  display: block;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #d32f2f;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.informasi-crud-container .rejection-reason-btn:hover {
+  color: #b71c1c;
+}
+
+
+/* ============================================================
+   📊 KOLOM STATUS TABLE
+   ============================================================ */
+
+.informasi-crud-container .informasi-table th:nth-child(6),
+.informasi-crud-container .informasi-table td:nth-child(6) {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   📱 STATUS RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .informasi-crud-container .status-badge {
+    min-width: 85px;
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+
+  .informasi-crud-container .rejection-reason-btn {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .informasi-crud-container .status-badge {
+    min-width: auto;
+    padding: 5px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .informasi-crud-container .status-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* ================================
+   STATUS BADGE
+================================ */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 100px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  background: transparent;
+  cursor: default;
+}
+
+/* MENUNGGU */
+.status-pending {
+  color: #b7791f;
+  background: #fff8e1;
+  border-color: #f6d365;
+}
+
+/* MENUNGGU - BISA DIKLIK ADMIN/SUPERADMIN */
+.status-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-clickable:hover {
+  background: #fff3cd;
+  border-color: #e5b93d;
+  transform: translateY(-1px);
+}
+
+/* DISETUJUI */
+.status-approved {
+  color: #218739;
+  background: #eaf7ed;
+  border-color: #8fd19e;
+}
+
+/* DITOLAK */
+.status-rejected {
+  color: #c62828;
+  background: #fdecec;
+  border-color: #f1a1a1;
+}
+
+/* DITOLAK - BISA DIKLIK UNTUK MELIHAT ALASAN */
+.status-rejected-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.status-rejected-clickable:hover {
+  background: #fce0e0;
+  border-color: #dc7f7f;
+  transform: translateY(-1px);
+}
+
+.status-rejected-clickable:active {
+  transform: translateY(0);
 }
 
 /* ==========================

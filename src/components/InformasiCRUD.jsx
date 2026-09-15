@@ -6,21 +6,50 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  CheckCircle,
+  Clock3,
+  XCircle,
 } from "lucide-react";
+import Swal from "sweetalert2";
 
 import "../styles/InformasiCRUD.css";
 import { API_URL } from "../config";
 
 const InformasiCRUD = () => {
+  // ============================================================
+  // DATA
+  // ============================================================
   const [informasiList, setInformasiList] = useState([]);
   const [filteredInfo, setFilteredInfo] = useState([]);
 
+  // ============================================================
+  // MODAL
+  // ============================================================
   const [modalMode, setModalMode] = useState(null);
 
+  // ============================================================
+  // USER / ROLE
+  // ============================================================
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userRole, setUserRole] = useState("");
+  const [satkerList, setSatkerList] = useState([]);
+
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("id");
+
+  const isAdmin = userRole === "admin";
+  const isSuperadmin = userRole === "superadmin";
+  const isEditor = userRole === "editor";
+
+  const canValidate = ["admin", "superadmin"].includes(userRole);
+
+  // ============================================================
   // FILTER
+  // ============================================================
   const [searchTerm, setSearchTerm] = useState("");
   const [infoTypeFilter, setInfoTypeFilter] = useState("");
-
+  const [statusFilter, setStatusFilter] = useState("");
+const [satkerFilter, setSatkerFilter] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [dateRange, setDateRange] = useState({
@@ -28,120 +57,541 @@ const InformasiCRUD = () => {
     to: "",
   });
 
+  // ============================================================
   // PAGINATION
+  // ============================================================
   const [currentPage, setCurrentPage] = useState(1);
 
+  // ============================================================
   // FORM
+  // ============================================================
   const [formData, setFormData] = useState({
     id: null,
     title: "",
     date: "",
     info_types: "",
+    id_satker: "",
     file: "",
   });
 
   const [filePreview, setFilePreview] = useState(null);
 
+  // ============================================================
   // ERRORS
+  // ============================================================
   const [errors, setErrors] = useState({
     title: "",
     date: "",
     info_types: "",
+    id_satker: "",
     file: "",
   });
 
-  /* ============================================================
-     FETCH DATA
-  ============================================================ */
+  // ============================================================
+  // HELPER TOKEN JWT
+  // ============================================================
+  const getJwtPayload = () => {
+    if (!token) return null;
+
+    try {
+      const parts = token.split(".");
+
+      if (parts.length !== 3) {
+        throw new Error("Token JWT tidak valid");
+      }
+
+      const base64Url = parts[1];
+
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(""),
+      );
+
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      console.error("❌ Gagal membaca JWT:", error);
+      return null;
+    }
+  };
+
+  // ============================================================
+  // FETCH USER / ROLE
+  // ============================================================
   useEffect(() => {
-    const fetchInformasi = async () => {
+    if (!token) return;
+
+    const loadUser = async () => {
       try {
-        const res = await fetch(`${API_URL}/informasi`, {
-          credentials: "include",
-        });
+        const payload = getJwtPayload();
 
-        const data = await res.json();
+        console.log("===== JWT USER =====");
+        console.log("JWT Payload:", payload);
 
-        const list = Array.isArray(data.data) ? data.data : data;
+        let user = payload || {};
 
-        setInformasiList(list);
-        setFilteredInfo(list);
-      } catch (err) {
-        console.error("Error fetching informasi:", err);
+        /*
+         * Coba ambil profil terbaru dari backend.
+         * Ini penting agar id_satker editor berasal dari database,
+         * bukan hanya bergantung pada isi JWT.
+         */
+        if (userId) {
+          try {
+            const profileRes = await fetch(`${API_URL}/profilAdmin/${userId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              credentials: "include",
+            });
+
+            if (profileRes.ok) {
+              const profileData = await profileRes.json();
+
+              console.log("📥 Response Profil Admin:", profileData);
+
+              const profile =
+                profileData?.data || profileData?.user || profileData;
+
+              if (profile && typeof profile === "object") {
+                user = {
+                  ...payload,
+                  ...profile,
+                };
+              }
+            }
+          } catch (profileError) {
+            console.warn(
+              "⚠️ Profil admin tidak berhasil diambil:",
+              profileError,
+            );
+          }
+        }
+
+        const role = String(
+          user?.role || user?.level || user?.user_role || payload?.role || "",
+        )
+          .trim()
+          .toLowerCase();
+
+        setCurrentUser(user);
+        setUserRole(role);
+
+        console.log("👤 Current User:", user);
+        console.log("🔐 Role:", role);
+        console.log("🏢 ID Satker:", user?.id_satker);
+      } catch (error) {
+        console.error("❌ Gagal membaca user:", error);
+
+        setCurrentUser(null);
+        setUserRole("");
       }
     };
 
-    fetchInformasi();
-  }, []);
+    loadUser();
+  }, [token, userId]);
 
-  /* ============================================================
-     FILTER
-  ============================================================ */
+  // ============================================================
+  // FETCH SATKER
+  // ============================================================
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchSatker = async () => {
+      try {
+        console.log(
+          "🏢 Mengambil data Satker dari:",
+          `${API_URL}/satuankerja/satker/all`,
+        );
+
+        const response = await fetch(`${API_URL}/satuankerja/satker/all`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+          credentials: "include",
+        });
+
+        const responseText = await response.text();
+
+        console.log("📥 Response Satker:", responseText);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} - ${responseText}`);
+        }
+
+        let data;
+
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          throw new Error("Response Satker bukan JSON yang valid.");
+        }
+
+        /*
+         * Mendukung beberapa bentuk response:
+         *
+         * [
+         *   {...}
+         * ]
+         *
+         * {
+         *   data: [...]
+         * }
+         *
+         * {
+         *   satker: [...]
+         * }
+         */
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.satker)
+              ? data.satker
+              : Array.isArray(data?.rows)
+                ? data.rows
+                : [];
+
+        console.log("🏢 Daftar Satker:", list);
+        console.log("🏢 Jumlah Satker:", list.length);
+
+        setSatkerList(list);
+
+        if (list.length === 0) {
+          console.warn("⚠️ Data Satker kosong.");
+        }
+      } catch (error) {
+        console.error("❌ Gagal mengambil data Satker:", error);
+
+        setSatkerList([]);
+
+        Swal.fire({
+          icon: "error",
+          title: "Gagal Memuat Satker",
+          text: "Data satuan kerja tidak dapat diambil dari server.",
+          confirmButtonText: "OK",
+        });
+      }
+    };
+
+    fetchSatker();
+  }, [token]);
+
+  // ============================================================
+  // CARI NAMA SATKER
+  // ============================================================
+  const getSatkerName = (idSatker) => {
+    if (!idSatker) return "-";
+
+    const satker = satkerList.find(
+      (item) =>
+        String(item?.id_satker ?? item?.id ?? item?.kode) === String(idSatker),
+    );
+
+    if (!satker) {
+      return idSatker;
+    }
+
+    return (
+      satker.nama ||
+      satker.name ||
+      satker.nama_satker ||
+      satker.nama_satuan_kerja ||
+      satker.satuan_kerja ||
+      satker.nama_unit ||
+      satker.id_satker ||
+      "-"
+    );
+  };
+
+  // ============================================================
+  // FETCH INFORMASI
+  // ============================================================
+  const fetchInformasi = async () => {
+    try {
+      const headers = {};
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      // Editor: ambil hanya Berkala dari satker sendiri
+      let url = `${API_URL}/informasi?limit=0`;
+
+      if (isEditor && currentUser?.id_satker) {
+        url += `&info_types=Berkala&id_satker=${currentUser.id_satker}`;
+      }
+
+      const res = await fetch(url, {
+        method: "GET",
+        headers,
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`HTTP ${res.status} - ${errorText}`);
+      }
+
+      const data = await res.json();
+
+      console.log("📥 Response API Informasi:", data);
+
+      const list = Array.isArray(data?.data)
+        ? data.data
+        : Array.isArray(data)
+          ? data
+          : [];
+
+      console.log("📋 Total data dari API:", list.length);
+
+      let visibleList = list;
+
+      // ========================================================
+      // EDITOR
+      // HANYA BERKALA + SATKER SENDIRI
+      // ========================================================
+      if (isEditor) {
+        visibleList = list.filter(
+          (item) =>
+            String(item.info_types || "").toLowerCase() === "berkala" &&
+            String(item.id_satker) === String(currentUser?.id_satker),
+        );
+
+        console.log("🔐 Editor ID Satker:", currentUser?.id_satker);
+        console.log("📋 Data Editor:", visibleList.length);
+      }
+
+      setInformasiList(visibleList);
+    } catch (err) {
+      console.error("❌ Error fetching informasi:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Memuat Informasi",
+        text: "Data informasi tidak dapat dimuat.",
+      });
+    }
+  };
+  // ============================================================
+  // LOAD INFORMASI SETELAH USER TERSEDIA
+  // ============================================================
+  useEffect(() => {
+    if (!token) return;
+
+    if (!userRole || !currentUser) return;
+
+    fetchInformasi();
+  }, [token, userRole, currentUser?.id_satker]);
+
+  // ============================================================
+  // FILTER INFORMASI
+  // ============================================================
   useEffect(() => {
     let result = [...informasiList];
 
+    // ========================================================
     // SEARCH
+    // ========================================================
+
     if (searchTerm.trim() !== "") {
-      const keyword = searchTerm.toLowerCase();
+      const keyword = searchTerm.trim().toLowerCase();
 
       result = result.filter((item) => {
-        const title = item.title?.toLowerCase() || "";
+        const title = String(item.title || "").toLowerCase();
+        const type = String(item.info_types || "").toLowerCase();
+        const satker = String(
+          item.nama_satker || item.satker_nama || item.id_satker || "",
+        ).toLowerCase();
 
-        const type = item.info_types?.toLowerCase() || "";
-
-        return title.includes(keyword) || type.includes(keyword);
+        return (
+          title.includes(keyword) ||
+          type.includes(keyword) ||
+          satker.includes(keyword)
+        );
       });
     }
 
+    // ========================================================
     // FILTER JENIS INFORMASI
+    // ========================================================
+
     if (infoTypeFilter) {
       result = result.filter(
         (item) =>
-          (item.info_types || "").toLowerCase() ===
-          infoTypeFilter.toLowerCase(),
+          String(item.info_types || "").toLowerCase() ===
+          String(infoTypeFilter).toLowerCase(),
       );
     }
 
-    // DATE RANGE
-    if (dateRange.from && dateRange.to) {
-      const from = new Date(dateRange.from);
+    // ========================================================
+    // FILTER STATUS
+    // ========================================================
 
-      const to = new Date(dateRange.to);
+    if (statusFilter) {
+      result = result.filter(
+        (item) =>
+          String(item.status || "pending").toLowerCase() ===
+          String(statusFilter).toLowerCase(),
+      );
+    }
+
+    // ========================================================
+// FILTER SATUAN KERJA
+// KHUSUS ADMIN & SUPERADMIN
+// ========================================================
+if (!isEditor && satkerFilter) {
+  result = result.filter(
+    (item) =>
+      String(item.id_satker || "") === String(satkerFilter)
+  );
+}
+    // ========================================================
+    // FILTER TANGGAL
+    // ========================================================
+
+    if (dateRange.from) {
+      const from = new Date(`${dateRange.from}T00:00:00`);
 
       result = result.filter((item) => {
-        const d = item.date ? new Date(item.date) : null;
+        if (!item.date) return false;
 
-        return d && d >= from && d <= to;
+        const itemDate = new Date(item.date);
+
+        return itemDate >= from;
       });
     }
 
-    setFilteredInfo(result);
-    setCurrentPage(1);
-  }, [searchTerm, infoTypeFilter, dateRange, informasiList]);
+    if (dateRange.to) {
+      const to = new Date(`${dateRange.to}T23:59:59`);
 
-  /* ============================================================
-     VALIDATE
-  ============================================================ */
+      result = result.filter((item) => {
+        if (!item.date) return false;
+
+        const itemDate = new Date(item.date);
+
+        return itemDate <= to;
+      });
+    }
+
+    // ========================================================
+    // URUTAN STATUS
+    // ========================================================
+
+    result.sort((a, b) => {
+      const statusA = String(a.status || "pending").toLowerCase();
+      const statusB = String(b.status || "pending").toLowerCase();
+
+      const priority = {
+        pending: 1,
+        menunggu: 1,
+
+        rejected: 2,
+        ditolak: 2,
+
+        approved: 3,
+        disetujui: 3,
+      };
+
+      const priorityA = priority[statusA] || 99;
+      const priorityB = priority[statusB] || 99;
+
+      // Prioritaskan status
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+
+      // Jika status sama, tanggal terbaru di atas
+      return new Date(b.date || 0) - new Date(a.date || 0);
+    });
+
+    console.log("🔎 Hasil filter:", result.length);
+
+    setFilteredInfo(result);
+
+    // Set kembali ke halaman 1 setiap filter berubah
+    setCurrentPage(1);
+  },  [
+  searchTerm,
+  infoTypeFilter,
+  statusFilter,
+  satkerFilter,
+  dateRange,
+  informasiList,
+  isEditor,
+]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
+
+  // ============================================================
+  // VALIDATE FORM
+  // ============================================================
   const validate = () => {
-    const newErr = {
+    const newErrors = {
       title: "",
       date: "",
       info_types: "",
+      id_satker: "",
       file: "",
     };
 
+    // ========================================================
+    // TITLE
+    // ========================================================
     if (!formData.title?.trim()) {
-      newErr.title = "Judul wajib diisi.";
+      newErrors.title = "Judul wajib diisi.";
     }
 
+    // ========================================================
+    // DATE
+    // ========================================================
     if (!formData.date) {
-      newErr.date = "Tanggal wajib diisi.";
+      newErrors.date = "Tanggal wajib diisi.";
     }
 
+    // ========================================================
+    // TYPE
+    // ========================================================
     if (!formData.info_types) {
-      newErr.info_types = "Jenis informasi wajib dipilih.";
+      newErrors.info_types = "Jenis informasi wajib dipilih.";
     }
 
+    // ========================================================
+    // EDITOR -> HANYA BERKALA
+    // ========================================================
+    if (isEditor) {
+      if (formData.info_types !== "Berkala") {
+        newErrors.info_types =
+          "Editor hanya dapat membuat informasi jenis Berkala.";
+      }
+    }
+
+    // ========================================================
+    // SATKER
+    // ========================================================
+    if (!formData.id_satker) {
+      newErrors.id_satker = "Satker wajib dipilih.";
+    }
+
+    // ========================================================
+    // EDITOR -> SATKER SENDIRI
+    // ========================================================
+    if (isEditor) {
+      if (!currentUser?.id_satker) {
+        newErrors.id_satker = "Satker akun editor tidak ditemukan.";
+      } else if (String(formData.id_satker) !== String(currentUser.id_satker)) {
+        newErrors.id_satker = "Editor hanya dapat menggunakan Satker sendiri.";
+      }
+    }
+
+    // ========================================================
+    // FILE
+    // ========================================================
     const isCreate = !formData.id;
 
     const hasExistingFile = !!filePreview;
@@ -152,38 +602,61 @@ const InformasiCRUD = () => {
       (isCreate && !hasNewFile) ||
       (!isCreate && !hasExistingFile && !hasNewFile)
     ) {
-      newErr.file = "File wajib diunggah (PDF maksimal 5MB).";
+      newErrors.file = "File wajib diunggah (PDF maksimal 5MB).";
     }
 
+    // ========================================================
+    // VALIDASI FILE BARU
+    // ========================================================
     if (hasNewFile) {
-      const f = formData.file;
+      const file = formData.file;
 
-      const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+      const isPdf =
+        file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+  
 
-      const isMax5Mb = f.size <= 5 * 1024 * 1024;
+      const isMax5Mb = file.size <= 5 * 1024 * 1024;
 
-      if (!isPdf || !isMax5Mb) {
-        newErr.file = "Format harus PDF dan ukuran maksimal 5MB.";
+      if (!isPdf) {
+        newErrors.file = "Format file harus PDF.";
+      } else if (!isMax5Mb) {
+        newErrors.file = "Ukuran file maksimal 5MB.";
       }
     }
 
-    setErrors(newErr);
+    setErrors(newErrors);
 
-    return Object.values(newErr).every((m) => m === "");
+    return Object.values(newErrors).every((message) => message === "");
   };
 
-  /* ============================================================
-     SUBMIT
-  ============================================================ */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // ============================================================
+  // SUBMIT
+  // ============================================================
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!validate()) return;
 
-    try {
-      const method = formData.id ? "PUT" : "POST";
+    // ========================================================
+    // PASTIKAN EDITOR MEMPUNYAI SATKER
+    // ========================================================
+    if (isEditor && !currentUser?.id_satker) {
+      Swal.fire({
+        icon: "error",
+        title: "Satker Tidak Ditemukan",
+        text: "Akun editor belum memiliki id_satker. Silakan hubungi administrator.",
+        confirmButtonText: "OK",
+      });
 
-      const url = formData.id
+      return;
+    }
+
+    const isEdit = !!formData.id;
+
+    try {
+      const method = isEdit ? "PUT" : "POST";
+
+      const url = isEdit
         ? `${API_URL}/informasi/${formData.id}`
         : `${API_URL}/informasi`;
 
@@ -193,91 +666,492 @@ const InformasiCRUD = () => {
 
       body.append("date", formData.date || "");
 
-      body.append("info_types", formData.info_types || "");
+      // ======================================================
+      // EDITOR SELALU BERKALA
+      // ======================================================
+      const submitInfoType = isEditor ? "Berkala" : formData.info_types || "";
 
+      body.append("info_types", submitInfoType);
+
+      // ======================================================
+      // EDITOR SELALU SATKER SENDIRI
+      // ======================================================
+      const submitSatker = isEditor
+        ? currentUser?.id_satker
+        : formData.id_satker;
+
+      body.append("id_satker", submitSatker || "");
+
+      // ======================================================
+      // STATUS
+      // ADMIN & SUPERADMIN = LANGSUNG DISETUJUI
+      // EDITOR = MENUNGGU VALIDASI
+      // ======================================================
+      const submitStatus = canValidate ? "approved" : "pending";
+
+      body.append("status", submitStatus);
+
+      // ======================================================
+      // FILE
+      // ======================================================
       if (formData.file instanceof File) {
         body.append("file", formData.file);
       }
 
-      const res = await fetch(url, {
+      console.log("📤 SUBMIT INFORMASI:", {
+        method,
+        url,
+        title: formData.title,
+        date: formData.date,
+        info_types: submitInfoType,
+        id_satker: submitSatker,
+        file: formData.file instanceof File ? formData.file.name : "file lama",
+        role: userRole,
+      });
+
+      const response = await fetch(url, {
         method,
         body,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         credentials: "include",
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+      const responseText = await response.text();
+
+      console.log("📥 Response Submit:", responseText);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} – ${responseText}`);
       }
 
-      // REFRESH
-      const updated = await fetch(`${API_URL}/informasi`, {
-        credentials: "include",
-      }).then((r) => r.json());
-
-      const list = Array.isArray(updated.data) ? updated.data : updated;
-
-      setInformasiList(list);
-      setFilteredInfo(list);
+      await fetchInformasi();
 
       closeModal();
 
-      alert("✅ Informasi berhasil disimpan!");
-    } catch (err) {
-      console.error("❌ Error submit informasi:", err);
+     Swal.fire({
+       icon: "success",
+       title: isEdit
+         ? "Informasi Berhasil Diperbarui"
+         : "Informasi Berhasil Disimpan",
+       text: canValidate
+         ? "Informasi langsung berstatus disetujui."
+         : isEdit
+           ? "Informasi kembali berstatus menunggu dan harus divalidasi."
+           : "Informasi berhasil disimpan dan menunggu validasi.",
+       showConfirmButton: false,
+       timer: 1800,
+       timerProgressBar: true,
+     });
+    } catch (error) {
+      console.error("❌ Error submit informasi:", error);
 
-      alert("Gagal menyimpan informasi.");
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Menyimpan Informasi",
+        text: error.message || "Terjadi kesalahan saat menyimpan data.",
+        confirmButtonText: "OK",
+      });
     }
   };
 
-  /* ============================================================
-     EDIT
-  ============================================================ */
-  const handleEdit = (info) => {
-    const dateValue = info.date
-      ? new Date(info.date).toISOString().split("T")[0]
-      : "";
+  // ============================================================
+  // TAMBAH INFORMASI
+  // ============================================================
+  const handleAdd = () => {
+    // ========================================================
+    // EDITOR HARUS MEMPUNYAI SATKER
+    // ========================================================
+    if (isEditor && !currentUser?.id_satker) {
+      Swal.fire({
+        icon: "error",
+        title: "Satker Tidak Ditemukan",
+        text: "Akun editor belum memiliki Satker. Silakan hubungi administrator.",
+        confirmButtonText: "OK",
+      });
+
+      return;
+    }
 
     setFormData({
-      id: info.id ?? null,
-      title: info.title ?? "",
-      date: dateValue,
-      info_types: info.info_types ?? "",
+      id: null,
+      title: "",
+      date: "",
+      info_types: isEditor ? "Berkala" : "",
+      id_satker: isEditor ? currentUser?.id_satker || "" : "",
       file: "",
     });
 
-    setFilePreview(info.file_url || `${API_URL}/${info.file_path}`);
+    setFilePreview(null);
 
     setErrors({
       title: "",
       date: "",
       info_types: "",
+      id_satker: "",
       file: "",
     });
 
     setModalMode("edit");
   };
 
-  /* ============================================================
-     DELETE
-  ============================================================ */
-  const handleDelete = async (id) => {
-    if (!window.confirm("Hapus data informasi ini?")) return;
+  // ============================================================
+  // EDIT
+  // ============================================================
+  const handleEdit = (info) => {
+    // ========================================================
+    // EDITOR HANYA BOLEH BERKALA
+    // ========================================================
+    if (
+      isEditor &&
+      String(info?.info_types || "").toLowerCase() !== "berkala"
+    ) {
+      Swal.fire({
+        icon: "info",
+        title: "Tidak Dapat Diedit",
+        text: "Editor hanya dapat mengedit informasi jenis Berkala.",
+        confirmButtonText: "OK",
+      });
 
-    await fetch(`${API_URL}/informasi/${id}`, {
-      method: "DELETE",
-      credentials: "include",
+      return;
+    }
+
+    // ========================================================
+    // EDITOR HANYA BOLEH SATKER SENDIRI
+    // ========================================================
+    if (
+      isEditor &&
+      String(info?.id_satker) !== String(currentUser?.id_satker)
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Akses Ditolak",
+        text: "Anda hanya dapat mengedit informasi dari Satker sendiri.",
+        confirmButtonText: "OK",
+      });
+
+      return;
+    }
+
+    const dateValue = info?.date
+      ? new Date(info.date).toISOString().split("T")[0]
+      : "";
+
+    setFormData({
+      id: info?.id ?? null,
+
+      title: info?.title ?? "",
+
+      date: dateValue,
+
+      info_types: isEditor ? "Berkala" : (info?.info_types ?? ""),
+
+      id_satker: isEditor
+        ? (currentUser?.id_satker ?? "")
+        : (info?.id_satker ?? ""),
+
+      file: "",
     });
 
-    setInformasiList((prev) => prev.filter((n) => n.id !== id));
+    setFilePreview(
+      info?.file_url ||
+        (info?.file_path ? `${API_URL}/${info.file_path}` : null),
+    );
 
-    setFilteredInfo((prev) => prev.filter((n) => n.id !== id));
+    setErrors({
+      title: "",
+      date: "",
+      info_types: "",
+      id_satker: "",
+      file: "",
+    });
+
+    setModalMode("edit");
   };
 
-  /* ============================================================
-     FILE CHANGE
-  ============================================================ */
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
+  // ============================================================
+  // DELETE
+  // ============================================================
+  const handleDelete = async (info) => {
+    // ========================================================
+    // EDITOR -> CEK SATKER
+    // ========================================================
+    if (
+      isEditor &&
+      String(info?.id_satker) !== String(currentUser?.id_satker)
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Akses Ditolak",
+        text: "Anda hanya dapat menghapus informasi dari Satker sendiri.",
+        confirmButtonText: "OK",
+      });
+
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Yakin?",
+      text: "Informasi ini akan dihapus permanen!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      showLoaderOnConfirm: true,
+      allowOutsideClick: () => !Swal.isLoading(),
+
+      preConfirm: async () => {
+        try {
+          const response = await fetch(`${API_URL}/informasi/${info.id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          });
+
+          const responseText = await response.text();
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status} – ${responseText}`);
+          }
+
+          return true;
+        } catch (error) {
+          console.error("❌ Error hapus informasi:", error);
+
+          Swal.showValidationMessage(
+            error.message || "Gagal menghapus informasi",
+          );
+
+          return false;
+        }
+      },
+    });
+
+    if (result.isConfirmed) {
+      setInformasiList((prev) => prev.filter((item) => item.id !== info.id));
+
+      setFilteredInfo((prev) => prev.filter((item) => item.id !== info.id));
+
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Informasi berhasil dihapus",
+        timer: 1500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+    }
+  };
+
+  // ============================================================
+  // STATUS
+  // ============================================================
+  const getStatus = (info) => {
+    return String(info?.status || "pending").toLowerCase();
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "approved":
+        return "Disetujui";
+
+      case "rejected":
+        return "Ditolak";
+
+      default:
+        return "Menunggu";
+    }
+  };
+
+  // ============================================================
+  // VALIDATE INFORMATION
+  // ============================================================
+  // ============================================================
+  // VALIDATE INFORMATION
+  // ============================================================
+  const handleValidate = async (info) => {
+    if (!canValidate) {
+      return;
+    }
+
+    const status = getStatus(info);
+
+    // ========================================================
+    // HANYA PENDING
+    // ========================================================
+    if (status !== "pending") {
+      Swal.fire({
+        icon: "info",
+        title: "Tidak Dapat Divalidasi",
+        text: "Hanya informasi dengan status pending yang dapat diubah statusnya.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Ubah Status Informasi",
+      html: `
+      <div style="text-align:left">
+        <p><strong>${info?.title || "-"}</strong></p>
+
+        <p>
+          Status saat ini:
+          <strong>${status || "-"}</strong>
+        </p>
+
+        <p>
+          Pilih tindakan untuk informasi ini.
+        </p>
+      </div>
+    `,
+      icon: "question",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "✓ Setujui",
+      denyButtonText: "✕ Tolak",
+      cancelButtonText: "Batal",
+      confirmButtonColor: "#198754",
+      denyButtonColor: "#dc3545",
+    });
+
+    // ========================================================
+    // SETUJUI
+    // ========================================================
+    if (result.isConfirmed) {
+      await updateInfoStatus(info.id, "approve");
+      return;
+    }
+
+    // ========================================================
+    // TOLAK
+    // ========================================================
+    if (result.isDenied) {
+      const rejectResult = await Swal.fire({
+        title: "Tolak Informasi",
+        input: "textarea",
+        inputLabel: "Alasan penolakan",
+        inputPlaceholder: "Masukkan alasan penolakan...",
+        inputAttributes: {
+          "aria-label": "Alasan penolakan",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Tolak Informasi",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#dc3545",
+        inputValidator: (value) => {
+          if (!value || !value.trim()) {
+            return "Alasan penolakan wajib diisi.";
+          }
+
+          if (value.trim().length < 5) {
+            return "Alasan penolakan minimal 5 karakter.";
+          }
+
+          return null;
+        },
+      });
+
+      if (rejectResult.isConfirmed) {
+        await updateInfoStatus(info.id, "rejected", rejectResult.value.trim());
+      }
+    }
+  };
+
+  // ============================================================
+  // UPDATE STATUS
+  // ============================================================
+  const updateInfoStatus = async (id, status, rejectionReason = "") => {
+    try {
+      const authToken = localStorage.getItem("token");
+
+      const isApprove = status === "approve";
+
+      const normalizedStatus = isApprove ? "approved" : "rejected";
+
+      const endpoint = isApprove
+        ? `${API_URL}/informasi/validation/${id}/approve`
+        : `${API_URL}/informasi/validation/${id}/reject`;
+
+      const options = {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        credentials: "include",
+      };
+
+      // Jika ditolak
+      if (!isApprove) {
+        options.headers["Content-Type"] = "application/json";
+
+        options.body = JSON.stringify({
+          rejection_reason: rejectionReason.trim(),
+        });
+      }
+
+      console.log("📤 Update Status Informasi:", {
+        id,
+        status,
+        normalizedStatus,
+        rejectionReason,
+        endpoint,
+      });
+
+      const response = await fetch(endpoint, options);
+
+      const responseData = await response.json().catch(() => ({}));
+
+      console.log("📥 Response:", {
+        status: response.status,
+        data: responseData,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          responseData?.message ||
+            responseData?.error ||
+            `HTTP ${response.status}`,
+        );
+      }
+
+      await fetchInformasi();
+
+      await Swal.fire({
+        icon: "success",
+        title: isApprove ? "Informasi Disetujui" : "Informasi Ditolak",
+        text: isApprove
+          ? "Informasi berhasil disetujui."
+          : "Informasi berhasil ditolak.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      return true;
+    } catch (error) {
+      console.error("❌ Error update status informasi:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: error.message || "Gagal mengubah status informasi.",
+        confirmButtonText: "OK",
+      });
+
+      return false;
+    }
+  };
+
+  // ============================================================
+  // FILE CHANGE
+  // ============================================================
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
 
     if (!file) return;
 
@@ -285,10 +1159,26 @@ const InformasiCRUD = () => {
 
     const isMax5Mb = file.size <= 5 * 1024 * 1024;
 
-    if (!isPdf || !isMax5Mb) {
+    if (!isPdf) {
       setErrors((prev) => ({
         ...prev,
-        file: "Format harus PDF dan ukuran maksimal 5MB.",
+        file: "Format file harus PDF.",
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        file: "",
+      }));
+
+      setFilePreview(null);
+
+      return;
+    }
+
+    if (!isMax5Mb) {
+      setErrors((prev) => ({
+        ...prev,
+        file: "Ukuran file maksimal 5MB.",
       }));
 
       setFormData((prev) => ({
@@ -308,17 +1198,15 @@ const InformasiCRUD = () => {
 
     setFilePreview(URL.createObjectURL(file));
 
-    if (errors.file) {
-      setErrors((prev) => ({
-        ...prev,
-        file: "",
-      }));
-    }
+    setErrors((prev) => ({
+      ...prev,
+      file: "",
+    }));
   };
 
-  /* ============================================================
-     CLOSE MODAL
-  ============================================================ */
+  // ============================================================
+  // CLOSE MODAL
+  // ============================================================
   const closeModal = () => {
     setModalMode(null);
 
@@ -327,6 +1215,7 @@ const InformasiCRUD = () => {
       title: "",
       date: "",
       info_types: "",
+      id_satker: "",
       file: "",
     });
 
@@ -336,18 +1225,20 @@ const InformasiCRUD = () => {
       title: "",
       date: "",
       info_types: "",
+      id_satker: "",
       file: "",
     });
   };
 
-  /* ============================================================
-     PAGINATION
-  ============================================================ */
-
+  // ============================================================
+  // PAGINATION
+  // ============================================================
   const totalData = filteredInfo.length;
 
   const totalPages =
-    itemsPerPage === 0 ? 1 : Math.ceil(filteredInfo.length / itemsPerPage);
+    itemsPerPage === 0
+      ? 1
+      : Math.max(1, Math.ceil(filteredInfo.length / itemsPerPage));
 
   const startIndex = itemsPerPage === 0 ? 0 : (currentPage - 1) * itemsPerPage;
 
@@ -357,7 +1248,9 @@ const InformasiCRUD = () => {
       : filteredInfo.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) return;
+    if (page < 1 || page > totalPages) {
+      return;
+    }
 
     setCurrentPage(page);
   };
@@ -394,23 +1287,26 @@ const InformasiCRUD = () => {
     return pages;
   };
 
-  /* ============================================================
-     RENDER
-  ============================================================ */
-
+  // ============================================================
+  // RENDER
+  // ============================================================
   return (
     <div className="informasi-crud-container">
-      {/* HEADER */}
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
       <div className="crud-header">
         <h2>Manajemen Informasi</h2>
 
-        <button className="btn-add" onClick={() => setModalMode("edit")}>
+        <button className="btn-add" onClick={handleAdd}>
           <PlusCircle size={18} />
           Tambah Informasi
         </button>
       </div>
 
-      {/* FILTER */}
+      {/* ======================================================
+          FILTER
+      ====================================================== */}
       <div className="filter-bar">
         <div className="filter-group">
           {/* SEARCH */}
@@ -421,18 +1317,18 @@ const InformasiCRUD = () => {
               type="text"
               placeholder="Cari judul / jenis informasi..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(event) => setSearchTerm(event.target.value)}
             />
           </div>
 
           <div className="filter-inline">
             {/* JENIS INFORMASI */}
-            <div className="filter-item">
+            {/* <div className="filter-item">
               <label>Jenis Informasi</label>
 
               <select
                 value={infoTypeFilter}
-                onChange={(e) => setInfoTypeFilter(e.target.value)}>
+                onChange={(event) => setInfoTypeFilter(event.target.value)}>
                 <option value="">Semua</option>
 
                 <option value="Berkala">Berkala</option>
@@ -440,6 +1336,74 @@ const InformasiCRUD = () => {
                 <option value="Setiap Saat">Setiap Saat</option>
 
                 <option value="Serta Merta">Serta Merta</option>
+              </select>
+            </div> */}
+
+            {!isEditor && (
+              <div className="filter-item">
+                <label>Jenis Informasi</label>
+                <select
+                  value={infoTypeFilter}
+                  onChange={(e) => {
+                    setInfoTypeFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}>
+                  <option value="">Semua Jenis</option>
+                  <option value="Berkala">Berkala</option>
+                  <option value="Setiap Saat">Setiap Saat</option>
+                  <option value="Serta Merta">Serta Merta</option>
+                </select>
+              </div>
+            )}
+
+            {/* SATUAN KERJA */}
+            {!isEditor && (
+              <div className="filter-item">
+                <label>Satuan Kerja</label>
+
+                <select
+                  value={satkerFilter}
+                  onChange={(event) => setSatkerFilter(event.target.value)}>
+                  <option value="">Semua Satker</option>
+
+                  {satkerList.map((satker) => {
+                    const id = satker?.id_satker ?? satker?.id ?? satker?.kode;
+
+                    const nama =
+                      satker?.nama ||
+                      satker?.name ||
+                      satker?.nama_satker ||
+                      satker?.nama_satuan_kerja ||
+                      satker?.satuan_kerja ||
+                      id;
+
+                    return (
+                      <option key={id} value={id}>
+                        {nama}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
+
+            {/* STATUS */}
+            <div className="filter-item">
+              <label>Status</label>
+
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}>
+                <option value="">Semua Status</option>
+
+                {canValidate ? (
+                  <option value="pending">Validasi</option>
+                ) : (
+                  <option value="pending">Menunggu</option>
+                )}
+
+                <option value="rejected">Ditolak</option>
+                <option value="approved">Disetujui</option>
               </select>
             </div>
 
@@ -449,7 +1413,9 @@ const InformasiCRUD = () => {
 
               <select
                 value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(Number(e.target.value))}>
+                onChange={(event) =>
+                  setItemsPerPage(Number(event.target.value))
+                }>
                 <option value={10}>10</option>
 
                 <option value={20}>20</option>
@@ -470,10 +1436,10 @@ const InformasiCRUD = () => {
                 <input
                   type="date"
                   value={dateRange.from}
-                  onChange={(e) =>
+                  onChange={(event) =>
                     setDateRange({
                       ...dateRange,
-                      from: e.target.value,
+                      from: event.target.value,
                     })
                   }
                 />
@@ -483,10 +1449,10 @@ const InformasiCRUD = () => {
                 <input
                   type="date"
                   value={dateRange.to}
-                  onChange={(e) =>
+                  onChange={(event) =>
                     setDateRange({
                       ...dateRange,
-                      to: e.target.value,
+                      to: event.target.value,
                     })
                   }
                 />
@@ -496,7 +1462,9 @@ const InformasiCRUD = () => {
         </div>
       </div>
 
-      {/* TABLE */}
+      {/* ======================================================
+          TABLE
+      ====================================================== */}
       <div className="table-wrapper">
         <table className="informasi-table">
           <thead>
@@ -504,61 +1472,119 @@ const InformasiCRUD = () => {
               <th>No</th>
               <th>Judul</th>
               <th>Tanggal</th>
-              <th>Jenis Informasi</th>
+              {!isEditor && <th>Jenis Informasi</th>}
+              <th>Satuan Kerja</th>
               <th>File</th>
+              <th>Status</th>
               <th>Aksi</th>
             </tr>
           </thead>
 
           <tbody>
-            {currentData.map((info, idx) => (
-              <tr key={info.id}>
-                <td>{startIndex + idx + 1}</td>
+            {currentData.map((info, index) => {
+              const status = getStatus(info);
 
-                <td>{info.title}</td>
+              const isPending = status === "pending";
 
-                <td>
-                  {info.date
-                    ? new Date(info.date).toLocaleDateString("id-ID", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "-"}
-                </td>
+              return (
+                <tr key={info.id}>
+                  <td>{startIndex + index + 1}</td>
 
-                <td>{info.info_types || "-"}</td>
+                  <td>{info.title || "-"}</td>
 
-                <td>
-                  {info.file_path ? (
-                    <a
-                      href={info.file_url || `${API_URL}/${info.file_path}`}
-                      target="_blank"
-                      rel="noreferrer">
-                      Lihat File
-                    </a>
-                  ) : (
-                    "Tidak ada"
-                  )}
-                </td>
+                  <td>
+                    {info.date
+                      ? new Date(info.date).toLocaleDateString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </td>
 
-                <td className="action-cell">
-                  <div className="action-buttons">
-                    <button
-                      className="btn-edit"
-                      onClick={() => handleEdit(info)}>
-                      <Edit size={16} />
-                    </button>
+                  {!isEditor && <td>{info.info_types}</td>}
 
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDelete(info.id)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+
+                  {/* SATKER */}
+                  <td>
+                    {info.nama_satker ||
+                      info.satker_nama ||
+                      getSatkerName(info.id_satker)}
+                  </td>
+
+                  {/* FILE */}
+                  <td>
+                    {info.file_path ? (
+                      <a
+                        href={info.file_url || `${API_URL}/${info.file_path}`}
+                        target="_blank"
+                        rel="noreferrer">
+                        Lihat
+                      </a>
+                    ) : (
+                      "Tidak ada"
+                    )}
+                  </td>
+
+                  {/* STATUS */}
+                  <td>
+                    {canValidate && isPending ? (
+                      <button
+                        type="button"
+                        className="status-badge status-pending status-clickable"
+                        onClick={() => handleValidate(info)}
+                        title="Klik untuk validasi">
+                        <Clock3 size={14} />
+                        Validasi
+                      </button>
+                    ) : status === "rejected" ? (
+                      <button
+                        type="button"
+                        className="status-badge status-rejected status-rejected-clickable"
+                        onClick={() =>
+                          Swal.fire({
+                            icon: "error",
+                            title: "Alasan Penolakan",
+                            text:
+                              info?.rejection_reason ||
+                              "Tidak ada alasan penolakan.",
+                            confirmButtonText: "Tutup",
+                            confirmButtonColor: "#6c757d",
+                          })
+                        }
+                        title="Klik untuk melihat alasan penolakan">
+                        <XCircle size={14} />
+                        Ditolak
+                      </button>
+                    ) : (
+                      <span className={`status-badge status-${status}`}>
+                        {status === "approved" && <CheckCircle size={14} />}
+                        {status === "pending" && <Clock3 size={14} />}
+                        {getStatusLabel(status)}
+                      </span>
+                    )}
+                  </td>
+                  {/* AKSI */}
+                  <td className="action-cell">
+                    <div className="action-buttons">
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(info)}
+                        title="Edit">
+                        <Edit size={16} />
+                      </button>
+
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(info)}
+                        title="Hapus">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
 
@@ -583,19 +1609,19 @@ const InformasiCRUD = () => {
                 <ChevronLeft size={16} />
               </button>
 
-              {getPageNumbers().map((item, idx) =>
-                item === "..." ? (
-                  <span key={`ellipsis-${idx}`} className="page-ellipsis">
+              {getPageNumbers().map((page, index) =>
+                page === "..." ? (
+                  <span key={`ellipsis-${index}`} className="page-ellipsis">
                     ...
                   </span>
                 ) : (
                   <button
-                    key={item}
+                    key={page}
                     className={`btn-page ${
-                      currentPage === item ? "active" : ""
+                      currentPage === page ? "active" : ""
                     }`}
-                    onClick={() => handlePageChange(item)}>
-                    {item}
+                    onClick={() => handlePageChange(page)}>
+                    {page}
                   </button>
                 ),
               )}
@@ -611,14 +1637,18 @@ const InformasiCRUD = () => {
         )}
       </div>
 
-      {/* MODAL */}
+      {/* ======================================================
+          MODAL
+      ====================================================== */}
       {modalMode && (
         <div className="modal-overlay">
           <div className="modal-content modal-large">
             <h3>{formData.id ? "Edit Informasi" : "Tambah Informasi"}</h3>
 
             <form onSubmit={handleSubmit} noValidate>
-              {/* TITLE */}
+              {/* ==================================================
+                  TITLE
+              ================================================== */}
               <div>
                 <label>
                   Judul Informasi
@@ -628,16 +1658,22 @@ const InformasiCRUD = () => {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) =>
+                  onChange={(event) =>
                     setFormData({
                       ...formData,
-                      title: e.target.value,
+                      title: event.target.value,
                     })
                   }
                 />
+
+                {errors.title && (
+                  <small className="error-text">{errors.title}</small>
+                )}
               </div>
 
-              {/* GRID */}
+              {/* ==================================================
+                  GRID
+              ================================================== */}
               <div className="form-grid">
                 {/* DATE */}
                 <div>
@@ -646,36 +1682,43 @@ const InformasiCRUD = () => {
                   <input
                     type="date"
                     value={formData.date}
-                    onChange={(e) =>
+                    onChange={(event) =>
                       setFormData({
                         ...formData,
-                        date: e.target.value,
+                        date: event.target.value,
                       })
                     }
                   />
+
+                  {errors.date && (
+                    <small className="error-text">{errors.date}</small>
+                  )}
                 </div>
 
                 {/* TYPE */}
-                <div>
-                  <label>Jenis Informasi</label>
+                {!isEditor && (
+                  <div>
+                    <label>Jenis Informasi</label>
 
-                  <select
-                    value={formData.info_types}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        info_types: e.target.value,
-                      })
-                    }>
-                    <option value="">Pilih</option>
+                    <select
+                      value={formData.info_types}
+                      onChange={(event) =>
+                        setFormData({
+                          ...formData,
+                          info_types: event.target.value,
+                        })
+                      }>
+                      <option value="">Pilih</option>
+                      <option value="Berkala">Berkala</option>
+                      <option value="Setiap Saat">Setiap Saat</option>
+                      <option value="Serta Merta">Serta Merta</option>
+                    </select>
 
-                    <option value="Berkala">Berkala</option>
-
-                    <option value="Setiap Saat">Setiap Saat</option>
-
-                    <option value="Serta Merta">Serta Merta</option>
-                  </select>
-                </div>
+                    {errors.info_types && (
+                      <small className="error-text">{errors.info_types}</small>
+                    )}
+                  </div>
+                )}
 
                 {/* FILE */}
                 <div>
@@ -686,6 +1729,10 @@ const InformasiCRUD = () => {
                     accept="application/pdf,.pdf"
                     onChange={handleFileChange}
                   />
+
+                  {errors.file && (
+                    <small className="error-text">{errors.file}</small>
+                  )}
 
                   {filePreview && (
                     <div className="preview-wrap">
@@ -699,7 +1746,81 @@ const InformasiCRUD = () => {
                 </div>
               </div>
 
-              {/* ACTION */}
+              {/* ==================================================
+                  SATKER
+              ================================================== */}
+              <div>
+                <label>
+                  Satuan Kerja
+                  <span className="required">*</span>
+                </label>
+
+                {isEditor ? (
+                  <>
+                    <select value={formData.id_satker} disabled>
+                      {formData.id_satker ? (
+                        <option value={formData.id_satker}>
+                          {getSatkerName(formData.id_satker)}
+                        </option>
+                      ) : (
+                        <option value="">Satker belum ditemukan</option>
+                      )}
+                    </select>
+
+                    <small
+                      style={{
+                        display: "block",
+                        marginTop: "5px",
+                      }}>
+                      Satker otomatis mengikuti satuan kerja akun Editor.
+                    </small>
+
+                    {!currentUser?.id_satker && (
+                      <small className="error-text">
+                        ID Satker akun Editor belum ditemukan.
+                      </small>
+                    )}
+                  </>
+                ) : (
+                  <select
+                    value={formData.id_satker}
+                    onChange={(event) =>
+                      setFormData({
+                        ...formData,
+                        id_satker: event.target.value,
+                      })
+                    }>
+                    <option value="">Pilih Satker</option>
+
+                    {satkerList.map((satker) => {
+                      const id =
+                        satker?.id_satker ?? satker?.id ?? satker?.kode;
+
+                      const nama =
+                        satker?.nama ||
+                        satker?.name ||
+                        satker?.nama_satker ||
+                        satker?.nama_satuan_kerja ||
+                        satker?.satuan_kerja ||
+                        id;
+
+                      return (
+                        <option key={id} value={id}>
+                          {nama}
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
+
+                {errors.id_satker && (
+                  <small className="error-text">{errors.id_satker}</small>
+                )}
+              </div>
+
+              {/* ==================================================
+                  ACTION
+              ================================================== */}
               <div className="form-actions">
                 <button type="submit" className="btn-save">
                   Simpan
@@ -718,6 +1839,6 @@ const InformasiCRUD = () => {
       )}
     </div>
   );
-};
+};;;
 
 export default InformasiCRUD;

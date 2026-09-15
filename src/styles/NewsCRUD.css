@@ -1,6 +1,7 @@
-/* ==========================
-   🎯 WRAPPER & HEADER (namespaced)
-========================== */
+/* ==========================================================
+   🎯 WRAPPER & HEADER
+   ========================================================== */
+
 .news-crud-container {
   background: #fff;
   border-radius: 12px;
@@ -23,6 +24,11 @@
   color: #004d40;
 }
 
+
+/* ==========================================================
+   ➕ BUTTON TAMBAH
+   ========================================================== */
+
 .news-crud-container .btn-add {
   display: flex;
   align-items: center;
@@ -41,9 +47,11 @@
   background: #004d40;
 }
 
-/* ==========================
-   🔍 FILTER SECTION (namespaced)
-========================== */
+
+/* ==========================================================
+   🔍 FILTER SECTION
+   ========================================================== */
+
 .news-crud-container .filter-bar {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
@@ -55,7 +63,9 @@
   gap: 16px;
 }
 
-/* Search box */
+
+/* Search */
+
 .news-crud-container .search-box {
   display: flex;
   align-items: center;
@@ -82,12 +92,16 @@
   color: #333;
 }
 
-/* Inline filter row */
+
+/* Inline filter */
+
 .news-crud-container .filter-inline {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 20px;
+  row-gap: 14px;
+  column-gap: 20px;
+  padding-top: 14px;
 }
 
 .news-crud-container .filter-item {
@@ -95,6 +109,7 @@
   flex-direction: column;
   gap: 6px;
   min-width: 180px;
+  max-width: 1000px;
 }
 
 .news-crud-container .filter-item label {
@@ -119,7 +134,9 @@
   border-color: #00695c;
 }
 
+
 /* Date range */
+
 .news-crud-container .date-range .date-inputs {
   display: flex;
   align-items: center;
@@ -131,9 +148,11 @@
   color: #777;
 }
 
-/* ==========================
-   📋 TABLE (namespaced)
-========================== */
+
+/* ==========================================================
+   📋 TABLE
+   ========================================================== */
+
 .news-crud-container .table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
@@ -165,8 +184,25 @@
 }
 
 .news-crud-container .news-table td {
-  color: #444;
+  color: #444 !important;
 }
+
+.news-crud-container .news-table td a {
+  text-decoration: none !important;
+}
+
+.news-crud-container .empty-text {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 45px 20px !important;
+  color: #888 !important;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fafafa;
+  border-bottom: none !important;
+}
+
+/* Preview image */
 
 .news-crud-container .preview-img {
   width: 100%;
@@ -176,9 +212,17 @@
   border-radius: 8px;
 }
 
-/* ==========================
-   ⚙️ ACTION BUTTONS (namespaced)
-========================== */
+
+/* ==========================================================
+   ⚙️ ACTION BUTTONS
+   ========================================================== */
+
+.news-crud-container .action-cell {
+  width: 120px;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
 .news-crud-container .action-buttons {
   display: flex;
   align-items: center;
@@ -211,36 +255,189 @@
   color: #d32f2f;
 }
 
-/* ==========================
-   🧩 MODAL (namespaced)
-========================== */
+
+/* ==========================================================
+   🔐 STATUS VALIDASI BERITA
+   ========================================================== */
+
+.news-crud-container .status-cell {
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.news-crud-container .status-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.news-crud-container .status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 100px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================
+   🟡 MENUNGGU
+   ========================================================== */
+
+.news-crud-container .status-pending {
+  color: #856404;
+  background: #fff8e1;
+  border-color: #ffe082;
+}
+
+
+/* Pending khusus Admin & Superadmin
+   Bisa diklik untuk membuka validasi */
+
+.news-crud-container .status-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.news-crud-container .status-clickable:hover {
+  background: #ffecb3;
+  border-color: #ffc107;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(133, 100, 4, 0.12);
+}
+
+.news-crud-container .status-clickable:active {
+  transform: translateY(0);
+}
+
+
+/* ==========================================================
+   🟢 DISETUJUI
+   ========================================================== */
+
+.news-crud-container .status-approved {
+  color: #146c43;
+    background: #e8f5e9;
+    border-color: #a5d6a7;
+}
+
+
+/* ==========================================================
+   🔴 DITOLAK
+   ========================================================== */
+
+.news-crud-container .status-rejected {
+  color: #b02a37;
+  background: #fdecec;
+  border-color: #f1aeb5;
+}
+
+
+/* ==========================================================
+   📝 ALASAN PENOLAKAN
+   ========================================================== */
+
+.news-crud-container .rejection-reason-btn {
+  display: block;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #d32f2f;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.news-crud-container .rejection-reason-btn:hover {
+  color: #b71c1c;
+}
+
+
+/* ==========================================================
+   📱 STATUS RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 768px) {
+  .news-crud-container .status-badge {
+    min-width: 85px;
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+
+  .news-crud-container .rejection-reason-btn {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .news-crud-container .status-badge {
+    min-width: auto;
+    padding: 5px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .news-crud-container .status-badge svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+
+/* ==========================================================
+   🧩 MODAL
+   ⚠️ TIDAK DIUBAH DARI CSS NEWS SEBELUMNYA
+   ========================================================== */
+
 .news-crud-container .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0, 0, 0, 0.45) !important;
+
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  z-index: 999 !important;
-  overflow-y: auto !important;
+
   padding: 30px !important;
+
+  background: rgba(0, 0, 0, 0.45) !important;
+
+  z-index: 999 !important;
+
+  overflow-y: auto !important;
   box-sizing: border-box;
 }
 
 .news-crud-container .modal-content {
-  background: #ffffff !important;
-  border-radius: 16px !important;
-  width: 100% !important;  
-  max-width: 1400px !important;
-  overflow-y: auto !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
-  padding: 32px !important;
   position: relative !important;
-  transition: all 0.3s ease !important;
-  animation: newsFadeIn 0.25s ease !important;
+
+  width: 100% !important;
+  max-width: 1400px !important;
+  max-height: 80vh;
+
   margin-top: 10vh;
   margin-bottom: 0;
-  max-height: 80vh;
+
+  padding: 32px !important;
+
+  background: #fff !important;
+  border-radius: 16px !important;
+
+  overflow-y: auto !important;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+
+  transition: all 0.3s ease !important;
+  animation: newsFadeIn 0.25s ease !important;
 }
 
 .news-crud-container .modal-content h3 {
@@ -251,6 +448,7 @@
 .news-crud-container .modal-content label {
   display: block;
   margin-top: 10px;
+
   font-size: 14px;
   font-weight: 600;
   color: #333;
@@ -260,11 +458,18 @@
 .news-crud-container .modal-content select {
   width: 100%;
   padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
   margin-top: 6px;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+
   box-sizing: border-box;
 }
+
+
+/* ==========================================================
+   FORM GRID
+   ========================================================== */
 
 .news-crud-container .form-grid {
   display: grid;
@@ -272,27 +477,40 @@
   gap: 15px;
 }
 
+
+/* ==========================================================
+   FORM ACTIONS
+   ========================================================== */
+
 .news-crud-container .form-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 10px;
+
   margin-top: 20px;
-  position: static;
-  bottom: 0;
-  /* background: white; */
   padding-top: 10px;
+
   box-sizing: border-box;
 }
 
+
+/* Save */
+
 .news-crud-container .btn-save {
+  display: flex;
+  align-items: center;
+
+  width: fit-content;
+
+  margin-top: 6px;
+  padding: 8px 14px;
+
   background: #00695c;
   border: none;
-  padding: 8px 14px;
   border-radius: 6px;
+
   cursor: pointer;
-  width: fit-content;
-  display: flex;
-  margin-top: 6px;
 }
 
 .news-crud-container .btn-save:hover {
@@ -300,16 +518,22 @@
 }
 
 
+/* Cancel */
+
 .news-crud-container .btn-cancel {
+  display: flex;
+  align-items: center;
+
+  width: fit-content;
+
+  margin-top: 6px;
+  padding: 8px 14px;
+
   background: #ccc;
   border: none;
-  padding: 8px 14px;
   border-radius: 6px;
+
   cursor: pointer;
-  width: fit-content;
-  display: flex;
-  margin-top: 6px;
-  align-self: flex-end;
 }
 
 .news-crud-container .btn-cancel:hover {
@@ -317,106 +541,142 @@
 }
 
 .news-crud-container .required {
-  color: red;
   margin-left: 3px;
+  color: red;
 }
 
-/* ==========================
-   ✏️ JODIT EDITOR AREA (namespaced)
-========================== */
+
+/* ==========================================================
+   ✏️ JODIT EDITOR
+   ========================================================== */
+
 .news-crud-container .modal-content form .jodit-container {
-  min-height: 340px !important;
   width: 100% !important;
   max-width: 100% !important;
+  min-height: 340px !important;
+
   font-size: 15px;
 }
 
 .news-crud-container .jodit-wysiwyg {
   padding: 12px !important;
+
   font-size: 15px !important;
   line-height: 1.6 !important;
 }
-/* ==========================
+
+
+/* ==========================================================
+   🖼️ IMAGE PREVIEW
+   ========================================================== */
+
+.news-crud-container .preview-wrap {
+  position: relative;
+
+  display: inline-block;
+
+  margin-top: 8px;
+}
+
+.news-crud-container .image-hint {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+
+  padding: 4px 8px;
+
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+
+  color: #fff;
+  font-size: 12px;
+
+  pointer-events: none;
+}
+
+.news-crud-container .image-hint-inline {
+  margin-top: 6px;
+
+  color: #666;
+  font-size: 12px;
+}
+
+
+/* ==========================================================
    🔔 PAGINATION
-========================== */
+   ========================================================== */
+
 .news-crud-container .pagination {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 16px;
-  margin-top: 18px;
+  margin-top: 20px;
+
   flex-wrap: wrap;
 }
 
 .news-crud-container .pagination-info {
-  font-size: 17px;
-  color: #222;
+  font-size: 15px;
   font-weight: 500;
+  color: #333;
 }
 
-/* WRAPPER BUTTON */
 .news-crud-container .pagination-controls {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* BUTTON PAGINATION */
 .news-crud-container .btn-page {
-  min-width: 42px;
-  height: 42px;
-  border: 1.5px solid #cfd8dc;
-  background: #ffffff;
-  color: #00695c;
-  font-size: 16px;
-  font-weight: 600;
+  min-width: 40px;
+  height: 40px;
+
+  border: 1px solid #d0d7de;
   border-radius: 10px;
+
+  background: #fff;
+  color: #00695c;
+
+  font-size: 15px;
+  font-weight: 600;
+
   cursor: pointer;
-  transition: all 0.25s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
 }
 
-/* HOVER */
 .news-crud-container .btn-page:hover:not(:disabled) {
   background: #e0f2f1;
   border-color: #00695c;
-  transform: translateY(-1px);
 }
 
-/* ACTIVE PAGE */
 .news-crud-container .btn-page.active {
   background: #00695c;
-  color: #fff;
+  color: white;
   border-color: #00695c;
-  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.25);
+
+  box-shadow: 0 4px 10px rgba(0, 105, 92, 0.2);
 }
 
-/* DISABLED */
 .news-crud-container .btn-page:disabled {
   opacity: 0.45;
   cursor: not-allowed;
-  background: #f5f5f5;
 }
 
-/* ELLIPSIS */
 .news-crud-container .page-ellipsis {
-  min-width: 30px;
+  min-width: 24px;
+
   text-align: center;
-  font-size: 18px;
-  font-weight: 700;
   color: #00695c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-weight: 700;
 }
 
-/* ==========================
-   🔔 ANIMATIONS (namespaced)
-========================== */
+
+/* ==========================================================
+   🔔 ANIMATION
+   ========================================================== */
+
 @keyframes newsFadeIn {
   from {
     opacity: 0;
@@ -429,25 +689,28 @@
   }
 }
 
-/* ==========================
-   📱 RESPONSIVE (namespaced)
-========================== */
-@media (max-width: 768px) {
+
+/* ==========================================================
+   📱 RESPONSIVE TABLET
+   ========================================================== */
+
+@media (max-width: 1024px) {
+  /* MODAL TETAP SEPERTI NEWS SEBELUMNYA */
+
   .news-crud-container .modal-content {
-    width: 95%;
-    height: 90vh;
-    padding: 24px;
+    width: 95% !important;
+    max-width: 95% !important;
+    height: 90vh !important;
+    padding: 28px !important;
   }
+}
 
-  .news-crud-container .filter-inline {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
-  .news-crud-container .filter-item {
-    width: 100%;
-  }
+/* ==========================================================
+   📱 RESPONSIVE ≤ 768px
+   ========================================================== */
 
+@media (max-width: 768px) {
   .news-crud-container {
     padding: 15px;
   }
@@ -460,68 +723,62 @@
     padding: 8px 10px;
   }
 
+  .news-crud-container .filter-inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .news-crud-container .filter-item {
+    width: 100%;
+  }
+
   .news-crud-container .news-table th,
   .news-crud-container .news-table td {
     font-size: 12px;
     padding: 8px;
   }
-}
 
-/* Wrapper untuk preview + overlay teks (namespaced) */
-.news-crud-container .preview-wrap {
-  position: relative;
-  display: inline-block;
-  margin-top: 8px;
-}
 
-/* Overlay note di pojok kiri bawah gambar (namespaced) */
-.news-crud-container .image-hint {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 6px;
-  pointer-events: none;
-}
+  /* MODAL TETAP SEPERTI NEWS SEBELUMNYA */
 
-/* Bila belum ada preview, tampilkan note inline di bawah input (namespaced) */
-.news-crud-container .image-hint-inline {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #666;
-}
-
-@media (max-width: 1024px) {
   .news-crud-container .modal-content {
-    max-width: 95% !important;
-    height: 90vh !important;
-    padding: 28px !important;
+    width: 95%;
+    height: 90vh;
+    padding: 24px;
   }
 }
 
-/* Smartphone (≤600px) — namespaced mobile tweaks */
+
+/* ==========================================================
+   📱 SMARTPHONE ≤ 600px
+   ========================================================== */
+
 @media (max-width: 600px) {
   .news-crud-container .modal-overlay {
     padding: 0;
   }
 
+
+  /* MODAL TETAP SEPERTI NEWS SEBELUMNYA */
+
   .news-crud-container .modal-content {
-    margin: 0 !important;
     width: 100% !important;
-    height:80vh !important;
     max-width: none !important;
-    border-radius: 0 !important;
+    height: 80vh !important;
+
+    margin: 0 !important;
     padding: 16px !important;
+
+    border-radius: 0 !important;
+
     box-shadow: none !important;
+
     text-align: justify;
   }
 
   .news-crud-container .modal-content h3 {
-    font-size: 18px;
     margin-bottom: 10px;
+    font-size: 18px;
   }
 
   .news-crud-container .form-grid {
@@ -542,10 +799,13 @@
   .news-crud-container .form-actions {
     position: sticky;
     bottom: 0;
-    background: #fff;
+
+    gap: 10px;
+
     padding-top: 10px;
     padding-bottom: 10px;
-    gap: 10px;
+
+    background: #fff;
   }
 
   .news-crud-container .btn-add {
@@ -554,8 +814,8 @@
 
   .news-crud-container .news-table th,
   .news-crud-container .news-table td {
-    font-size: 12px;
     padding: 8px;
+    font-size: 12px;
   }
 
   .news-crud-container .date-inputs {
